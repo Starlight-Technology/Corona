@@ -1,0 +1,134 @@
+﻿@namespace Corona.Components
+@using Corona.Components.Enums
+
+<div class="corona-card @Class"
+     style="@BuildStyle()">
+
+    @if (!string.IsNullOrWhiteSpace(Title))
+    {
+        <div class="corona-card-header" style="@BuildHeaderStyle()">
+            @Title
+        </div>
+    }
+
+    <div class="corona-card-content" style="@BuildContentStyle()">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    // ===== CONTENT =====
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    // ===== SIZE =====
+    [Parameter] public string Width { get; set; } = "auto";
+    [Parameter] public string Height { get; set; } = "auto";
+    [Parameter] public string Padding { get; set; } = "16px";
+    [Parameter] public string Margin { get; set; } = "0";
+
+    // ===== COLORS =====
+    [Parameter] public string BackgroundColor { get; set; } = "#ffffff";
+    [Parameter] public string TextColor { get; set; } = "#1f2937";
+    [Parameter] public string TitleColor { get; set; } = "#111827";
+    [Parameter] public string BorderColor { get; set; } = "rgba(0,0,0,0.08)";
+
+    // ===== STYLE =====
+    [Parameter] public string BorderRadius { get; set; } = "16px";
+    [Parameter] public string BoxShadow { get; set; } = "0 10px 25px rgba(0,0,0,0.08)";
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    // ===== HEADER =====
+    [Parameter] public string HeaderPadding { get; set; } = "16px 16px 0 16px";
+    [Parameter] public string HeaderFontSize { get; set; } = "1.1rem";
+    [Parameter] public string HeaderFontWeight { get; set; } = "600";
+    [Parameter] public CoronaTextAlign HeaderTextAlign { get; set; } = CoronaTextAlign.Left;
+
+    // ===== CONTENT =====
+    [Parameter] public string ContentPadding { get; set; } = "16px";
+    [Parameter] public CoronaTextAlign ContentTextAlign { get; set; } = CoronaTextAlign.Left;
+    [Parameter] public CoronaFlexAlign ContentJustify { get; set; } = CoronaFlexAlign.Start;
+    [Parameter] public CoronaItemsAlign ContentAlignItems { get; set; } = CoronaItemsAlign.Stretch;
+
+private string BuildStyle()
+    {
+        return $@"
+            width:{Width};
+            height:{Height};
+            margin:{Margin};
+            padding:0;
+            background:{BackgroundColor};
+            color:{TextColor};
+            border-radius:{BorderRadius};
+            box-shadow:{BoxShadow};
+            border:1px solid {BorderColor};
+            display:flex;
+            flex-direction:column;
+            overflow:hidden;
+        ";
+    }
+
+    private string BuildHeaderStyle()
+    {
+        return $@"
+            padding:{HeaderPadding};
+            color:{TitleColor};
+            font-size:{HeaderFontSize};
+            font-weight:{HeaderFontWeight};
+            text-align:{MapTextAlign(HeaderTextAlign)};
+        ";
+    }
+
+    private string BuildContentStyle()
+    {
+        return $@"
+            padding:{ContentPadding};
+            flex:1;
+            text-align:{MapTextAlign(ContentTextAlign)};
+            display:flex;
+            justify-content:{MapFlexAlign(ContentJustify)};
+            align-items:{MapItemsAlign(ContentAlignItems)};
+            flex-direction:column;
+        ";
+    }
+
+
+    private static string MapTextAlign(CoronaTextAlign align) => align switch
+    {
+        CoronaTextAlign.Left => "left",
+        CoronaTextAlign.Center => "center",
+        CoronaTextAlign.Right => "right",
+        CoronaTextAlign.Justify => "justify",
+        _ => "left"
+    };
+
+    private static string MapFlexAlign(CoronaFlexAlign align) => align switch
+    {
+        CoronaFlexAlign.Start => "flex-start",
+        CoronaFlexAlign.Center => "center",
+        CoronaFlexAlign.End => "flex-end",
+        CoronaFlexAlign.SpaceBetween => "space-between",
+        CoronaFlexAlign.SpaceAround => "space-around",
+        CoronaFlexAlign.SpaceEvenly => "space-evenly",
+        _ => "flex-start"
+    };
+
+    private static string MapItemsAlign(CoronaItemsAlign align) => align switch
+    {
+        CoronaItemsAlign.Start => "flex-start",
+        CoronaItemsAlign.Center => "center",
+        CoronaItemsAlign.End => "flex-end",
+        CoronaItemsAlign.Stretch => "stretch",
+        _ => "stretch"
+    };
+}
+
+<style>
+    .corona-card {
+        transition: all .2s ease;
+    }
+
+        .corona-card:hover {
+            transform: translateY(-2px);
+        }
+</style>
