@@ -1,5 +1,7 @@
-﻿@namespace Corona.Components
+@namespace Corona.Components
 @using Corona.Components.Enums
+@using Corona.Theming
+@inject CoronaThemeProvider ThemeProvider
 
 <div class="corona-card @Class"
      style="@BuildStyle()">
@@ -17,6 +19,13 @@
 </div>
 
 @code {
+    [CascadingParameter] public CoronaTheme? Theme { get; set; }
+
+    /// <summary>
+    /// Optional component-level theme overrides.
+    /// </summary>
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+
     // ===== CONTENT =====
     [Parameter] public string? Title { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
@@ -24,65 +33,63 @@
     // ===== SIZE =====
     [Parameter] public string Width { get; set; } = "auto";
     [Parameter] public string Height { get; set; } = "auto";
-    [Parameter] public string Padding { get; set; } = "16px";
     [Parameter] public string Margin { get; set; } = "0";
 
-    // ===== COLORS =====
-    [Parameter] public string BackgroundColor { get; set; } = "#ffffff";
-    [Parameter] public string TextColor { get; set; } = "#1f2937";
-    [Parameter] public string TitleColor { get; set; } = "#111827";
-    [Parameter] public string BorderColor { get; set; } = "rgba(0,0,0,0.08)";
-
     // ===== STYLE =====
-    [Parameter] public string BorderRadius { get; set; } = "16px";
-    [Parameter] public string BoxShadow { get; set; } = "0 10px 25px rgba(0,0,0,0.08)";
     [Parameter] public string Class { get; set; } = string.Empty;
 
     // ===== HEADER =====
-    [Parameter] public string HeaderPadding { get; set; } = "16px 16px 0 16px";
-    [Parameter] public string HeaderFontSize { get; set; } = "1.1rem";
-    [Parameter] public string HeaderFontWeight { get; set; } = "600";
     [Parameter] public CoronaTextAlign HeaderTextAlign { get; set; } = CoronaTextAlign.Left;
 
     // ===== CONTENT =====
-    [Parameter] public string ContentPadding { get; set; } = "16px";
     [Parameter] public CoronaTextAlign ContentTextAlign { get; set; } = CoronaTextAlign.Left;
     [Parameter] public CoronaFlexAlign ContentJustify { get; set; } = CoronaFlexAlign.Start;
     [Parameter] public CoronaItemsAlign ContentAlignItems { get; set; } = CoronaItemsAlign.Stretch;
 
-private string BuildStyle()
+    private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+
+    private string BuildStyle()
     {
+        var semantic = ActiveTheme.Semantic;
+
         return $@"
             width:{Width};
             height:{Height};
             margin:{Margin};
             padding:0;
-            background:{BackgroundColor};
-            color:{TextColor};
-            border-radius:{BorderRadius};
-            box-shadow:{BoxShadow};
-            border:1px solid {BorderColor};
+            background:{semantic.CardBackground};
+            color:{semantic.TextPrimary};
+            border-radius:{semantic.RadiusCard};
+            box-shadow:{semantic.ElevationCard};
+            border:1px solid {semantic.BorderDefault};
             display:flex;
             flex-direction:column;
             overflow:hidden;
+            font-family:{semantic.FontFamilyDefault};
         ";
     }
 
     private string BuildHeaderStyle()
     {
+        var semantic = ActiveTheme.Semantic;
+
         return $@"
-            padding:{HeaderPadding};
-            color:{TitleColor};
-            font-size:{HeaderFontSize};
-            font-weight:{HeaderFontWeight};
+            padding:{semantic.SpacingCardHeader} {semantic.SpacingCard} 0 {semantic.SpacingCard};
+            color:{semantic.TextPrimary};
+            font-size:{semantic.FontSizeHeading};
+            font-weight:{semantic.FontWeightHeading};
             text-align:{MapTextAlign(HeaderTextAlign)};
         ";
     }
 
     private string BuildContentStyle()
     {
+        var semantic = ActiveTheme.Semantic;
+
         return $@"
-            padding:{ContentPadding};
+            padding:{semantic.SpacingCard};
+            font-size:{semantic.FontSizeBody};
+            color:{semantic.TextSecondary};
             flex:1;
             text-align:{MapTextAlign(ContentTextAlign)};
             display:flex;
@@ -91,7 +98,6 @@ private string BuildStyle()
             flex-direction:column;
         ";
     }
-
 
     private static string MapTextAlign(CoronaTextAlign align) => align switch
     {
@@ -128,7 +134,7 @@ private string BuildStyle()
         transition: all .2s ease;
     }
 
-        .corona-card:hover {
-            transform: translateY(-2px);
-        }
+    .corona-card:hover {
+        transform: translateY(-2px);
+    }
 </style>

@@ -1,0 +1,30 @@
+@using Corona.Theming
+@implements IDisposable
+@inject CoronaThemeProvider ThemeProvider
+
+<CascadingValue Value="ThemeProvider.CurrentTheme" IsFixed="false">
+    @ChildContent
+</CascadingValue>
+
+@code {
+    /// <summary>
+    /// Child content that receives the current <see cref="CoronaTheme"/> through cascading values.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public RenderFragment? ChildContent { get; set; }
+
+    protected override void OnInitialized()
+    {
+        ThemeProvider.ThemeChanged += OnThemeChanged;
+    }
+
+    private void OnThemeChanged(object? sender, EventArgs e)
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        ThemeProvider.ThemeChanged -= OnThemeChanged;
+    }
+}
