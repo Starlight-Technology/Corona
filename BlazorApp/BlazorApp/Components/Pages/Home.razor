@@ -1,9 +1,38 @@
 ﻿@page "/"
 @using Corona.Components
+@using Corona.Theming
+@inject CoronaThemeProvider ThemeProvider
 
 <PageTitle>Home</PageTitle>
 
+<div class="d-flex flex-column gap-3" style="padding: 1rem; background:@ThemeProvider.CurrentTheme.Semantic.SurfaceBackground; min-height:100vh;">
+    <div class="d-flex gap-2 align-items-center">
+        <button class="btn btn-primary" @onclick="ToggleTheme">Toggle @ThemeProvider.CurrentTheme.Mode Theme</button>
+        <span>Current theme: <strong>@ThemeProvider.CurrentTheme.Name</strong></span>
+    </div>
 
-<Card Title="aaaaaaa"
-    HeaderTextAlign="center" >
-    Todas estas questões, devidamente ponderadas, levantam dúvidas sobre se a adoção de políticas descentralizadoras pode nos levar a considerar a reestruturação das direções preferenciais no sentido do progresso.</Card>
+    <Card Title="Default Token-Driven Card" HeaderTextAlign="Corona.Components.Enums.CoronaTextAlign.Left">
+        This card consumes only semantic tokens from the active Corona theme.
+        Switch themes at runtime to see the component restyle without page reload.
+    </Card>
+
+    <Card Title="Per-Component Override Example"
+          ThemeOverrides="_accentedCardOverrides"
+          HeaderTextAlign="Corona.Components.Enums.CoronaTextAlign.Center">
+        This card overrides only a subset of semantic tokens, leaving the rest inherited from the active theme.
+    </Card>
+</div>
+
+@code {
+    private readonly CoronaThemeOverrides _accentedCardOverrides = new(
+        Semantic: new CoronaSemanticTokenOverrides(
+            CardBackground: "#F0F9FF",
+            BorderDefault: "#7DD3FC",
+            TextPrimary: "#0C4A6E",
+            TextSecondary: "#075985"));
+
+    private void ToggleTheme()
+    {
+        ThemeProvider.ToggleTheme();
+    }
+}
