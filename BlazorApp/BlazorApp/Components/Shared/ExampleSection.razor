@@ -1,0 +1,26 @@
+@using Corona.Components.Enums
+
+<Card Title="@Title" Class="docs-example-card">
+    <CoronaStack Spacing="1rem" FullWidth="true">
+        @if (!string.IsNullOrWhiteSpace(Description))
+        {
+            <p class="docs-section-description">@Description</p>
+        }
+
+        <div class="docs-live-preview">
+            @ChildContent
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Code))
+        {
+            <CodeSnippet Code="Code" />
+        }
+    </CoronaStack>
+</Card>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter] public string? Description { get; set; }
+    [Parameter] public string? Code { get; set; }
+    [Parameter, EditorRequired] public RenderFragment? ChildContent { get; set; }
+}

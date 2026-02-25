@@ -1,18 +1,29 @@
 @page "/components/badge"
 @using Corona.Components.Enums
 
-<PageTitle>CoronaBadge Examples</PageTitle>
+<PageTitle>Badge | Corona Docs</PageTitle>
 
-<h1>CoronaBadge</h1>
+<CoronaContainer MaxWidth="CoronaContainerMaxWidth.Xl">
+    <CoronaStack Spacing="1.5rem" FullWidth="true">
+        <section><h1>Badge</h1><p class="docs-page-description">Badges highlight status, counts, and semantic metadata.</p></section>
+        <section><h2>Live examples</h2><CoronaStack Spacing="1rem" FullWidth="true">
+            <ExampleSection Title="Basic usage" Code='@"<CoronaBadge Content=\"New\" />"'><CoronaBadge Content="New" /></ExampleSection>
+            <ExampleSection Title="Variants" Code='@"<CoronaBadge Variant=\"CoronaBadgeVariant.Soft\" Content=\"Beta\" />"'><CoronaStack Direction="CoronaStackDirection.Row" Spacing=".75rem"><CoronaBadge Content="New" /><CoronaBadge Content="Beta" Variant="CoronaBadgeVariant.Soft" Color="CoronaColorSemantic.Warning" /><CoronaBadge Content="Alert" Variant="CoronaBadgeVariant.Outlined" Color="CoronaColorSemantic.Danger" /></CoronaStack></ExampleSection>
+            <ExampleSection Title="States" Description="Dot badge for unread indicators." Code='@"<CoronaBadge Dot=\"true\" Overlap=\"true\">...</CoronaBadge>"'><CoronaBadge Dot="true" Overlap="true" Position="CoronaBadgePosition.TopRight" Color="CoronaColorSemantic.Success"><CoronaButton Variant="CoronaButtonVariant.Outlined">Notifications</CoronaButton></CoronaBadge></ExampleSection>
+        </CoronaStack></section>
+        <section><h2>Usage</h2><CodeSnippet Code='@"<CoronaBadge Content=\"Beta\" Variant=\"CoronaBadgeVariant.Soft\" />"' /></section>
+        <section><h2>Parameters</h2><ParameterTable Parameters="_parameters" /></section>
+    </CoronaStack>
+</CoronaContainer>
 
-<CoronaStack Direction="CoronaStackDirection.Row" Spacing="1rem" Wrap="CoronaStackWrap.Wrap">
-    <CoronaBadge Content="New" Variant="CoronaBadgeVariant.Filled" />
-    <CoronaBadge Content="Beta" Variant="CoronaBadgeVariant.Soft" Color="CoronaColorSemantic.Warning" />
-    <CoronaBadge Content="Alert" Variant="CoronaBadgeVariant.Outlined" Color="CoronaColorSemantic.Danger" />
-</CoronaStack>
-
-<div class="mt-4">
-    <CoronaBadge Dot="true" Overlap="true" Position="CoronaBadgePosition.TopRight" Color="CoronaColorSemantic.Success">
-        <CoronaButton Variant="CoronaButtonVariant.Outlined">Notifications</CoronaButton>
-    </CoronaBadge>
-</div>
+@code {
+    private readonly IReadOnlyList<ParameterTable.ParameterDefinition> _parameters =
+    [
+        new("Content", "string", "null", "Text shown inside the badge."),
+        new("Variant", "CoronaBadgeVariant", "Filled", "Visual appearance type."),
+        new("Color", "CoronaColorSemantic", "Primary", "Semantic color token."),
+        new("Dot", "bool", "false", "Renders as a small status dot."),
+        new("Position", "CoronaBadgePosition", "TopRight", "Placement when overlapping content."),
+        new("Overlap", "bool", "false", "Overlaps the anchor element.")
+    ];
+}

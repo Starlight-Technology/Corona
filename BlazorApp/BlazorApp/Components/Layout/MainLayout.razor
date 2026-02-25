@@ -1,13 +1,102 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
+@implements IAsyncDisposable
+@inject IJSRuntime JSRuntime
+@inject CoronaThemeProvider ThemeProvider
 
-<div class="page">
+<CoronaPageHeader Title="Corona UI Documentation"
+                  ShowMenuButton="true"
+                  OnMenuClick="ToggleDrawer"
+                  Actions="@HeaderActions" />
 
-    <main>
+<div class="docs-shell">
+    <CoronaDrawer Open="_drawerOpen"
+                  OpenChanged="OnDrawerChanged"
+                  Overlay="@(!_isDesktop)"
+                  Width="300px"
+                  Class="docs-drawer @(_isDesktop ? "is-desktop" : string.Empty)">
+        <CoronaStack Spacing="1rem" FullWidth="true">
+            <p class="docs-drawer-title">Documentation</p>
+            <CoronaNavMenu Items="DocsNavigation.Items" />
+        </CoronaStack>
+    </CoronaDrawer>
 
-
-        <article class="content px-4">
-            @Body
-        </article>
+    <main class="docs-content">
+        @Body
     </main>
 </div>
 
+@code {
+    private const int DesktopBreakpoint = 1024;
+    private bool _isDesktop;
+    private bool _drawerOpen;
+    private DotNetObjectReference<MainLayout>? _dotNetReference;
+
+    private RenderFragment HeaderActions => @<CoronaStack Direction="Corona.Components.Enums.CoronaStackDirection.Row" Spacing=".5rem">
+        <CoronaButton Size="Corona.Components.Enums.CoronaComponentSize.Small"
+                      Variant="Corona.Components.Enums.CoronaButtonVariant.Outlined"
+                      OnClick="ToggleTheme">
+            Toggle @ThemeProvider.CurrentTheme.Mode
+        </CoronaButton>
+    </CoronaStack>;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _dotNetReference = DotNetObjectReference.Create(this);
+        var width = await JSRuntime.InvokeAsync<int>("coronaDocsLayout.initialize", _dotNetReference);
+        UpdateLayout(width);
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public Task OnBrowserResized(int width)
+    {
+        UpdateLayout(width);
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private void UpdateLayout(int width)
+    {
+        _isDesktop = width >= DesktopBreakpoint;
+        _drawerOpen = _isDesktop || _drawerOpen;
+
+        if (!_isDesktop)
+        {
+            _drawerOpen = false;
+        }
+    }
+
+    private Task OnDrawerChanged(bool open)
+    {
+        _drawerOpen = open;
+        return Task.CompletedTask;
+    }
+
+    private Task ToggleDrawer()
+    {
+        _drawerOpen = !_drawerOpen;
+        return Task.CompletedTask;
+    }
+
+    private Task ToggleTheme()
+    {
+        ThemeProvider.ToggleTheme();
+        return Task.CompletedTask;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_dotNetReference is null)
+        {
+            return;
+        }
+
+        await JSRuntime.InvokeVoidAsync("coronaDocsLayout.dispose");
+        _dotNetReference.Dispose();
+    }
+}
