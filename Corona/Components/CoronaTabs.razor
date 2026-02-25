@@ -1,0 +1,154 @@
+@namespace Corona.Components
+@using Corona.Components.Enums
+@using Corona.Components.Models
+@using Corona.Theming
+@inject CoronaThemeProvider ThemeProvider
+
+<div class="corona-tabs corona-tabs--@VariantClass @Class" style="@BuildContainerStyle()">
+    <div class="corona-tabs__header" role="tablist" aria-orientation="horizontal">
+        @for (var index = 0; index < _tabs.Count; index++)
+        {
+            var tab = _tabs[index];
+            var active = index == ActiveIndex;
+
+            <button type="button"
+                    id="@GetTabButtonId(index)"
+                    class="corona-tabs__tab @(active ? "is-active" : string.Empty)"
+                    role="tab"
+                    disabled="@tab.Disabled"
+                    aria-selected="@active"
+                    aria-controls="@GetTabPanelId(index)"
+                    @onclick="() => SetActiveIndexAsync(index)">
+                @if (tab.HeaderContent is not null)
+                {
+                    @tab.HeaderContent
+                }
+                else
+                {
+                    @tab.Header
+                }
+            </button>
+        }
+    </div>
+
+    @for (var index = 0; index < _tabs.Count; index++)
+    {
+        if (LazyRender && index != ActiveIndex)
+        {
+            continue;
+        }
+
+        var tab = _tabs[index];
+        var visible = index == ActiveIndex;
+
+        <section id="@GetTabPanelId(index)"
+                 class="corona-tabs__panel @(visible ? "is-active" : string.Empty) @tab.PanelClass"
+                 role="tabpanel"
+                 aria-labelledby="@GetTabButtonId(index)"
+                 hidden="@(!visible)">
+            @tab.ChildContent
+        </section>
+    }
+</div>
+
+<CascadingValue Value="this" IsFixed="true">
+    @ChildContent
+</CascadingValue>
+
+@code {
+    [CascadingParameter] public CoronaTheme? Theme { get; set; }
+
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+    [Parameter] public int ActiveIndex { get; set; }
+    [Parameter] public EventCallback<int> ActiveIndexChanged { get; set; }
+    [Parameter] public bool Scrollable { get; set; }
+    [Parameter] public bool LazyRender { get; set; }
+    [Parameter] public CoronaTabsVariant Variant { get; set; } = CoronaTabsVariant.Underline;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private readonly List<CoronaTabItem> _items = [];
+    private readonly List<CoronaTabDefinition> _tabs = [];
+
+    private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+
+    private string VariantClass => Variant.ToString().ToLowerInvariant();
+
+    internal void Register(CoronaTabItem item)
+    {
+        if (_items.Contains(item))
+        {
+            return;
+        }
+
+        _items.Add(item);
+        BuildTabs();
+        StateHasChanged();
+    }
+
+    internal void Unregister(CoronaTabItem item)
+    {
+        if (_items.Remove(item))
+        {
+            BuildTabs();
+            StateHasChanged();
+        }
+    }
+
+    internal void NotifyItemChanged()
+    {
+        BuildTabs();
+        StateHasChanged();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (ActiveIndex < 0)
+        {
+            ActiveIndex = 0;
+        }
+
+        if (_tabs.Count > 0 && ActiveIndex >= _tabs.Count)
+        {
+            ActiveIndex = _tabs.Count - 1;
+        }
+    }
+
+    private void BuildTabs()
+    {
+        _tabs.Clear();
+        foreach (var item in _items)
+        {
+            _tabs.Add(new CoronaTabDefinition(
+                Id: item.Id,
+                Header: item.Header,
+                HeaderContent: item.HeaderContent,
+                ChildContent: item.ChildContent,
+                Disabled: item.Disabled,
+                Class: item.Class,
+                PanelClass: item.PanelClass));
+        }
+    }
+
+    private Task SetActiveIndexAsync(int index)
+    {
+        if (index < 0 || index >= _tabs.Count || _tabs[index].Disabled || ActiveIndex == index)
+        {
+            return Task.CompletedTask;
+        }
+
+        ActiveIndex = index;
+        return ActiveIndexChanged.InvokeAsync(index);
+    }
+
+    private string BuildContainerStyle()
+    {
+        var semantic = ActiveTheme.Semantic;
+
+        return $"font-family:{semantic.FontFamilyDefault};color:{semantic.TextPrimary};--corona-tabs-accent:{semantic.ColorPrimary};--corona-tabs-border:{semantic.BorderDefault};--corona-tabs-focus:{semantic.FocusOutline};--corona-tabs-scroll:{(Scrollable ? "auto" : "visible")};";
+    }
+
+    private string GetTabButtonId(int index) => $"corona-tab-{_tabs[index].Id}-{index}";
+
+    private string GetTabPanelId(int index) => $"corona-tabpanel-{_tabs[index].Id}-{index}";
+}

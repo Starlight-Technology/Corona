@@ -1,0 +1,60 @@
+@namespace Corona.Components
+@using Corona.Components.Enums
+@using Corona.Theming
+@inject CoronaThemeProvider ThemeProvider
+
+<div class="corona-stack @Class"
+     style="@BuildStyle()">
+    @ChildContent
+</div>
+
+@code {
+    [CascadingParameter] public CoronaTheme? Theme { get; set; }
+
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+    [Parameter] public CoronaStackDirection Direction { get; set; } = CoronaStackDirection.Column;
+    [Parameter] public CoronaStackWrap Wrap { get; set; } = CoronaStackWrap.NoWrap;
+    [Parameter] public CoronaStackJustify Justify { get; set; } = CoronaStackJustify.Start;
+    [Parameter] public CoronaStackAlign Align { get; set; } = CoronaStackAlign.Stretch;
+    [Parameter] public string? Spacing { get; set; }
+    [Parameter] public bool FullWidth { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+
+    private string BuildStyle()
+    {
+        var semantic = ActiveTheme.Semantic;
+
+        return $"display:flex;flex-direction:{MapDirection()};gap:{Spacing ?? semantic.SpacingCard};flex-wrap:{MapWrap()};justify-content:{MapJustify()};align-items:{MapAlign()};width:{(FullWidth ? "100%" : "auto")};";
+    }
+
+    private string MapDirection() => Direction == CoronaStackDirection.Row ? "row" : "column";
+
+    private string MapWrap() => Wrap switch
+    {
+        CoronaStackWrap.Wrap => "wrap",
+        CoronaStackWrap.WrapReverse => "wrap-reverse",
+        _ => "nowrap"
+    };
+
+    private string MapJustify() => Justify switch
+    {
+        CoronaStackJustify.Center => "center",
+        CoronaStackJustify.End => "flex-end",
+        CoronaStackJustify.SpaceBetween => "space-between",
+        CoronaStackJustify.SpaceAround => "space-around",
+        CoronaStackJustify.SpaceEvenly => "space-evenly",
+        _ => "flex-start"
+    };
+
+    private string MapAlign() => Align switch
+    {
+        CoronaStackAlign.Center => "center",
+        CoronaStackAlign.End => "flex-end",
+        CoronaStackAlign.Stretch => "stretch",
+        CoronaStackAlign.Baseline => "baseline",
+        _ => "flex-start"
+    };
+}

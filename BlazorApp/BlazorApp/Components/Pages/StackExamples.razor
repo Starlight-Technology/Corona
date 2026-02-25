@@ -1,0 +1,24 @@
+@page "/components/stack"
+@using Corona.Components.Enums
+
+<PageTitle>CoronaStack Examples</PageTitle>
+
+<h1>CoronaStack</h1>
+
+<CoronaStack Spacing="1.25rem" FullWidth="true">
+    <CoronaStack Direction="CoronaStackDirection.Row"
+                 Wrap="CoronaStackWrap.Wrap"
+                 Justify="CoronaStackJustify.SpaceBetween"
+                 Align="CoronaStackAlign.Center"
+                 Spacing="0.75rem"
+                 FullWidth="true">
+        <CoronaBadge Content="Item A" />
+        <CoronaBadge Content="Item B" Variant="CoronaBadgeVariant.Soft" />
+        <CoronaBadge Content="Item C" Variant="CoronaBadgeVariant.Outlined" />
+    </CoronaStack>
+
+    <CoronaStack Direction="CoronaStackDirection.Column" Spacing="0.5rem">
+        <CoronaButton Variant="CoronaButtonVariant.Text">Stacked action 1</CoronaButton>
+        <CoronaButton Variant="CoronaButtonVariant.Text">Stacked action 2</CoronaButton>
+    </CoronaStack>
+</CoronaStack>

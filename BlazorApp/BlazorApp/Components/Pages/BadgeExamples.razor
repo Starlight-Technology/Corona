@@ -1,0 +1,18 @@
+@page "/components/badge"
+@using Corona.Components.Enums
+
+<PageTitle>CoronaBadge Examples</PageTitle>
+
+<h1>CoronaBadge</h1>
+
+<CoronaStack Direction="CoronaStackDirection.Row" Spacing="1rem" Wrap="CoronaStackWrap.Wrap">
+    <CoronaBadge Content="New" Variant="CoronaBadgeVariant.Filled" />
+    <CoronaBadge Content="Beta" Variant="CoronaBadgeVariant.Soft" Color="CoronaColorSemantic.Warning" />
+    <CoronaBadge Content="Alert" Variant="CoronaBadgeVariant.Outlined" Color="CoronaColorSemantic.Danger" />
+</CoronaStack>
+
+<div class="mt-4">
+    <CoronaBadge Dot="true" Overlap="true" Position="CoronaBadgePosition.TopRight" Color="CoronaColorSemantic.Success">
+        <CoronaButton Variant="CoronaButtonVariant.Outlined">Notifications</CoronaButton>
+    </CoronaBadge>
+</div>

@@ -1,0 +1,48 @@
+.corona-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+}
+
+.corona-button:hover:not(:disabled) {
+    filter: brightness(0.96);
+}
+
+.corona-button:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+.corona-button:disabled {
+    opacity: 0.68;
+    cursor: not-allowed;
+}
+
+.corona-button.is-full-width {
+    width: 100%;
+}
+
+.corona-button__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.corona-button__spinner {
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 999px;
+    animation: corona-button-spin 700ms linear infinite;
+}
+
+@keyframes corona-button-spin {
+    to {
+        transform: rotate(1turn);
+    }
+}

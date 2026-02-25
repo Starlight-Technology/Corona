@@ -1,0 +1,33 @@
+.corona-badge-anchor {
+    position: relative;
+    display: inline-flex;
+}
+
+.corona-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.25rem;
+    min-width: 1.25rem;
+    padding: 0.125rem 0.375rem;
+    border-radius: 999px;
+    line-height: 1;
+    transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.corona-badge.is-dot {
+    width: 0.625rem;
+    height: 0.625rem;
+    min-height: 0.625rem;
+    min-width: 0.625rem;
+    padding: 0;
+}
+
+.corona-badge-anchor.is-overlap .corona-badge {
+    position: absolute;
+}
+
+.corona-badge--topright { top: 0; right: 0; transform: translate(50%, -50%); }
+.corona-badge--topleft { top: 0; left: 0; transform: translate(-50%, -50%); }
+.corona-badge--bottomright { bottom: 0; right: 0; transform: translate(50%, 50%); }
+.corona-badge--bottomleft { bottom: 0; left: 0; transform: translate(-50%, 50%); }

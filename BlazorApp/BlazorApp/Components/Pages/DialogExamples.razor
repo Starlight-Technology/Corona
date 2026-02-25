@@ -1,0 +1,38 @@
+@page "/components/dialog"
+@using Corona.Components.Enums
+
+<PageTitle>CoronaDialog Examples</PageTitle>
+
+<h1>CoronaDialog</h1>
+
+<CoronaButton OnClick="OpenDialog">Open dialog</CoronaButton>
+
+<CoronaDialog @bind-Open="_open"
+              Title="Confirm deployment"
+              MaxWidth="34rem"
+              CloseOnEscape="true"
+              CloseOnBackdrop="true">
+    <ChildContent>
+        This dialog demonstrates a bindable Open state, title region, content body, and actions slot.
+    </ChildContent>
+    <Actions>
+        <CoronaButton Variant="CoronaButtonVariant.Text" OnClick="CloseDialog">Cancel</CoronaButton>
+        <CoronaButton Variant="CoronaButtonVariant.Filled" Color="CoronaColorSemantic.Success" OnClick="CloseDialog">Approve</CoronaButton>
+    </Actions>
+</CoronaDialog>
+
+@code {
+    private bool _open;
+
+    private Task OpenDialog()
+    {
+        _open = true;
+        return Task.CompletedTask;
+    }
+
+    private Task CloseDialog()
+    {
+        _open = false;
+        return Task.CompletedTask;
+    }
+}

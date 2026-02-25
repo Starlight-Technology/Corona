@@ -1,0 +1,39 @@
+@page "/components/button"
+@using Corona.Components.Enums
+
+<PageTitle>CoronaButton Examples</PageTitle>
+
+<h1>CoronaButton</h1>
+
+<CoronaStack Spacing="1rem" FullWidth="true">
+    <CoronaStack Direction="CoronaStackDirection.Row" Spacing="0.75rem" Wrap="CoronaStackWrap.Wrap">
+        <CoronaButton Variant="CoronaButtonVariant.Filled" OnClick="HandleClick">Filled</CoronaButton>
+        <CoronaButton Variant="CoronaButtonVariant.Outlined" OnClick="HandleClick">Outlined</CoronaButton>
+        <CoronaButton Variant="CoronaButtonVariant.Text" OnClick="HandleClick">Text</CoronaButton>
+    </CoronaStack>
+
+    <CoronaStack Direction="CoronaStackDirection.Row" Spacing="0.75rem" Wrap="CoronaStackWrap.Wrap">
+        <CoronaButton Size="CoronaComponentSize.Small" StartIcon="◀">Small</CoronaButton>
+        <CoronaButton Size="CoronaComponentSize.Medium" EndIcon="▶">Medium</CoronaButton>
+        <CoronaButton Size="CoronaComponentSize.Large" Color="CoronaColorSemantic.Danger">Large</CoronaButton>
+    </CoronaStack>
+
+    <CoronaButton Loading="_loading" Disabled="_loading" FullWidth="true" OnClick="ToggleLoading">
+        @_loadingText
+    </CoronaButton>
+</CoronaStack>
+
+@code {
+    private bool _loading;
+
+    private string _loadingText => _loading ? "Loading..." : "Toggle loading state";
+
+    private Task HandleClick() => Task.CompletedTask;
+
+    private async Task ToggleLoading()
+    {
+        _loading = true;
+        await Task.Delay(1200);
+        _loading = false;
+    }
+}

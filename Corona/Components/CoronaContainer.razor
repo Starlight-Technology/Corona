@@ -1,0 +1,40 @@
+@namespace Corona.Components
+@using Corona.Components.Enums
+@using Corona.Theming
+@inject CoronaThemeProvider ThemeProvider
+
+<div class="corona-container @(CenterContent ? "is-centered" : string.Empty) @Class"
+     style="@BuildStyle()">
+    @ChildContent
+</div>
+
+@code {
+    [CascadingParameter] public CoronaTheme? Theme { get; set; }
+
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+    [Parameter] public CoronaContainerMaxWidth MaxWidth { get; set; } = CoronaContainerMaxWidth.Lg;
+    [Parameter] public bool CenterContent { get; set; }
+    [Parameter] public string? Padding { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+
+    private string BuildStyle()
+    {
+        var semantic = ActiveTheme.Semantic;
+
+        return $"width:100%;max-width:{ResolveMaxWidth()};padding-inline:{Padding ?? semantic.SpacingCard};margin-inline:auto;box-sizing:border-box;";
+    }
+
+    private string ResolveMaxWidth() => MaxWidth switch
+    {
+        CoronaContainerMaxWidth.Xs => "20rem",
+        CoronaContainerMaxWidth.Sm => "30rem",
+        CoronaContainerMaxWidth.Md => "48rem",
+        CoronaContainerMaxWidth.Lg => "64rem",
+        CoronaContainerMaxWidth.Xl => "80rem",
+        CoronaContainerMaxWidth.Fluid => "100%",
+        _ => "64rem"
+    };
+}
