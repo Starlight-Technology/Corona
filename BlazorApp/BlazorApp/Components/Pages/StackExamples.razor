@@ -9,15 +9,15 @@
         <section>
             <h2>Live examples</h2>
             <CoronaStack Spacing="1rem" FullWidth="true">
-                <ExampleSection Title="Basic usage" Code='@"<CoronaStack Spacing=\"1rem\"><CoronaBadge Content=\"One\" /><CoronaBadge Content=\"Two\" /></CoronaStack>"'>
+                <ExampleSection Title="Basic usage" Code='@("<CoronaStack Spacing=\"1rem\"><CoronaBadge Content=\"One\" /><CoronaBadge Content=\"Two\" /></CoronaStack>")'>
                     <CoronaStack Spacing="1rem"><CoronaBadge Content="One" /><CoronaBadge Content="Two" /></CoronaStack>
                 </ExampleSection>
-                <ExampleSection Title="Direction + wrap" Code='@"<CoronaStack Direction=\"CoronaStackDirection.Row\" Wrap=\"CoronaStackWrap.Wrap\" Spacing=\".75rem\">...</CoronaStack>"'>
+                <ExampleSection Title="Direction + wrap" Code='@("<CoronaStack Direction=\"CoronaStackDirection.Row\" Wrap=\"CoronaStackWrap.Wrap\" Spacing=\".75rem\">...</CoronaStack>")'>
                     <CoronaStack Direction="CoronaStackDirection.Row" Wrap="CoronaStackWrap.Wrap" Spacing=".75rem">
                         <CoronaBadge Content="A" /><CoronaBadge Content="B" /><CoronaBadge Content="C" />
                     </CoronaStack>
                 </ExampleSection>
-                <ExampleSection Title="Alignment" Code='@"<CoronaStack Direction=\"CoronaStackDirection.Row\" Align=\"CoronaStackAlign.Center\" Justify=\"CoronaStackJustify.SpaceBetween\" FullWidth=\"true\">...</CoronaStack>"'>
+                <ExampleSection Title="Alignment" Code='@("<CoronaStack Direction=\"CoronaStackDirection.Row\" Align=\"CoronaStackAlign.Center\" Justify=\"CoronaStackJustify.SpaceBetween\" FullWidth=\"true\">...</CoronaStack>")'>
                     <CoronaStack Direction="CoronaStackDirection.Row" Align="CoronaStackAlign.Center" Justify="CoronaStackJustify.SpaceBetween" FullWidth="true">
                         <CoronaButton Variant="CoronaButtonVariant.Text">Back</CoronaButton>
                         <CoronaButton>Continue</CoronaButton>
@@ -25,7 +25,7 @@
                 </ExampleSection>
             </CoronaStack>
         </section>
-        <section><h2>Usage</h2><CodeSnippet Code='@"<CoronaStack Direction=\"CoronaStackDirection.Row\" Spacing=\"1rem\">...</CoronaStack>"' /></section>
+        <section><h2>Usage</h2><CodeSnippet Code='@("<CoronaStack Direction=\"CoronaStackDirection.Row\" Spacing=\"1rem\">...</CoronaStack>")' /></section>
         <section><h2>Parameters</h2><ParameterTable Parameters="_parameters" /></section>
     </CoronaStack>
 </CoronaContainer>
