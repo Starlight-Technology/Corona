@@ -1,24 +1,43 @@
 @page "/components/stack"
 @using Corona.Components.Enums
 
-<PageTitle>CoronaStack Examples</PageTitle>
+<PageTitle>Stack | Corona Docs</PageTitle>
 
-<h1>CoronaStack</h1>
-
-<CoronaStack Spacing="1.25rem" FullWidth="true">
-    <CoronaStack Direction="CoronaStackDirection.Row"
-                 Wrap="CoronaStackWrap.Wrap"
-                 Justify="CoronaStackJustify.SpaceBetween"
-                 Align="CoronaStackAlign.Center"
-                 Spacing="0.75rem"
-                 FullWidth="true">
-        <CoronaBadge Content="Item A" />
-        <CoronaBadge Content="Item B" Variant="CoronaBadgeVariant.Soft" />
-        <CoronaBadge Content="Item C" Variant="CoronaBadgeVariant.Outlined" />
+<CoronaContainer MaxWidth="CoronaContainerMaxWidth.Xl">
+    <CoronaStack Spacing="1.5rem" FullWidth="true">
+        <section><h1>Stack</h1><p class="docs-page-description">Stack composes vertical or horizontal layouts with token-based spacing.</p></section>
+        <section>
+            <h2>Live examples</h2>
+            <CoronaStack Spacing="1rem" FullWidth="true">
+                <ExampleSection Title="Basic usage" Code='@"<CoronaStack Spacing=\"1rem\"><CoronaBadge Content=\"One\" /><CoronaBadge Content=\"Two\" /></CoronaStack>"'>
+                    <CoronaStack Spacing="1rem"><CoronaBadge Content="One" /><CoronaBadge Content="Two" /></CoronaStack>
+                </ExampleSection>
+                <ExampleSection Title="Direction + wrap" Code='@"<CoronaStack Direction=\"CoronaStackDirection.Row\" Wrap=\"CoronaStackWrap.Wrap\" Spacing=\".75rem\">...</CoronaStack>"'>
+                    <CoronaStack Direction="CoronaStackDirection.Row" Wrap="CoronaStackWrap.Wrap" Spacing=".75rem">
+                        <CoronaBadge Content="A" /><CoronaBadge Content="B" /><CoronaBadge Content="C" />
+                    </CoronaStack>
+                </ExampleSection>
+                <ExampleSection Title="Alignment" Code='@"<CoronaStack Direction=\"CoronaStackDirection.Row\" Align=\"CoronaStackAlign.Center\" Justify=\"CoronaStackJustify.SpaceBetween\" FullWidth=\"true\">...</CoronaStack>"'>
+                    <CoronaStack Direction="CoronaStackDirection.Row" Align="CoronaStackAlign.Center" Justify="CoronaStackJustify.SpaceBetween" FullWidth="true">
+                        <CoronaButton Variant="CoronaButtonVariant.Text">Back</CoronaButton>
+                        <CoronaButton>Continue</CoronaButton>
+                    </CoronaStack>
+                </ExampleSection>
+            </CoronaStack>
+        </section>
+        <section><h2>Usage</h2><CodeSnippet Code='@"<CoronaStack Direction=\"CoronaStackDirection.Row\" Spacing=\"1rem\">...</CoronaStack>"' /></section>
+        <section><h2>Parameters</h2><ParameterTable Parameters="_parameters" /></section>
     </CoronaStack>
+</CoronaContainer>
 
-    <CoronaStack Direction="CoronaStackDirection.Column" Spacing="0.5rem">
-        <CoronaButton Variant="CoronaButtonVariant.Text">Stacked action 1</CoronaButton>
-        <CoronaButton Variant="CoronaButtonVariant.Text">Stacked action 2</CoronaButton>
-    </CoronaStack>
-</CoronaStack>
+@code {
+    private readonly IReadOnlyList<ParameterTable.ParameterDefinition> _parameters =
+    [
+        new("Direction", "CoronaStackDirection", "Column", "Layout axis: Row or Column."),
+        new("Spacing", "string", "theme spacing", "Gap between direct children."),
+        new("Wrap", "CoronaStackWrap", "NoWrap", "Controls item wrapping behavior."),
+        new("Justify", "CoronaStackJustify", "Start", "Main-axis alignment."),
+        new("Align", "CoronaStackAlign", "Stretch", "Cross-axis alignment."),
+        new("FullWidth", "bool", "false", "Expands the stack to 100% width.")
+    ];
+}

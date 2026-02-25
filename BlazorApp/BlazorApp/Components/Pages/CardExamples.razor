@@ -1,0 +1,29 @@
+@page "/components/card"
+@using Corona.Components.Enums
+
+<PageTitle>Card | Corona Docs</PageTitle>
+
+<CoronaContainer MaxWidth="CoronaContainerMaxWidth.Xl">
+    <CoronaStack Spacing="1.5rem" FullWidth="true">
+        <section><h1>Card</h1><p class="docs-page-description">Card groups related content into clear, elevated surfaces.</p></section>
+        <section><h2>Live examples</h2><CoronaStack Spacing="1rem" FullWidth="true">
+            <ExampleSection Title="Basic usage" Code='@"<Card Title=\"Overview\">...</Card>"'><Card Title="Overview">Card body content.</Card></ExampleSection>
+            <ExampleSection Title="Variants" Description="Adjust header alignment and content alignment for different layouts." Code='@"<Card HeaderTextAlign=\"CoronaTextAlign.Center\">...</Card>"'><CoronaStack Direction="CoronaStackDirection.Row" Spacing="1rem" Wrap="CoronaStackWrap.Wrap"><Card Title="Centered" HeaderTextAlign="CoronaTextAlign.Center">Centered header.</Card><Card Title="Right Aligned" HeaderTextAlign="CoronaTextAlign.Right">Right aligned header.</Card></CoronaStack></ExampleSection>
+            <ExampleSection Title="State" Description="Cards adapt automatically to current theme."><CoronaBadge Content="Theme aware" Variant="CoronaBadgeVariant.Soft" /></ExampleSection>
+        </CoronaStack></section>
+        <section><h2>Usage</h2><CodeSnippet Code='@"<Card Title=\"Release notes\">\n    Latest platform updates.\n</Card>"' /></section>
+        <section><h2>Parameters</h2><ParameterTable Parameters="_parameters" /></section>
+    </CoronaStack>
+</CoronaContainer>
+
+@code {
+    private readonly IReadOnlyList<ParameterTable.ParameterDefinition> _parameters =
+    [
+        new("Title", "string", "null", "Optional card header text."),
+        new("HeaderTextAlign", "CoronaTextAlign", "Left", "Header text alignment."),
+        new("ContentTextAlign", "CoronaTextAlign", "Left", "Content text alignment."),
+        new("ContentJustify", "CoronaFlexAlign", "Start", "Main axis alignment inside content."),
+        new("ContentAlignItems", "CoronaItemsAlign", "Stretch", "Cross axis alignment inside content."),
+        new("Class", "string", "\"\"", "Additional custom CSS classes.")
+    ];
+}

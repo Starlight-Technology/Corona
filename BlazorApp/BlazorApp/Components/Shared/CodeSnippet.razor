@@ -1,0 +1,32 @@
+@using Corona.Components.Enums
+@inject IJSRuntime JSRuntime
+
+<div class="docs-code-snippet">
+    <div class="docs-code-snippet__header">
+        <span>Razor</span>
+        <CoronaButton Size="CoronaComponentSize.Small"
+                      Variant="CoronaButtonVariant.Text"
+                      OnClick="CopyToClipboard">
+            @_copyButtonLabel
+        </CoronaButton>
+    </div>
+
+    <pre><code>@Code</code></pre>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Code { get; set; } = string.Empty;
+
+    private string _copyButtonLabel = "Copy";
+
+    private async Task CopyToClipboard()
+    {
+        await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", Code);
+        _copyButtonLabel = "Copied";
+        StateHasChanged();
+
+        await Task.Delay(1200);
+        _copyButtonLabel = "Copy";
+        StateHasChanged();
+    }
+}
