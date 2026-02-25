@@ -1,0 +1,27 @@
+@page "/components/tabs"
+@using Corona.Components.Enums
+
+<PageTitle>CoronaTabs Examples</PageTitle>
+
+<h1>CoronaTabs</h1>
+
+<CoronaTabs @bind-ActiveIndex="_activeIndex"
+            Scrollable="true"
+            LazyRender="true"
+            Variant="CoronaTabsVariant.Pills">
+    <CoronaTabItem Header="Overview">
+        <p>Overview content for release metrics.</p>
+    </CoronaTabItem>
+    <CoronaTabItem Header="Integrations">
+        <p>Integration settings and health checks.</p>
+    </CoronaTabItem>
+    <CoronaTabItem Header="Audit">
+        <p>Audit trail entries and change summaries.</p>
+    </CoronaTabItem>
+</CoronaTabs>
+
+<p class="mt-3"><strong>Active tab index:</strong> @_activeIndex</p>
+
+@code {
+    private int _activeIndex;
+}

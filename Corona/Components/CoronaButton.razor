@@ -1,0 +1,137 @@
+@namespace Corona.Components
+@using Corona.Components.Enums
+@using Corona.Theming
+@inject CoronaThemeProvider ThemeProvider
+
+<button type="button"
+        class="corona-button corona-button--@VariantClass corona-button--@SizeClass @(FullWidth ? "is-full-width" : string.Empty) @Class"
+        style="@BuildStyle()"
+        disabled="@IsDisabled"
+        aria-busy="@Loading"
+        @onclick="HandleClickAsync">
+    @if (Loading)
+    {
+        <span class="corona-button__spinner" aria-hidden="true"></span>
+    }
+    else
+    {
+        @if (!string.IsNullOrWhiteSpace(StartIcon))
+        {
+            <span class="corona-button__icon" aria-hidden="true">@StartIcon</span>
+        }
+
+        @if (ChildContent is not null)
+        {
+            <span class="corona-button__label">@ChildContent</span>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(EndIcon))
+        {
+            <span class="corona-button__icon" aria-hidden="true">@EndIcon</span>
+        }
+    }
+</button>
+
+@code {
+    [CascadingParameter] public CoronaTheme? Theme { get; set; }
+
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+    [Parameter] public CoronaButtonVariant Variant { get; set; } = CoronaButtonVariant.Filled;
+    [Parameter] public CoronaComponentSize Size { get; set; } = CoronaComponentSize.Medium;
+    [Parameter] public CoronaColorSemantic Color { get; set; } = CoronaColorSemantic.Primary;
+    [Parameter] public bool Loading { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool FullWidth { get; set; }
+    [Parameter] public string? StartIcon { get; set; }
+    [Parameter] public string? EndIcon { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+
+    [Parameter] public string? Width { get; set; }
+    [Parameter] public string? Height { get; set; }
+    [Parameter] public string? Padding { get; set; }
+    [Parameter] public string? BorderRadius { get; set; }
+    [Parameter] public string? BackgroundColor { get; set; }
+    [Parameter] public string? TextColor { get; set; }
+    [Parameter] public string? BorderColor { get; set; }
+    [Parameter] public string? BoxShadow { get; set; }
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private bool IsDisabled => Disabled || Loading;
+
+    private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+
+    private string VariantClass => Variant.ToString().ToLowerInvariant();
+
+    private string SizeClass => Size.ToString().ToLowerInvariant();
+
+    private async Task HandleClickAsync()
+    {
+        if (IsDisabled)
+        {
+            return;
+        }
+
+        await OnClick.InvokeAsync();
+    }
+
+    private string BuildStyle()
+    {
+        var semantic = ActiveTheme.Semantic;
+        var primitive = ActiveTheme.Primitive;
+        var palette = ResolveSemanticColor();
+        var size = ResolveSize();
+
+        var background = BackgroundColor ?? ResolveBackground(palette);
+        var color = TextColor ?? ResolveTextColor(palette);
+        var border = BorderColor ?? ResolveBorderColor(palette);
+
+        return $"width:{(FullWidth ? "100%" : Width ?? "auto")};height:{Height ?? size.Height};padding:{Padding ?? size.Padding};border-radius:{BorderRadius ?? semantic.RadiusCard};background-color:{background};color:{color};border:1px solid {border};box-shadow:{BoxShadow ?? (Variant == CoronaButtonVariant.Filled ? semantic.ElevationCard : "none")};font-family:{semantic.FontFamilyDefault};font-size:{size.FontSize};font-weight:{primitive.Typography.WeightMedium};";
+    }
+
+    private (string Base, string Contrast, string Soft) ResolveSemanticColor()
+    {
+        var colors = ActiveTheme.Primitive.Colors;
+
+        return Color switch
+        {
+            CoronaColorSemantic.Neutral => (colors.Gray700, colors.White, colors.Gray100),
+            CoronaColorSemantic.Success => ("#15803D", colors.White, "#DCFCE7"),
+            CoronaColorSemantic.Warning => ("#B45309", colors.White, "#FEF3C7"),
+            CoronaColorSemantic.Danger => ("#B91C1C", colors.White, "#FEE2E2"),
+            _ => (ActiveTheme.Semantic.ColorPrimary, colors.White, ActiveTheme.Semantic.FocusOutline)
+        };
+    }
+
+    private (string Height, string Padding, string FontSize) ResolveSize()
+    {
+        var primitive = ActiveTheme.Primitive;
+
+        return Size switch
+        {
+            CoronaComponentSize.Small => ("2rem", $"{primitive.Spacing.Xs} {primitive.Spacing.Sm}", primitive.Typography.SizeSm),
+            CoronaComponentSize.Large => ("2.75rem", $"{primitive.Spacing.Sm} {primitive.Spacing.Lg}", primitive.Typography.SizeLg),
+            _ => ("2.375rem", $"{primitive.Spacing.Sm} {primitive.Spacing.Md}", primitive.Typography.SizeMd)
+        };
+    }
+
+    private string ResolveBackground((string Base, string Contrast, string Soft) palette) => Variant switch
+    {
+        CoronaButtonVariant.Text => "transparent",
+        CoronaButtonVariant.Outlined => "transparent",
+        _ => palette.Base
+    };
+
+    private string ResolveTextColor((string Base, string Contrast, string Soft) palette) => Variant switch
+    {
+        CoronaButtonVariant.Filled => palette.Contrast,
+        _ => palette.Base
+    };
+
+    private string ResolveBorderColor((string Base, string Contrast, string Soft) palette) => Variant switch
+    {
+        CoronaButtonVariant.Outlined => palette.Base,
+        CoronaButtonVariant.Text => "transparent",
+        _ => palette.Base
+    };
+}

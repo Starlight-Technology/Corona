@@ -1,0 +1,74 @@
+@namespace Corona.Components
+@using Corona.Components.Enums
+@using Corona.Theming
+@inject CoronaThemeProvider ThemeProvider
+
+<span class="corona-badge-anchor @(Overlap ? "is-overlap" : string.Empty) @Class">
+    @if (ChildContent is not null)
+    {
+        @ChildContent
+    }
+
+    <span class="corona-badge corona-badge--@VariantClass corona-badge--@PositionClass @(Dot ? "is-dot" : string.Empty)"
+          style="@BuildStyle()"
+          role="status"
+          aria-live="polite">
+        @if (!Dot)
+        {
+            @Content
+        }
+    </span>
+</span>
+
+@code {
+    [CascadingParameter] public CoronaTheme? Theme { get; set; }
+
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+    [Parameter] public string? Content { get; set; }
+    [Parameter] public CoronaColorSemantic Color { get; set; } = CoronaColorSemantic.Primary;
+    [Parameter] public CoronaBadgeVariant Variant { get; set; } = CoronaBadgeVariant.Filled;
+    [Parameter] public bool Dot { get; set; }
+    [Parameter] public CoronaBadgePosition Position { get; set; } = CoronaBadgePosition.TopRight;
+    [Parameter] public bool Overlap { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+
+    private string VariantClass => Variant.ToString().ToLowerInvariant();
+
+    private string PositionClass => Position.ToString().ToLowerInvariant();
+
+    private string BuildStyle()
+    {
+        var primitive = ActiveTheme.Primitive;
+        var semantic = ActiveTheme.Semantic;
+        var palette = ResolvePalette();
+
+        var background = Variant switch
+        {
+            CoronaBadgeVariant.Outlined => "transparent",
+            CoronaBadgeVariant.Soft => palette.Soft,
+            _ => palette.Base
+        };
+
+        var text = Variant == CoronaBadgeVariant.Filled ? palette.Contrast : palette.Base;
+        var border = Variant == CoronaBadgeVariant.Outlined ? palette.Base : "transparent";
+
+        return $"background-color:{background};color:{text};border:1px solid {border};font-family:{semantic.FontFamilyDefault};font-size:{primitive.Typography.SizeSm};";
+    }
+
+    private (string Base, string Contrast, string Soft) ResolvePalette()
+    {
+        var colors = ActiveTheme.Primitive.Colors;
+
+        return Color switch
+        {
+            CoronaColorSemantic.Neutral => (colors.Gray700, colors.White, colors.Gray100),
+            CoronaColorSemantic.Success => ("#15803D", colors.White, "#DCFCE7"),
+            CoronaColorSemantic.Warning => ("#B45309", colors.White, "#FEF3C7"),
+            CoronaColorSemantic.Danger => ("#B91C1C", colors.White, "#FEE2E2"),
+            _ => (ActiveTheme.Semantic.ColorPrimary, colors.White, ActiveTheme.Semantic.FocusOutline)
+        };
+    }
+}

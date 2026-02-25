@@ -1,0 +1,20 @@
+@page "/components/container"
+@using Corona.Components.Enums
+
+<PageTitle>CoronaContainer Examples</PageTitle>
+
+<h1>CoronaContainer</h1>
+
+<CoronaStack Spacing="1rem" FullWidth="true">
+    <CoronaContainer MaxWidth="CoronaContainerMaxWidth.Xs" Class="border rounded py-3">
+        <strong>XS container</strong>
+    </CoronaContainer>
+
+    <CoronaContainer MaxWidth="CoronaContainerMaxWidth.Md" Class="border rounded py-3">
+        <strong>MD container</strong>
+    </CoronaContainer>
+
+    <CoronaContainer MaxWidth="CoronaContainerMaxWidth.Fluid" Padding="0.5rem" Class="border rounded py-3">
+        <strong>Fluid container</strong>
+    </CoronaContainer>
+</CoronaStack>
