@@ -1,0 +1,72 @@
+@namespace Corona.Components
+@using Corona.Components.Enums
+@using Corona.Theming
+@using Microsoft.AspNetCore.Components.Web
+@inject CoronaThemeProvider ThemeProvider
+
+<div class="corona-drawer-shell">
+    @if (Overlay)
+    {
+        <button type="button"
+                class="corona-drawer-overlay @(Open ? "is-visible" : string.Empty)"
+                style="@BuildOverlayStyle()"
+                @onclick="CloseAsync"
+                @onkeydown="HandleOverlayKeyDown"
+                tabindex="@(Open ? "0" : "-1")"
+                aria-label="Close navigation drawer"
+                aria-hidden="@(!Open)"></button>
+    }
+
+    <aside class="corona-drawer corona-drawer--@PositionClass @(Open ? "is-open" : string.Empty) @Class"
+           style="@BuildStyle()"
+           aria-hidden="@(!Open)">
+        @ChildContent
+    </aside>
+</div>
+
+@code {
+    [CascadingParameter] public CoronaTheme? Theme { get; set; }
+
+    /// <summary>
+    /// Optional component-level theme overrides.
+    /// </summary>
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+
+    [Parameter] public bool Open { get; set; }
+    [Parameter] public EventCallback<bool> OpenChanged { get; set; }
+    [Parameter] public string Width { get; set; } = "280px";
+    [Parameter] public bool Overlay { get; set; } = true;
+    [Parameter] public CoronaDrawerPosition Position { get; set; } = CoronaDrawerPosition.Left;
+    [Parameter] public string? BackgroundColor { get; set; }
+    [Parameter] public string? Color { get; set; }
+    [Parameter] public string? Shadow { get; set; }
+    [Parameter] public string Padding { get; set; } = "1rem";
+    [Parameter] public string OverlayColor { get; set; } = "rgba(15, 23, 42, .42)";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+
+    private string PositionClass => Position == CoronaDrawerPosition.Right ? "right" : "left";
+
+    private string BuildStyle()
+    {
+        var semantic = ActiveTheme.Semantic;
+
+        return $"width:{Width};background-color:{BackgroundColor ?? semantic.SurfaceBackgroundAlt};color:{Color ?? semantic.TextPrimary};box-shadow:{Shadow ?? semantic.ElevationCard};padding:{Padding};border-inline-end:1px solid {semantic.BorderDefault};font-family:{semantic.FontFamilyDefault};";
+    }
+
+    private string BuildOverlayStyle() => $"background:{OverlayColor};";
+
+    private Task CloseAsync() => OpenChanged.InvokeAsync(false);
+
+    private Task HandleOverlayKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key is "Escape" or "Enter" or " ")
+        {
+            return CloseAsync();
+        }
+
+        return Task.CompletedTask;
+    }
+}

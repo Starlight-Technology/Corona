@@ -1,0 +1,53 @@
+.corona-page-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    transition: background-color .2s ease, box-shadow .2s ease;
+    box-sizing: border-box;
+}
+
+.corona-page-header__start {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
+
+.corona-page-header__title {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.corona-page-header__menu-button {
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+    border-radius: .5rem;
+    background: transparent;
+    color: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color .2s ease, border-color .2s ease;
+}
+
+.corona-page-header__menu-button:hover,
+.corona-page-header__menu-button:focus-visible {
+    background: color-mix(in srgb, currentColor 16%, transparent);
+    border-color: color-mix(in srgb, currentColor 55%, transparent);
+    outline: none;
+}
+
+.corona-page-header__actions {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+}

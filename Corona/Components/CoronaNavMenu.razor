@@ -1,0 +1,138 @@
+@namespace Corona.Components
+@using Corona.Theming
+@using Microsoft.AspNetCore.Components.Rendering
+@inject NavigationManager NavigationManager
+@inject CoronaThemeProvider ThemeProvider
+
+<nav class="corona-nav-menu @Class" style="@BuildStyle()" aria-label="Primary navigation">
+    @if (Items is { Count: > 0 })
+    {
+        @RenderItems(Items, 0)
+    }
+</nav>
+
+@code {
+    [CascadingParameter] public CoronaTheme? Theme { get; set; }
+
+    /// <summary>
+    /// Optional component-level theme overrides.
+    /// </summary>
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+
+    [Parameter, EditorRequired] public IReadOnlyList<CoronaNavItem> Items { get; set; } = [];
+    [Parameter] public string? BackgroundColor { get; set; }
+    [Parameter] public string? Color { get; set; }
+    [Parameter] public string? ActiveBackgroundColor { get; set; }
+    [Parameter] public string? ActiveColor { get; set; }
+    [Parameter] public string Padding { get; set; } = ".5rem";
+    [Parameter] public string ItemPadding { get; set; } = ".625rem .75rem";
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+
+    private RenderFragment RenderItems(IReadOnlyList<CoronaNavItem> items, int level) => builder =>
+    {
+        var seq = 0;
+        builder.OpenElement(seq++, "ul");
+        builder.AddAttribute(seq++, "class", "corona-nav-menu__list");
+
+        foreach (var item in items)
+        {
+            var hasChildren = item.Children.Count > 0;
+            var active = IsActive(item);
+
+            builder.OpenElement(seq++, "li");
+            builder.AddAttribute(seq++, "class", "corona-nav-menu__item");
+
+            builder.OpenElement(seq++, "div");
+            builder.AddAttribute(seq++, "class", $"corona-nav-menu__row {(active ? "is-active" : string.Empty)}");
+            builder.AddAttribute(seq++, "style", $"--corona-menu-item-padding:{ItemPadding};--corona-menu-level:{level};");
+
+            if (!string.IsNullOrWhiteSpace(item.Url))
+            {
+                builder.OpenElement(seq++, "a");
+                builder.AddAttribute(seq++, "href", item.Url);
+                builder.AddAttribute(seq++, "class", "corona-nav-menu__link");
+                builder.AddAttribute(seq++, "aria-current", active ? "page" : null);
+                BuildItemBody(builder, ref seq, item);
+                builder.CloseElement();
+            }
+            else
+            {
+                builder.OpenElement(seq++, "button");
+                builder.AddAttribute(seq++, "type", "button");
+                builder.AddAttribute(seq++, "class", "corona-nav-menu__button");
+                builder.AddAttribute(seq++, "onclick", EventCallback.Factory.Create(this, () => Toggle(item)));
+                BuildItemBody(builder, ref seq, item);
+                builder.CloseElement();
+            }
+
+            if (hasChildren)
+            {
+                builder.OpenElement(seq++, "button");
+                builder.AddAttribute(seq++, "type", "button");
+                builder.AddAttribute(seq++, "class", "corona-nav-menu__expander");
+                builder.AddAttribute(seq++, "aria-label", item.Expanded ? "Collapse section" : "Expand section");
+                builder.AddAttribute(seq++, "aria-expanded", item.Expanded);
+                builder.AddAttribute(seq++, "onclick", EventCallback.Factory.Create(this, () => Toggle(item)));
+                builder.AddContent(seq++, item.Expanded ? "▾" : "▸");
+                builder.CloseElement();
+            }
+
+            builder.CloseElement();
+
+            if (hasChildren && item.Expanded)
+            {
+                builder.AddContent(seq++, RenderItems(item.Children, level + 1));
+            }
+
+            builder.CloseElement();
+        }
+
+        builder.CloseElement();
+    };
+
+    private void BuildItemBody(RenderTreeBuilder builder, ref int seq, CoronaNavItem item)
+    {
+        if (!string.IsNullOrWhiteSpace(item.Icon))
+        {
+            builder.OpenElement(seq++, "span");
+            builder.AddAttribute(seq++, "class", "corona-nav-menu__icon");
+            builder.AddContent(seq++, item.Icon);
+            builder.CloseElement();
+        }
+
+        builder.OpenElement(seq++, "span");
+        builder.AddAttribute(seq++, "class", "corona-nav-menu__text");
+        builder.AddContent(seq++, item.Text);
+        builder.CloseElement();
+    }
+
+    private static void Toggle(CoronaNavItem item) => item.Expanded = !item.Expanded;
+
+    private bool IsActive(CoronaNavItem item)
+    {
+        if (string.IsNullOrWhiteSpace(item.Url))
+        {
+            return item.Children.Any(IsActive);
+        }
+
+        var currentPath = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        var itemPath = NavigationManager.ToBaseRelativePath(NavigationManager.ToAbsoluteUri(item.Url).AbsoluteUri);
+
+        if (string.IsNullOrWhiteSpace(currentPath) && string.IsNullOrWhiteSpace(itemPath))
+        {
+            return true;
+        }
+
+        return currentPath.Equals(itemPath, StringComparison.OrdinalIgnoreCase)
+            || currentPath.StartsWith(itemPath + '/', StringComparison.OrdinalIgnoreCase);
+    }
+
+    private string BuildStyle()
+    {
+        var semantic = ActiveTheme.Semantic;
+
+        return $"background-color:{BackgroundColor ?? "transparent"};color:{Color ?? semantic.TextPrimary};padding:{Padding};--corona-menu-active-background:{ActiveBackgroundColor ?? semantic.FocusOutline};--corona-menu-active-color:{ActiveColor ?? semantic.ColorPrimary};font-family:{semantic.FontFamilyDefault};";
+    }
+}
