@@ -1,0 +1,45 @@
+.corona-drawer-shell {
+    position: relative;
+    z-index: 1200;
+}
+
+.corona-drawer-overlay {
+    position: fixed;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    background: rgba(15, 23, 42, .42);
+    transition: opacity .25s ease;
+}
+
+.corona-drawer-overlay.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.corona-drawer {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    overflow-y: auto;
+    box-sizing: border-box;
+    transition: transform .25s ease;
+    will-change: transform;
+}
+
+.corona-drawer--left {
+    left: 0;
+    transform: translateX(-100%);
+}
+
+.corona-drawer--right {
+    right: 0;
+    transform: translateX(100%);
+}
+
+.corona-drawer.is-open {
+    transform: translateX(0);
+}

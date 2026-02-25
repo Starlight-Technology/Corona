@@ -1,0 +1,87 @@
+@namespace Corona.Components
+@using Corona.Components.Enums
+@using Corona.Theming
+@using Microsoft.AspNetCore.Components.Web
+@inject CoronaThemeProvider ThemeProvider
+
+<header class="corona-page-header @Class" style="@BuildStyle()">
+    <div class="corona-page-header__start">
+        @if (ShowMenuButton)
+        {
+            <button type="button"
+                    class="corona-page-header__menu-button"
+                    @onclick="HandleMenuClick"
+                    @onkeydown="HandleMenuKeyDown"
+                    aria-label="Toggle navigation menu">
+                <span aria-hidden="true">☰</span>
+            </button>
+        }
+
+        <h1 class="corona-page-header__title">@Title</h1>
+    </div>
+
+    @if (Actions is not null)
+    {
+        <div class="corona-page-header__actions">
+            @Actions
+        </div>
+    }
+</header>
+
+@code {
+    [CascadingParameter] public CoronaTheme? Theme { get; set; }
+
+    /// <summary>
+    /// Optional component-level theme overrides.
+    /// </summary>
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter] public RenderFragment? Actions { get; set; }
+    [Parameter] public bool ShowMenuButton { get; set; }
+    [Parameter] public EventCallback OnMenuClick { get; set; }
+
+    [Parameter] public string? Height { get; set; }
+    [Parameter] public string? BackgroundColor { get; set; }
+    [Parameter] public string? Color { get; set; }
+    [Parameter] public string? Padding { get; set; }
+    [Parameter] public string? Shadow { get; set; }
+    [Parameter] public CoronaHeaderDensity Density { get; set; } = CoronaHeaderDensity.Comfortable;
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+
+    private string BuildStyle()
+    {
+        var semantic = ActiveTheme.Semantic;
+
+        return $"height:{ResolveHeight(semantic)};background-color:{BackgroundColor ?? semantic.SurfaceBackgroundAlt};color:{Color ?? semantic.TextPrimary};padding:{Padding ?? "0 1rem"};box-shadow:{Shadow ?? semantic.ElevationCard};font-family:{semantic.FontFamilyDefault};";
+    }
+
+    private string ResolveHeight(CoronaSemanticTokens semantic)
+    {
+        if (!string.IsNullOrWhiteSpace(Height))
+        {
+            return Height;
+        }
+
+        return Density switch
+        {
+            CoronaHeaderDensity.Compact => "3.25rem",
+            CoronaHeaderDensity.Spacious => "4.5rem",
+            _ => $"calc({semantic.SpacingCard} * 3)"
+        };
+    }
+
+    private Task HandleMenuClick() => OnMenuClick.InvokeAsync();
+
+    private Task HandleMenuKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key is "Enter" or " ")
+        {
+            return OnMenuClick.InvokeAsync();
+        }
+
+        return Task.CompletedTask;
+    }
+}
