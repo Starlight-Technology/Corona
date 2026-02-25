@@ -1,20 +1,27 @@
 @page "/components/container"
 @using Corona.Components.Enums
 
-<PageTitle>CoronaContainer Examples</PageTitle>
+<PageTitle>Container | Corona Docs</PageTitle>
 
-<h1>CoronaContainer</h1>
+<CoronaContainer MaxWidth="CoronaContainerMaxWidth.Xl">
+    <CoronaStack Spacing="1.5rem" FullWidth="true">
+        <section><h1>Container</h1><p class="docs-page-description">Container constrains page width and keeps content readable at large viewports.</p></section>
+        <section><h2>Live examples</h2><CoronaStack Spacing="1rem" FullWidth="true">
+            <ExampleSection Title="Basic usage" Code='@"<CoronaContainer MaxWidth=\"CoronaContainerMaxWidth.Lg\">...</CoronaContainer>"'><CoronaContainer MaxWidth="CoronaContainerMaxWidth.Lg" Class="docs-demo-surface"><strong>Large container</strong></CoronaContainer></ExampleSection>
+            <ExampleSection Title="Variants" Code='@"<CoronaContainer MaxWidth=\"CoronaContainerMaxWidth.Xs\">XS</CoronaContainer>"'><CoronaStack Spacing=".75rem" FullWidth="true"><CoronaContainer MaxWidth="CoronaContainerMaxWidth.Xs" Class="docs-demo-surface">XS</CoronaContainer><CoronaContainer MaxWidth="CoronaContainerMaxWidth.Fluid" Class="docs-demo-surface">Fluid</CoronaContainer></CoronaStack></ExampleSection>
+            <ExampleSection Title="State" Description="Toggle centered content." Code='@"<CoronaContainer CenterContent=\"true\">...</CoronaContainer>"'><CoronaContainer CenterContent="true" Class="docs-demo-surface"><CoronaButton Variant="CoronaButtonVariant.Outlined">Centered content</CoronaButton></CoronaContainer></ExampleSection>
+        </CoronaStack></section>
+        <section><h2>Usage</h2><CodeSnippet Code='@"<CoronaContainer MaxWidth=\"CoronaContainerMaxWidth.Xl\">\n    @Body\n</CoronaContainer>"' /></section>
+        <section><h2>Parameters</h2><ParameterTable Parameters="_parameters" /></section>
+    </CoronaStack>
+</CoronaContainer>
 
-<CoronaStack Spacing="1rem" FullWidth="true">
-    <CoronaContainer MaxWidth="CoronaContainerMaxWidth.Xs" Class="border rounded py-3">
-        <strong>XS container</strong>
-    </CoronaContainer>
-
-    <CoronaContainer MaxWidth="CoronaContainerMaxWidth.Md" Class="border rounded py-3">
-        <strong>MD container</strong>
-    </CoronaContainer>
-
-    <CoronaContainer MaxWidth="CoronaContainerMaxWidth.Fluid" Padding="0.5rem" Class="border rounded py-3">
-        <strong>Fluid container</strong>
-    </CoronaContainer>
-</CoronaStack>
+@code {
+    private readonly IReadOnlyList<ParameterTable.ParameterDefinition> _parameters =
+    [
+        new("MaxWidth", "CoronaContainerMaxWidth", "Lg", "Sets max width token scale from Xs to Fluid."),
+        new("CenterContent", "bool", "false", "Centers child elements in the container."),
+        new("Padding", "string", "theme spacing", "Horizontal padding override."),
+        new("Class", "string", "\"\"", "Additional CSS class names.")
+    ];
+}
