@@ -14,7 +14,8 @@
                   OpenChanged="OnDrawerChanged"
                   Overlay="@(!_isDesktop)"
                   Width="300px"
-                  Class="docs-drawer @(_isDesktop ? "is-desktop" : string.Empty)">
+                  Class="@DrawerClass"
+                    >
         <CoronaStack Spacing="1rem" FullWidth="true">
             <p class="docs-drawer-title">Documentation</p>
             <CoronaNavMenu Items="DocsNavigation.Items" />
@@ -89,6 +90,8 @@
         ThemeProvider.ToggleTheme();
         return Task.CompletedTask;
     }
+
+    private string DrawerClass => _isDesktop ? "docs-drawer is-desktop" : "docs-drawer";
 
     public async ValueTask DisposeAsync()
     {
