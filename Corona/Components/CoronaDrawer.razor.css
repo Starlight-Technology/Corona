@@ -13,6 +13,7 @@
     padding: 0;
     background: rgba(15, 23, 42, .42);
     transition: opacity .25s ease;
+    z-index: 1199;
 }
 
 .corona-drawer-overlay.is-visible {
@@ -21,13 +22,15 @@
 }
 
 .corona-drawer {
-    position: fixed;
-    top: 0;
+    position: relative;
+    top: var(--corona-header-height, 4rem);
+    height: calc(100vh - var(--corona-header-height, 4rem));
     bottom: 0;
     overflow-y: auto;
     box-sizing: border-box;
     transition: transform .25s ease;
     will-change: transform;
+    z-index: 1200;
 }
 
 .corona-drawer--left {

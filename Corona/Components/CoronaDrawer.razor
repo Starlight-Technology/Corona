@@ -44,6 +44,7 @@
     [Parameter] public string OverlayColor { get; set; } = "rgba(15, 23, 42, .42)";
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public string Class { get; set; } = string.Empty;
+    [Parameter] public string TopOffset { get; set; } = "0px";
 
     private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
 
@@ -53,7 +54,15 @@
     {
         var semantic = ActiveTheme.Semantic;
 
-        return $"width:{Width};background-color:{BackgroundColor ?? semantic.SurfaceBackgroundAlt};color:{Color ?? semantic.TextPrimary};box-shadow:{Shadow ?? semantic.ElevationCard};padding:{Padding};border-inline-end:1px solid {semantic.BorderDefault};font-family:{semantic.FontFamilyDefault};";
+        return $"width:{Width};" +
+               $"top:{TopOffset};" +
+               $"height:calc(100vh - {TopOffset});" +
+               $"background-color:{BackgroundColor ?? semantic.SurfaceBackgroundAlt};" +
+               $"color:{Color ?? semantic.TextPrimary};" +
+               $"box-shadow:{Shadow ?? semantic.ElevationCard};" +
+               $"padding:{Padding};" +
+               $"border-inline-end:1px solid {semantic.BorderDefault};" +
+               $"font-family:{semantic.FontFamilyDefault};";
     }
 
     private string BuildOverlayStyle() => $"background:{OverlayColor};";

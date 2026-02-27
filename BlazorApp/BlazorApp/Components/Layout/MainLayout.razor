@@ -3,8 +3,9 @@
 @implements IAsyncDisposable
 @inject IJSRuntime JSRuntime
 @inject CoronaThemeProvider ThemeProvider
-
-<CoronaPageHeader Title="Corona UI Documentation"
+@rendermode InteractiveServer
+<CoronaPageHeader
+                  Title="Corona UI Documentation"
                   ShowMenuButton="true"
                   OnMenuClick="ToggleDrawer"
                   Actions="@HeaderActions" />
@@ -14,8 +15,7 @@
                   OpenChanged="OnDrawerChanged"
                   Overlay="@(!_isDesktop)"
                   Width="300px"
-                  Class="@DrawerClass"
-                    >
+                  Class="@DrawerClass">
         <CoronaStack Spacing="1rem" FullWidth="true">
             <p class="docs-drawer-title">Documentation</p>
             <CoronaNavMenu Items="DocsNavigation.Items" />
@@ -48,6 +48,7 @@
             return;
         }
 
+        ThemeProvider.OnChange += OnThemeChanged;
         _dotNetReference = DotNetObjectReference.Create(this);
         var width = await JSRuntime.InvokeAsync<int>("coronaDocsLayout.initialize", _dotNetReference);
         UpdateLayout(width);
@@ -73,6 +74,11 @@
         }
     }
 
+    private void OnThemeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
     private Task OnDrawerChanged(bool open)
     {
         _drawerOpen = open;
@@ -95,6 +101,8 @@
 
     public async ValueTask DisposeAsync()
     {
+        ThemeProvider.OnChange -= OnThemeChanged;
+
         if (_dotNetReference is null)
         {
             return;
