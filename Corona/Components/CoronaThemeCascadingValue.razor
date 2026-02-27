@@ -15,16 +15,16 @@
 
     protected override void OnInitialized()
     {
-        ThemeProvider.ThemeChanged += OnThemeChanged;
+        ThemeProvider.OnChange += OnThemeChanged;
     }
 
-    private void OnThemeChanged(object? sender, EventArgs e)
+    private void OnThemeChanged()
     {
-        _ = InvokeAsync(StateHasChanged);
+        InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
     {
-        ThemeProvider.ThemeChanged -= OnThemeChanged;
+        ThemeProvider.OnChange -= OnThemeChanged;
     }
 }
