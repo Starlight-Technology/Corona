@@ -1,4 +1,5 @@
 @namespace Corona.Components
+@implements IDisposable
 @using Corona.Theming
 @using Microsoft.AspNetCore.Components.Web
 @inject CoronaThemeProvider ThemeProvider
@@ -68,6 +69,17 @@
 
     private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
 
+
+    protected override void OnInitialized()
+    {
+        ThemeProvider.OnChange += HandleThemeChanged;
+    }
+
+    private void HandleThemeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
     private string BuildStyle()
     {
         var semantic = ActiveTheme.Semantic;
@@ -103,4 +115,9 @@
 
         return Task.CompletedTask;
     }
+    public void Dispose()
+    {
+        ThemeProvider.OnChange -= HandleThemeChanged;
+    }
+
 }

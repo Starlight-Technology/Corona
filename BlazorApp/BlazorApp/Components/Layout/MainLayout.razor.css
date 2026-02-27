@@ -22,14 +22,15 @@
         grid-template-columns: 300px minmax(0, 1fr);
     }
 
-    :deep(.docs-drawer.is-desktop.corona-drawer) {
+    :deep(.docs-drawer.corona-drawer) {
         position: sticky;
-        transform: translateX(0);
+        transform: none !important;
         top: 3.25rem;
+        left: 0;
         height: calc(100vh - 3.25rem);
     }
 
-    :deep(.docs-drawer.is-desktop + .corona-drawer-overlay) {
+    :deep(.corona-drawer-overlay) {
         display: none;
     }
 

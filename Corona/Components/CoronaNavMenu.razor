@@ -1,4 +1,5 @@
 @namespace Corona.Components
+@implements IDisposable
 @using Corona.Theming
 @using Microsoft.AspNetCore.Components.Rendering
 @inject NavigationManager NavigationManager
@@ -29,6 +30,17 @@
     [Parameter] public string Class { get; set; } = string.Empty;
 
     private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+
+
+    protected override void OnInitialized()
+    {
+        ThemeProvider.OnChange += HandleThemeChanged;
+    }
+
+    private void HandleThemeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
 
     private RenderFragment RenderItems(IReadOnlyList<CoronaNavItem> items, int level) => builder =>
     {
@@ -135,4 +147,9 @@
 
         return $"background-color:{BackgroundColor ?? "transparent"};color:{Color ?? semantic.TextPrimary};padding:{Padding};--corona-menu-active-background:{ActiveBackgroundColor ?? semantic.FocusOutline};--corona-menu-active-color:{ActiveColor ?? semantic.ColorPrimary};font-family:{semantic.FontFamilyDefault};";
     }
+    public void Dispose()
+    {
+        ThemeProvider.OnChange -= HandleThemeChanged;
+    }
+
 }

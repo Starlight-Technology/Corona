@@ -1,4 +1,5 @@
 @namespace Corona.Components
+@implements IDisposable
 @using Corona.Components.Enums
 @using Corona.Components.Models
 @using Corona.Theming
@@ -71,6 +72,17 @@
     private readonly List<CoronaTabDefinition> _tabs = [];
 
     private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+
+
+    protected override void OnInitialized()
+    {
+        ThemeProvider.OnChange += HandleThemeChanged;
+    }
+
+    private void HandleThemeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
 
     private string VariantClass => Variant.ToString().ToLowerInvariant();
 
@@ -151,4 +163,9 @@
     private string GetTabButtonId(int index) => $"corona-tab-{_tabs[index].Id}-{index}";
 
     private string GetTabPanelId(int index) => $"corona-tabpanel-{_tabs[index].Id}-{index}";
+    public void Dispose()
+    {
+        ThemeProvider.OnChange -= HandleThemeChanged;
+    }
+
 }
