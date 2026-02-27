@@ -1,4 +1,5 @@
 @namespace Corona.Components
+@implements IDisposable
 @using Corona.Components.Enums
 @using Corona.Theming
 @inject CoronaThemeProvider ThemeProvider
@@ -20,6 +21,17 @@
 
     private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
 
+
+    protected override void OnInitialized()
+    {
+        ThemeProvider.OnChange += HandleThemeChanged;
+    }
+
+    private void HandleThemeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
     private string BuildStyle()
     {
         var semantic = ActiveTheme.Semantic;
@@ -37,4 +49,9 @@
         CoronaContainerMaxWidth.Fluid => "100%",
         _ => "64rem"
     };
+    public void Dispose()
+    {
+        ThemeProvider.OnChange -= HandleThemeChanged;
+    }
+
 }

@@ -1,6 +1,5 @@
 @inherits LayoutComponentBase
-@implements IAsyncDisposable
-@inject IJSRuntime JSRuntime
+@implements IDisposable
 @inject CoronaThemeProvider ThemeProvider
 @rendermode InteractiveServer
 
@@ -12,9 +11,9 @@
 <div class="docs-shell">
     <CoronaDrawer Open="_drawerOpen"
                   OpenChanged="OnDrawerChanged"
-                  Overlay="@(!_isDesktop)"
+                  Overlay="true"
                   Width="300px"
-                  Class="@($"docs-drawer {(_isDesktop ? "is-desktop" : string.Empty)}")">
+                  Class="@DrawerClass">
         <CoronaStack Spacing="1rem" FullWidth="true">
             <p class="docs-drawer-title">Documentation</p>
             <CoronaNavMenu Items="DocsNavigation.Items" />
@@ -27,10 +26,9 @@
 </div>
 
 @code {
-    private const int DesktopBreakpoint = 1024;
-    private bool _isDesktop;
     private bool _drawerOpen;
-    private DotNetObjectReference<MainLayout>? _dotNetReference;
+
+    private string DrawerClass => "docs-drawer";
 
     private RenderFragment HeaderActions => @<CoronaStack Direction="Corona.Components.Enums.CoronaStackDirection.Row" Spacing=".5rem">
         <CoronaButton Size="Corona.Components.Enums.CoronaComponentSize.Small"
@@ -40,36 +38,14 @@
         </CoronaButton>
     </CoronaStack>;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnInitialized()
     {
-        if (!firstRender)
-        {
-            return;
-        }
-
-        _dotNetReference = DotNetObjectReference.Create(this);
-        var width = await JSRuntime.InvokeAsync<int>("coronaDocsLayout.initialize", _dotNetReference);
-        UpdateLayout(width);
-        StateHasChanged();
+        ThemeProvider.OnChange += HandleThemeChanged;
     }
 
-    [JSInvokable]
-    public Task OnBrowserResized(int width)
+    private void HandleThemeChanged()
     {
-        UpdateLayout(width);
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
-
-    private void UpdateLayout(int width)
-    {
-        _isDesktop = width >= DesktopBreakpoint;
-        _drawerOpen = _isDesktop || _drawerOpen;
-
-        if (!_isDesktop)
-        {
-            _drawerOpen = false;
-        }
+        InvokeAsync(StateHasChanged);
     }
 
     private Task OnDrawerChanged(bool open)
@@ -90,14 +66,8 @@
         return Task.CompletedTask;
     }
 
-    public async ValueTask DisposeAsync()
+    public void Dispose()
     {
-        if (_dotNetReference is null)
-        {
-            return;
-        }
-
-        await JSRuntime.InvokeVoidAsync("coronaDocsLayout.dispose");
-        _dotNetReference.Dispose();
+        ThemeProvider.OnChange -= HandleThemeChanged;
     }
 }

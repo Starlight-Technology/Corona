@@ -1,4 +1,5 @@
 @namespace Corona.Components
+@implements IDisposable
 @using Corona.Components.Enums
 @using Corona.Theming
 @inject CoronaThemeProvider ThemeProvider
@@ -34,6 +35,17 @@
     [Parameter] public string Class { get; set; } = string.Empty;
 
     private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+
+
+    protected override void OnInitialized()
+    {
+        ThemeProvider.OnChange += HandleThemeChanged;
+    }
+
+    private void HandleThemeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
 
     private string VariantClass => Variant.ToString().ToLowerInvariant();
 
@@ -71,4 +83,9 @@
             _ => (ActiveTheme.Semantic.ColorPrimary, colors.White, ActiveTheme.Semantic.FocusOutline)
         };
     }
+    public void Dispose()
+    {
+        ThemeProvider.OnChange -= HandleThemeChanged;
+    }
+
 }
