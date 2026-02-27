@@ -1,4 +1,3 @@
-@using Corona.Components.Enums
 @inherits LayoutComponentBase
 @implements IAsyncDisposable
 @inject IJSRuntime JSRuntime
@@ -6,17 +5,8 @@
 
 <CoronaPageHeader Title="Corona UI Documentation"
                   ShowMenuButton="true"
-                  OnMenuClick="ToggleDrawer">
-    <Actions>
-        <CoronaStack Direction="CoronaStackDirection.Row" Spacing=".5rem">
-            <CoronaButton Size="CoronaComponentSize.Small"
-                          Variant="CoronaButtonVariant.Outlined"
-                          OnClick="ToggleTheme">
-                Toggle @ThemeProvider.CurrentTheme.Mode
-            </CoronaButton>
-        </CoronaStack>
-    </Actions>
-</CoronaPageHeader>
+                  OnMenuClick="ToggleDrawer"
+                  Actions="@HeaderActions" />
 
 <div class="docs-shell">
     <CoronaDrawer Open="_drawerOpen"
@@ -40,6 +30,14 @@
     private bool _isDesktop;
     private bool _drawerOpen;
     private DotNetObjectReference<MainLayout>? _dotNetReference;
+
+    private RenderFragment HeaderActions => @<CoronaStack Direction="Corona.Components.Enums.CoronaStackDirection.Row" Spacing=".5rem">
+        <CoronaButton Size="Corona.Components.Enums.CoronaComponentSize.Small"
+                      Variant="Corona.Components.Enums.CoronaButtonVariant.Outlined"
+                      OnClick="ToggleTheme">
+            Toggle @ThemeProvider.CurrentTheme.Mode
+        </CoronaButton>
+    </CoronaStack>;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -85,9 +83,10 @@
         return Task.CompletedTask;
     }
 
-    private void ToggleTheme()
+    private Task ToggleTheme()
     {
         ThemeProvider.ToggleTheme();
+        return Task.CompletedTask;
     }
 
     public async ValueTask DisposeAsync()

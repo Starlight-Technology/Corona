@@ -12,7 +12,7 @@ public sealed class CoronaThemeProvider
     /// <summary>
     /// Occurs when the current theme changes.
     /// </summary>
-    public event EventHandler? ThemeChanged;
+    public event Action? OnChange;
 
     /// <summary>
     /// Initializes a new provider with an optional starting theme.
@@ -33,7 +33,7 @@ public sealed class CoronaThemeProvider
     public void SetTheme(CoronaTheme theme)
     {
         _currentTheme = theme;
-        ThemeChanged?.Invoke(this, EventArgs.Empty);
+        OnChange?.Invoke();
     }
 
     /// <summary>
@@ -47,6 +47,7 @@ public sealed class CoronaThemeProvider
 
         SetTheme(nextTheme);
     }
+
 }
 
 /// <summary>
@@ -61,7 +62,7 @@ public static class CoronaThemeServiceCollectionExtensions
         this IServiceCollection services,
         CoronaTheme? initialTheme = null)
     {
-        services.AddScoped(_ => new CoronaThemeProvider(initialTheme));
+        services.AddSingleton(_ => new CoronaThemeProvider(initialTheme));
         return services;
     }
 }

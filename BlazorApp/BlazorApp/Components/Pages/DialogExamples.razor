@@ -7,11 +7,11 @@
     <CoronaStack Spacing="1.5rem" FullWidth="true">
         <section><h1>Dialog</h1><p class="docs-page-description">Dialog presents focused decisions and workflows in a modal surface.</p></section>
         <section><h2>Live examples</h2><CoronaStack Spacing="1rem" FullWidth="true">
-            <ExampleSection Title="Basic usage" Code='@("<CoronaButton OnClick=\"OpenDialog\">Open dialog</CoronaButton>")'><CoronaButton OnClick="OpenDialog">Open dialog</CoronaButton></ExampleSection>
-            <ExampleSection Title="Variants" Description="Use different action emphasis in footer buttons." Code='@("<CoronaButton Variant=\"CoronaButtonVariant.Text\">Cancel</CoronaButton>")'><CoronaStack Direction="CoronaStackDirection.Row" Spacing=".75rem"><CoronaButton Variant="CoronaButtonVariant.Text">Cancel</CoronaButton><CoronaButton Color="CoronaColorSemantic.Success">Approve</CoronaButton></CoronaStack></ExampleSection>
+            <ExampleSection Title="Basic usage" Code='@"<CoronaButton OnClick=\"OpenDialog\">Open dialog</CoronaButton>"'><CoronaButton OnClick="OpenDialog">Open dialog</CoronaButton></ExampleSection>
+            <ExampleSection Title="Variants" Description="Use different action emphasis in footer buttons." Code='@"<CoronaButton Variant=\"CoronaButtonVariant.Text\">Cancel</CoronaButton>"'><CoronaStack Direction="CoronaStackDirection.Row" Spacing=".75rem"><CoronaButton Variant="CoronaButtonVariant.Text">Cancel</CoronaButton><CoronaButton Color="CoronaColorSemantic.Success">Approve</CoronaButton></CoronaStack></ExampleSection>
             <ExampleSection Title="States" Description="Backdrop and escape close behaviors can be configured."><CoronaBadge Content="CloseOnEscape=true" Variant="CoronaBadgeVariant.Soft" /></ExampleSection>
         </CoronaStack></section>
-        <section><h2>Usage</h2><CodeSnippet Code='@("<CoronaDialog @bind-Open=\"open\" Title=\"Confirm\">\n    Are you sure?\n</CoronaDialog>")' /></section>
+        <section><h2>Usage</h2><CodeSnippet Code='@"<CoronaDialog @bind-Open=\"open\" Title=\"Confirm\">\n    Are you sure?\n</CoronaDialog>"' /></section>
         <section><h2>Parameters</h2><ParameterTable Parameters="_parameters" /></section>
     </CoronaStack>
 </CoronaContainer>
