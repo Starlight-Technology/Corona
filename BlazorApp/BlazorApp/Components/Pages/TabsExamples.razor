@@ -7,13 +7,13 @@
     <CoronaStack Spacing="1.5rem" FullWidth="true">
         <section><h1>Tabs</h1><p class="docs-page-description">Tabs organize related content into discoverable, keyboard-friendly views.</p></section>
         <section><h2>Live examples</h2><CoronaStack Spacing="1rem" FullWidth="true">
-            <ExampleSection Title="Basic usage" Code='@("<CoronaTabs><CoronaTabItem Header=\"Overview\">...</CoronaTabItem></CoronaTabs>")'>
+            <ExampleSection Title="Basic usage" Code='@"<CoronaTabs><CoronaTabItem Header=\"Overview\">...</CoronaTabItem></CoronaTabs>"'>
                 <CoronaTabs @bind-ActiveIndex="_activeIndex" Variant="CoronaTabsVariant.Underline">
                     <CoronaTabItem Header="Overview"><p>Overview content.</p></CoronaTabItem>
                     <CoronaTabItem Header="Integrations"><p>Integration settings.</p></CoronaTabItem>
                 </CoronaTabs>
             </ExampleSection>
-            <ExampleSection Title="Variants" Code='@("<CoronaTabs Variant=\"CoronaTabsVariant.Pills\">...</CoronaTabs>")'>
+            <ExampleSection Title="Variants" Code='@"<CoronaTabs Variant=\"CoronaTabsVariant.Pills\">...</CoronaTabs>"'>
                 <CoronaTabs Variant="CoronaTabsVariant.Pills">
                     <CoronaTabItem Header="Day"><p>Daily metrics</p></CoronaTabItem>
                     <CoronaTabItem Header="Week"><p>Weekly metrics</p></CoronaTabItem>
@@ -21,7 +21,7 @@
             </ExampleSection>
             <ExampleSection Title="State" Description="Track active index with two-way binding."><p><strong>Active tab:</strong> @_activeIndex</p></ExampleSection>
         </CoronaStack></section>
-        <section><h2>Usage</h2><CodeSnippet Code='@("<CoronaTabs @bind-ActiveIndex=\"activeIndex\">\n    <CoronaTabItem Header=\"Overview\">...</CoronaTabItem>\n</CoronaTabs>")' /></section>
+        <section><h2>Usage</h2><CodeSnippet Code='@"<CoronaTabs @bind-ActiveIndex=\"activeIndex\">\n    <CoronaTabItem Header=\"Overview\">...</CoronaTabItem>\n</CoronaTabs>"' /></section>
         <section><h2>Parameters</h2><ParameterTable Parameters="_parameters" /></section>
     </CoronaStack>
 </CoronaContainer>

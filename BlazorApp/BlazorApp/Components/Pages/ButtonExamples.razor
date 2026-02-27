@@ -15,13 +15,13 @@
             <CoronaStack Spacing="1rem" FullWidth="true">
                 <ExampleSection Title="Basic usage"
                                 Description="Use the filled variant for primary actions."
-                                Code='@("<CoronaButton Variant=\"CoronaButtonVariant.Filled\">Create</CoronaButton>")'>
+                                Code='@"<CoronaButton Variant=\"CoronaButtonVariant.Filled\">Create</CoronaButton>"'>
                     <CoronaButton Variant="CoronaButtonVariant.Filled">Create</CoronaButton>
                 </ExampleSection>
 
                 <ExampleSection Title="Variants"
                                 Description="Button variants support different visual emphasis levels."
-                                Code='@("<CoronaStack Direction=\"CoronaStackDirection.Row\" Spacing=\"0.75rem\">\n    <CoronaButton Variant=\"CoronaButtonVariant.Filled\">Filled</CoronaButton>\n    <CoronaButton Variant=\"CoronaButtonVariant.Outlined\">Outlined</CoronaButton>\n    <CoronaButton Variant=\"CoronaButtonVariant.Text\">Text</CoronaButton>\n</CoronaStack>")'>
+                                Code='@"<CoronaStack Direction=\"CoronaStackDirection.Row\" Spacing=\"0.75rem\">\n    <CoronaButton Variant=\"CoronaButtonVariant.Filled\">Filled</CoronaButton>\n    <CoronaButton Variant=\"CoronaButtonVariant.Outlined\">Outlined</CoronaButton>\n    <CoronaButton Variant=\"CoronaButtonVariant.Text\">Text</CoronaButton>\n</CoronaStack>"'>
                     <CoronaStack Direction="CoronaStackDirection.Row" Spacing="0.75rem" Wrap="CoronaStackWrap.Wrap">
                         <CoronaButton Variant="CoronaButtonVariant.Filled">Filled</CoronaButton>
                         <CoronaButton Variant="CoronaButtonVariant.Outlined">Outlined</CoronaButton>
@@ -31,7 +31,7 @@
 
                 <ExampleSection Title="Sizes"
                                 Description="Use compact sizes in dense layouts and large sizes for key actions."
-                                Code='@("<CoronaStack Direction=\"CoronaStackDirection.Row\" Spacing=\"0.75rem\">\n    <CoronaButton Size=\"CoronaComponentSize.Small\">Small</CoronaButton>\n    <CoronaButton Size=\"CoronaComponentSize.Medium\">Medium</CoronaButton>\n    <CoronaButton Size=\"CoronaComponentSize.Large\">Large</CoronaButton>\n</CoronaStack>")'>
+                                Code='@"<CoronaStack Direction=\"CoronaStackDirection.Row\" Spacing=\"0.75rem\">\n    <CoronaButton Size=\"CoronaComponentSize.Small\">Small</CoronaButton>\n    <CoronaButton Size=\"CoronaComponentSize.Medium\">Medium</CoronaButton>\n    <CoronaButton Size=\"CoronaComponentSize.Large\">Large</CoronaButton>\n</CoronaStack>"'>
                     <CoronaStack Direction="CoronaStackDirection.Row" Spacing="0.75rem" Wrap="CoronaStackWrap.Wrap">
                         <CoronaButton Size="CoronaComponentSize.Small">Small</CoronaButton>
                         <CoronaButton Size="CoronaComponentSize.Medium">Medium</CoronaButton>
@@ -41,7 +41,7 @@
 
                 <ExampleSection Title="States"
                                 Description="Loading and disabled states communicate async or unavailable actions."
-                                Code='@("<CoronaButton Loading=\"isSaving\" Disabled=\"isSaving\" OnClick=\"SaveAsync\">\n    @(isSaving ? \"Saving...\" : \"Save\")\n</CoronaButton>")'>
+                                Code='@"<CoronaButton Loading=\"isSaving\" Disabled=\"isSaving\" OnClick=\"SaveAsync\">\n    @(isSaving ? \"Saving...\" : \"Save\")\n</CoronaButton>"'>
                     <CoronaButton Loading="_loading" Disabled="_loading" OnClick="ToggleLoading">
                         @(_loading ? "Saving..." : "Save")
                     </CoronaButton>
@@ -51,7 +51,7 @@
 
         <section>
             <h2>Usage</h2>
-            <CodeSnippet Code='@("<CoronaButton Variant=\"CoronaButtonVariant.Filled\"\n              Color=\"CoronaColorSemantic.Primary\"\n              OnClick=\"HandleCreate\">\n    Create project\n</CoronaButton>")' />
+            <CodeSnippet Code='@"<CoronaButton Variant=\"CoronaButtonVariant.Filled\"\n              Color=\"CoronaColorSemantic.Primary\"\n              OnClick=\"HandleCreate\">\n    Create project\n</CoronaButton>"' />
         </section>
 
         <section>
