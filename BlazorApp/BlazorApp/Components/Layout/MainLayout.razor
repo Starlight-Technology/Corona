@@ -2,6 +2,7 @@
 @implements IAsyncDisposable
 @inject IJSRuntime JSRuntime
 @inject CoronaThemeProvider ThemeProvider
+@rendermode InteractiveServer
 
 <CoronaPageHeader Title="Corona UI Documentation"
                   ShowMenuButton="true"
@@ -13,7 +14,7 @@
                   OpenChanged="OnDrawerChanged"
                   Overlay="@(!_isDesktop)"
                   Width="300px"
-                  Class="docs-drawer @(_isDesktop ? "is-desktop" : string.Empty)">
+                  Class="@($"docs-drawer {(_isDesktop ? "is-desktop" : string.Empty)}")">
         <CoronaStack Spacing="1rem" FullWidth="true">
             <p class="docs-drawer-title">Documentation</p>
             <CoronaNavMenu Items="DocsNavigation.Items" />

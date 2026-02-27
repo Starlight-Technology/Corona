@@ -1,6 +1,6 @@
 @using Corona.Components.Enums
 
-<Card Title="@Title" Class="docs-example-card">
+<CoronaCard Title="@Title" Class="docs-example-card">
     <CoronaStack Spacing="1rem" FullWidth="true">
         @if (!string.IsNullOrWhiteSpace(Description))
         {
@@ -16,7 +16,7 @@
             <CodeSnippet Code="Code" />
         }
     </CoronaStack>
-</Card>
+</CoronaCard>
 
 @code {
     [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
