@@ -1,0 +1,27 @@
+<table class="docs-params-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var parameter in Parameters)
+        {
+            <tr>
+                <td><code>@parameter.Name</code></td>
+                <td><code>@parameter.Type</code></td>
+                <td><code>@parameter.DefaultValue</code></td>
+                <td>@parameter.Description</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<ParameterDefinition> Parameters { get; set; } = [];
+
+    public sealed record ParameterDefinition(string Name, string Type, string DefaultValue, string Description);
+}

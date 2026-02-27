@@ -1,0 +1,29 @@
+@page "/"
+@using Corona.Components.Enums
+
+<PageTitle>Corona UI Documentation</PageTitle>
+
+<CoronaContainer MaxWidth="CoronaContainerMaxWidth.Xl">
+    <CoronaStack Spacing="1.5rem" FullWidth="true">
+        <Card Title="Build polished Blazor interfaces with Corona">
+            <CoronaStack Spacing="1rem" FullWidth="true">
+                <p>Corona is a Razor component library focused on theme-driven design, consistency, and fast developer workflows.</p>
+                <CoronaStack Direction="CoronaStackDirection.Row" Spacing=".75rem" Wrap="CoronaStackWrap.Wrap">
+                    <CoronaBadge Content="Theme Aware" />
+                    <CoronaBadge Content="Composable" Variant="CoronaBadgeVariant.Soft" Color="CoronaColorSemantic.Success" />
+                    <CoronaBadge Content="Production Ready" Variant="CoronaBadgeVariant.Outlined" />
+                </CoronaStack>
+            </CoronaStack>
+        </Card>
+
+        <Card Title="Quick start">
+            <CodeSnippet Code='@("builder.Services.AddCoronaTheming(CoronaThemes.Light());\n\n<CoronaThemeCascadingValue>\n    <App />\n</CoronaThemeCascadingValue>")' />
+        </Card>
+
+        <Card Title="First component">
+            <ExampleSection Title="Basic Button" Description="A minimal Corona button using semantic defaults." Code='@("<CoronaButton Variant=\"CoronaButtonVariant.Filled\">Save Changes</CoronaButton>")'>
+                <CoronaButton Variant="CoronaButtonVariant.Filled">Save Changes</CoronaButton>
+            </ExampleSection>
+        </Card>
+    </CoronaStack>
+</CoronaContainer>

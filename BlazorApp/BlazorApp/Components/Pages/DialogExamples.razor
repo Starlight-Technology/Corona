@@ -1,38 +1,42 @@
 @page "/components/dialog"
 @using Corona.Components.Enums
 
-<PageTitle>CoronaDialog Examples</PageTitle>
+<PageTitle>Dialog | Corona Docs</PageTitle>
 
-<h1>CoronaDialog</h1>
+<CoronaContainer MaxWidth="CoronaContainerMaxWidth.Xl">
+    <CoronaStack Spacing="1.5rem" FullWidth="true">
+        <section><h1>Dialog</h1><p class="docs-page-description">Dialog presents focused decisions and workflows in a modal surface.</p></section>
+        <section><h2>Live examples</h2><CoronaStack Spacing="1rem" FullWidth="true">
+            <ExampleSection Title="Basic usage" Code='@("<CoronaButton OnClick=\"OpenDialog\">Open dialog</CoronaButton>")'><CoronaButton OnClick="OpenDialog">Open dialog</CoronaButton></ExampleSection>
+            <ExampleSection Title="Variants" Description="Use different action emphasis in footer buttons." Code='@("<CoronaButton Variant=\"CoronaButtonVariant.Text\">Cancel</CoronaButton>")'><CoronaStack Direction="CoronaStackDirection.Row" Spacing=".75rem"><CoronaButton Variant="CoronaButtonVariant.Text">Cancel</CoronaButton><CoronaButton Color="CoronaColorSemantic.Success">Approve</CoronaButton></CoronaStack></ExampleSection>
+            <ExampleSection Title="States" Description="Backdrop and escape close behaviors can be configured."><CoronaBadge Content="CloseOnEscape=true" Variant="CoronaBadgeVariant.Soft" /></ExampleSection>
+        </CoronaStack></section>
+        <section><h2>Usage</h2><CodeSnippet Code='@("<CoronaDialog @bind-Open=\"open\" Title=\"Confirm\">\n    Are you sure?\n</CoronaDialog>")' /></section>
+        <section><h2>Parameters</h2><ParameterTable Parameters="_parameters" /></section>
+    </CoronaStack>
+</CoronaContainer>
 
-<CoronaButton OnClick="OpenDialog">Open dialog</CoronaButton>
-
-<CoronaDialog @bind-Open="_open"
-              Title="Confirm deployment"
-              MaxWidth="34rem"
-              CloseOnEscape="true"
-              CloseOnBackdrop="true">
-    <ChildContent>
-        This dialog demonstrates a bindable Open state, title region, content body, and actions slot.
-    </ChildContent>
+<CoronaDialog @bind-Open="_open" Title="Confirm deployment" MaxWidth="34rem">
+    <ChildContent>Promote current release candidate to production?</ChildContent>
     <Actions>
         <CoronaButton Variant="CoronaButtonVariant.Text" OnClick="CloseDialog">Cancel</CoronaButton>
-        <CoronaButton Variant="CoronaButtonVariant.Filled" Color="CoronaColorSemantic.Success" OnClick="CloseDialog">Approve</CoronaButton>
+        <CoronaButton Color="CoronaColorSemantic.Success" OnClick="CloseDialog">Deploy</CoronaButton>
     </Actions>
 </CoronaDialog>
 
 @code {
     private bool _open;
 
-    private Task OpenDialog()
-    {
-        _open = true;
-        return Task.CompletedTask;
-    }
+    private readonly IReadOnlyList<ParameterTable.ParameterDefinition> _parameters =
+    [
+        new("Open", "bool", "false", "Controls visibility of the modal."),
+        new("Title", "string", "null", "Dialog heading text."),
+        new("CloseOnEscape", "bool", "true", "Allows closing with Escape key."),
+        new("CloseOnBackdrop", "bool", "true", "Allows closing by clicking backdrop."),
+        new("Overlay", "bool", "true", "Renders a dimmed backdrop."),
+        new("Actions", "RenderFragment", "null", "Footer action area.")
+    ];
 
-    private Task CloseDialog()
-    {
-        _open = false;
-        return Task.CompletedTask;
-    }
+    private Task OpenDialog() { _open = true; return Task.CompletedTask; }
+    private Task CloseDialog() { _open = false; return Task.CompletedTask; }
 }
