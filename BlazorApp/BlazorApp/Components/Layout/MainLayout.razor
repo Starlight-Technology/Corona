@@ -3,34 +3,22 @@
 @inject CoronaThemeProvider ThemeProvider
 @rendermode InteractiveServer
 
-<CoronaPageHeader Title="Corona UI Documentation"
-                  ShowMenuButton="true"
-                  OnMenuClick="ToggleDrawer"
-                  Actions="@HeaderActions" />
-
-<div class="docs-shell">
-    <CoronaDrawer Open="_drawerOpen"
-                  OpenChanged="OnDrawerChanged"
-                  Overlay="true"
-                  Width="300px"
-                  Class="@DrawerClass">
-        <CoronaStack Spacing="1rem" FullWidth="true">
-            <p class="docs-drawer-title">Documentation</p>
-            <CoronaNavMenu Items="DocsNavigation.Items" />
-        </CoronaStack>
-    </CoronaDrawer>
-
-    <main class="docs-content">
-        @Body
-    </main>
-</div>
+<CoronaLayoutShell DrawerTitle="Documentation"
+                   DrawerWidthPx="300"
+                   DrawerOverlay="true"
+                   ShowMenuButton="true"
+                   NavItems="@DocsNavigation.Items"
+                   HeaderActions="@HeaderActions">
+@Body
+</CoronaLayoutShell>
 
 @code {
     private bool _drawerOpen;
 
     private string DrawerClass => "docs-drawer";
 
-    private RenderFragment HeaderActions => @<CoronaStack Direction="Corona.Components.Enums.CoronaStackDirection.Row" Spacing=".5rem">
+    private RenderFragment HeaderActions =>
+    @<CoronaStack Direction="Corona.Components.Enums.CoronaStackDirection.Row" Spacing=".5rem">
         <CoronaButton Size="Corona.Components.Enums.CoronaComponentSize.Small"
                       Variant="Corona.Components.Enums.CoronaButtonVariant.Outlined"
                       OnClick="ToggleTheme">
