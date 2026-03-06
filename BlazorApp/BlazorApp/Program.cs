@@ -33,6 +33,7 @@ app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(BlazorApp.Client._Imports).Assembly);
+    .AddAdditionalAssemblies(typeof(BlazorApp.Client._Imports).Assembly)
+    .AddAdditionalAssemblies(typeof(Corona.Theming.CoronaThemeProvider).Assembly);
 
-app.Run();
+await app.RunAsync().ConfigureAwait(true);

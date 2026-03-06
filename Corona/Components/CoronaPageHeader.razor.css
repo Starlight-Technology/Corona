@@ -1,4 +1,7 @@
 .corona-page-header {
+    position: relative; 
+    z-index: 100; 
+
     width: 100%;
     display: flex;
     align-items: center;
@@ -48,8 +51,14 @@
         outline: none;
     }
 
+
 .corona-page-header__actions {
     display: inline-flex;
     align-items: center;
     gap: .5rem;
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
+
 }
+

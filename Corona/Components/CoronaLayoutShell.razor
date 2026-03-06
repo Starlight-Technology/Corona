@@ -1,7 +1,6 @@
 @using Corona.Components.Navigation
 @using Corona.Theming
 @inherits LayoutComponentBase
-@implements IDisposable
 @inject CoronaThemeProvider ThemeProvider
 
 <CoronaPageHeader Title="Corona UI Documentation"
@@ -10,7 +9,7 @@
                   Actions="@HeaderActions" />
 
 <div class="docs-shell">
-    <CoronaDrawer Open="_drawerOpen"
+    <CoronaDrawer Open="DrawerOpen"
                   OpenChanged="OnDrawerChanged"
                   Overlay="@DrawerOverlay"
                   Width="@($"{DrawerWidthPx}px")"
@@ -31,7 +30,7 @@
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
-        [Parameter] public IReadOnlyList<CoronaNavItem> NavItems { get; set; }
+    [Parameter] public IReadOnlyList<CoronaNavItem> NavItems { get; set; }
     [Parameter]
     public string DrawerTitle { get; set; }
 
@@ -51,42 +50,21 @@
     public bool ShowMenuButton { get; set; }
 
     [Parameter]
-    public bool _drawerOpen { get; set; } = true;
+    public bool DrawerOpen { get; set; } = true;
+
+    [Parameter] public EventCallback<bool> DrawerOpenChanged { get; set; }
 
     private string DrawerClass => "docs-drawer";
 
-
-
-    protected override void OnInitialized()
-    {
-        ThemeProvider.OnChange += HandleThemeChanged;
-    }
-
-    private void HandleThemeChanged()
-    {
-        InvokeAsync(StateHasChanged);
-    }
-
     private Task OnDrawerChanged(bool open)
     {
-        _drawerOpen = open;
+        DrawerOpen = open;
         return Task.CompletedTask;
     }
 
     private Task ToggleDrawer()
     {
-        _drawerOpen = !_drawerOpen;
+        DrawerOpen = !DrawerOpen;
         return Task.CompletedTask;
-    }
-
-    private Task ToggleTheme()
-    {
-        ThemeProvider.ToggleTheme();
-        return Task.CompletedTask;
-    }
-
-    public void Dispose()
-    {
-        ThemeProvider.OnChange -= HandleThemeChanged;
     }
 }

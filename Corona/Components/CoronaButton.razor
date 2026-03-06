@@ -9,7 +9,7 @@
         style="@BuildStyle()"
         disabled="@IsDisabled"
         aria-busy="@Loading"
-        @onclick="HandleClickAsync">
+        onclick="@HandleClickAsync">
     @if (Loading)
     {
         <span class="corona-button__spinner" aria-hidden="true"></span>

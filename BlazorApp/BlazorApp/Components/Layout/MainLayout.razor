@@ -21,7 +21,7 @@
     @<CoronaStack Direction="Corona.Components.Enums.CoronaStackDirection.Row" Spacing=".5rem">
         <CoronaButton Size="Corona.Components.Enums.CoronaComponentSize.Small"
                       Variant="Corona.Components.Enums.CoronaButtonVariant.Outlined"
-                      OnClick="ToggleTheme">
+                          OnClick="@EventCallback.Factory.Create(this, ToggleTheme)">
             Toggle @ThemeProvider.CurrentTheme.Mode
         </CoronaButton>
     </CoronaStack>;
@@ -34,18 +34,6 @@
     private void HandleThemeChanged()
     {
         InvokeAsync(StateHasChanged);
-    }
-
-    private Task OnDrawerChanged(bool open)
-    {
-        _drawerOpen = open;
-        return Task.CompletedTask;
-    }
-
-    private Task ToggleDrawer()
-    {
-        _drawerOpen = !_drawerOpen;
-        return Task.CompletedTask;
     }
 
     private Task ToggleTheme()
