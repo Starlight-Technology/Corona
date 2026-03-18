@@ -16,9 +16,9 @@
     }
     else
     {
-        @if (!string.IsNullOrWhiteSpace(StartIcon))
+        @if (StartIconContent is not null)
         {
-            <span class="corona-button__icon" aria-hidden="true">@StartIcon</span>
+            <span class="corona-button__icon" aria-hidden="true">@StartIconContent</span>
         }
 
         @if (ChildContent is not null)
@@ -26,9 +26,9 @@
             <span class="corona-button__label">@ChildContent</span>
         }
 
-        @if (!string.IsNullOrWhiteSpace(EndIcon))
+        @if (EndIconContent is not null)
         {
-            <span class="corona-button__icon" aria-hidden="true">@EndIcon</span>
+            <span class="corona-button__icon" aria-hidden="true">@EndIconContent</span>
         }
     }
 </button>
@@ -45,6 +45,10 @@
     [Parameter] public bool FullWidth { get; set; }
     [Parameter] public string? StartIcon { get; set; }
     [Parameter] public string? EndIcon { get; set; }
+    [Parameter] public string? StartIconName { get; set; }
+    [Parameter] public string? EndIconName { get; set; }
+    [Parameter] public CoronaIconStyle StartIconStyle { get; set; } = CoronaIconStyle.Solid;
+    [Parameter] public CoronaIconStyle EndIconStyle { get; set; } = CoronaIconStyle.Solid;
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public EventCallback OnClick { get; set; }
 
@@ -76,6 +80,32 @@
     private string VariantClass => Variant.ToString().ToLowerInvariant();
 
     private string SizeClass => Size.ToString().ToLowerInvariant();
+
+    private RenderFragment? StartIconContent => BuildIconContent(StartIcon, StartIconName, StartIconStyle);
+
+    private RenderFragment? EndIconContent => BuildIconContent(EndIcon, EndIconName, EndIconStyle);
+
+    private RenderFragment? BuildIconContent(string? textIcon, string? iconName, CoronaIconStyle iconStyle)
+    {
+        if (!string.IsNullOrWhiteSpace(iconName))
+        {
+            return builder =>
+            {
+                builder.OpenComponent<CoronaIcon>(0);
+                builder.AddAttribute(1, nameof(CoronaIcon.Name), iconName);
+                builder.AddAttribute(2, nameof(CoronaIcon.Style), iconStyle);
+                builder.AddAttribute(3, nameof(CoronaIcon.Size), "sm");
+                builder.CloseComponent();
+            };
+        }
+
+        if (string.IsNullOrWhiteSpace(textIcon))
+        {
+            return null;
+        }
+
+        return builder => builder.AddContent(0, textIcon);
+    }
 
     private async Task HandleClickAsync()
     {

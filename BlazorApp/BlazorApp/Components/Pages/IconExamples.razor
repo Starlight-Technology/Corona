@@ -1,0 +1,76 @@
+@page "/components/icon"
+@using Corona.Components.Enums
+@using Corona.Components.Iconography
+
+<PageTitle>Icon | Corona Docs</PageTitle>
+
+<CoronaContainer MaxWidth="CoronaContainerMaxWidth.Xl">
+    <CoronaStack Spacing="1.5rem" FullWidth="true">
+        <section>
+            <h1>Icon</h1>
+            <p class="docs-page-description">CoronaIcon provides a provider-ready icon surface that resolves any local Font Awesome Free icon class dynamically.</p>
+        </section>
+
+        <section>
+            <h2>Live examples</h2>
+            <CoronaStack Spacing="1rem" FullWidth="true">
+                <ExampleSection Title="Basic usage"
+                                Description="Pass any Font Awesome Free icon name without maintaining a local icon registry."
+                                Code='@("<CoronaStack Direction=\"CoronaStackDirection.Row\" Spacing=\"1rem\">\n    <CoronaIcon Name=\"user\" />\n    <CoronaIcon Name=\"star\" Style=\"CoronaIconStyle.Solid\" Color=\"#EAB308\" />\n    <CoronaIcon Name=\"github\" Style=\"CoronaIconStyle.Brand\" />\n</CoronaStack>")'>
+                    <CoronaStack Direction="CoronaStackDirection.Row" Spacing="1rem" Wrap="CoronaStackWrap.Wrap">
+                        <CoronaIcon Name="user" />
+                        <CoronaIcon Name="star" Style="CoronaIconStyle.Solid" Color="#EAB308" />
+                        <CoronaIcon Name="github" Style="CoronaIconStyle.Brand" />
+                    </CoronaStack>
+                </ExampleSection>
+
+                <ExampleSection Title="Pseudo-CSS styling"
+                                Description="Use sizing and box-model parameters the same way you style other Corona primitives."
+                                Code='@("<CoronaStack Direction=\"CoronaStackDirection.Row\" Spacing=\"1rem\">\n    <CoronaIcon Name=\"bell\" BackgroundColor=\"#EFF6FF\" Color=\"#2563EB\" Padding=\"0.75rem\" BorderRadius=\"999px\" />\n    <CoronaIcon Name=\"triangle-exclamation\" Color=\"#B45309\" Size=\"2xl\" />\n    <CoronaIcon Name=\"gear\" Spin=\"true\" />\n</CoronaStack>")'>
+                    <CoronaStack Direction="CoronaStackDirection.Row" Spacing="1rem" Wrap="CoronaStackWrap.Wrap">
+                        <CoronaIcon Name="bell" BackgroundColor="#EFF6FF" Color="#2563EB" Padding="0.75rem" BorderRadius="999px" />
+                        <CoronaIcon Name="triangle-exclamation" Color="#B45309" Size="2xl" />
+                        <CoronaIcon Name="gear" Spin="true" />
+                    </CoronaStack>
+                </ExampleSection>
+
+                <ExampleSection Title="Buttons with icons"
+                                Description="Buttons can consume CoronaIcon through icon-specific parameters while preserving existing text icon support."
+                                Code='@("<CoronaStack Direction=\"CoronaStackDirection.Row\" Spacing=\"0.75rem\">\n    <CoronaButton StartIconName=\"download\">Export</CoronaButton>\n    <CoronaButton Variant=\"CoronaButtonVariant.Outlined\" EndIconName=\"arrow-right\">Continue</CoronaButton>\n</CoronaStack>")'>
+                    <CoronaStack Direction="CoronaStackDirection.Row" Spacing="0.75rem" Wrap="CoronaStackWrap.Wrap">
+                        <CoronaButton StartIconName="download">Export</CoronaButton>
+                        <CoronaButton Variant="CoronaButtonVariant.Outlined" EndIconName="arrow-right">Continue</CoronaButton>
+                    </CoronaStack>
+                </ExampleSection>
+            </CoronaStack>
+        </section>
+
+        <section>
+            <h2>Usage</h2>
+            <CodeSnippet Code='@("<CoronaIcon Name=\"github\" Style=\"CoronaIconStyle.Brand\" Margin=\"0 0.5rem 0 0\" />")' />
+        </section>
+
+        <section>
+            <h2>Common icon helper</h2>
+            <CodeSnippet Code='@($"<CoronaIcon Name=\"{CoronaIcons.CircleInfo}\" Color=\"var(--brand-info)\" />")' />
+        </section>
+
+        <section>
+            <h2>Parameters</h2>
+            <ParameterTable Parameters="_parameters" />
+        </section>
+    </CoronaStack>
+</CoronaContainer>
+
+@code {
+    private readonly IReadOnlyList<ParameterTable.ParameterDefinition> _parameters =
+    [
+        new("Name", "string", "required", "Dynamic Font Awesome icon name such as user, star, or github."),
+        new("Style", "CoronaIconStyle", "Solid", "Maps to fa-solid, fa-regular, or fa-brands."),
+        new("Size", "string", "null", "Optional Font Awesome size suffix like sm, lg, or 2xl."),
+        new("Color", "string", "Theme text color", "Overrides the icon foreground while preserving theme defaults."),
+        new("BackgroundColor", "string", "null", "Applies an optional background behind the icon glyph."),
+        new("Spin / Pulse / FixedWidth", "bool", "false", "Adds fa-spin, fa-pulse, and fa-fw utility classes conditionally."),
+        new("Decorative", "bool", "true", "Sets aria-hidden for decorative icons or role=img when the icon is meaningful.")
+    ];
+}
