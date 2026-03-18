@@ -6,7 +6,8 @@
 <CoronaPageHeader Title="@HeaderTitle"
                   ShowMenuButton="@ShowMenuButton"
                   OnMenuClick="ToggleDrawer"
-                  Actions="@HeaderActions" />
+                  Actions="@HeaderActions" 
+                  MenuIcon="@MenuIcon"/>
 
 <div class="docs-shell">
     <CoronaDrawer Open="DrawerOpen"
@@ -53,6 +54,8 @@
 
     [Parameter]
     public bool ShowMenuButton { get; set; }
+
+    [Parameter] public string? MenuIcon { get; set; } = "☰";
 
     [Parameter]
     public bool DrawerOpen { get; set; } = true;

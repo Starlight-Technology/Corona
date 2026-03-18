@@ -13,7 +13,7 @@
                     @onclick="HandleMenuClick"
                     @onkeydown="HandleMenuKeyDown"
                     aria-label="Toggle navigation menu">
-                <span aria-hidden="true">☰</span>
+                <span aria-hidden="true">@MenuIcon</span>
             </button>
         }
 
@@ -41,6 +41,7 @@
     [Parameter] public bool ShowMenuButton { get; set; }
     [Parameter] public EventCallback OnMenuClick { get; set; }
 
+    [Parameter] public string? MenuIcon { get; set; } = "☰";
     [Parameter] public string? Height { get; set; }
     [Parameter] public string? BackgroundColor { get; set; }
     [Parameter] public string? Color { get; set; }
