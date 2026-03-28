@@ -1,0 +1,29 @@
+.corona-input {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* Espaço entre label, input e helper */
+}
+
+.corona-input__label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #444;
+}
+
+.corona-input__field {
+    padding: 8px 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color .2s ease;
+}
+
+    .corona-input__field:focus {
+        border-color: #0078d4; /* Azul padrão MS, só pra ter algo */
+    }
+
+.corona-input__helper {
+    font-size: 0.8rem;
+    color: #666;
+}

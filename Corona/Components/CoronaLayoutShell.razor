@@ -3,10 +3,12 @@
 @inherits LayoutComponentBase
 @inject CoronaThemeProvider ThemeProvider
 
-<CoronaPageHeader Title="Corona UI Documentation"
+<CoronaPageHeader Title="@HeaderTitle"
                   ShowMenuButton="@ShowMenuButton"
                   OnMenuClick="ToggleDrawer"
-                  Actions="@HeaderActions" />
+                  Actions="@HeaderActions" 
+                  MenuIcon="@MenuIcon"
+                  />
 
 <div class="docs-shell">
     <CoronaDrawer Open="DrawerOpen"
@@ -16,7 +18,8 @@
                   Class="@DrawerClass">
         <CoronaStack Spacing="1rem" FullWidth="true">
             <p class="docs-drawer-title">@DrawerTitle</p>
-            <CoronaNavMenu Items="NavItems" />
+            
+            <CoronaNavMenu Items="DrawerItens" />
         </CoronaStack>
     </CoronaDrawer>
 
@@ -30,9 +33,14 @@
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
-    [Parameter] public IReadOnlyList<CoronaNavItem> NavItems { get; set; }
+    [Parameter] 
+    public IReadOnlyList<CoronaNavItem> DrawerItens { get; set; }
+
     [Parameter]
     public string DrawerTitle { get; set; }
+
+    [Parameter]
+    public string HeaderTitle { get; set; }
 
     [Parameter]
     public int DrawerWidthPx { get; set; } = 300;
@@ -48,6 +56,8 @@
 
     [Parameter]
     public bool ShowMenuButton { get; set; }
+
+    [Parameter] public string? MenuIcon { get; set; } = "☰";
 
     [Parameter]
     public bool DrawerOpen { get; set; } = true;

@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Components;
+
 namespace Corona.Components;
 
 public sealed class CoronaNavItem
@@ -11,4 +13,7 @@ public sealed class CoronaNavItem
     public IReadOnlyList<CoronaNavItem> Children { get; init; } = [];
 
     public bool Expanded { get; set; }
+
+    public RenderFragment? Content { get; init; }
+
 }

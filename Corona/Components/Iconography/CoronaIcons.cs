@@ -55,4 +55,6 @@ public static class CoronaIcons
     public const string Youtube = "youtube";
     public const string Discord = "discord";
     public const string Slack = "slack";
+    public const string Cog = "cog";
+    public const string Cogs = "cogs";
 }
