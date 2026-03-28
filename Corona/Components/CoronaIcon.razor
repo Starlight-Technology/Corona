@@ -1,0 +1,161 @@
+@namespace Corona.Components
+@implements IDisposable
+@using System.Text
+@using Corona.Components.Enums
+@using Corona.Theming
+@inject CoronaThemeProvider ThemeProvider
+
+<i class="@BuildClass()"
+   style="@BuildStyle()"
+   role="@ResolvedRole"
+   aria-hidden="@AriaHidden"
+   aria-label="@ResolvedAriaLabel"></i>
+
+@code {
+    [CascadingParameter] public CoronaTheme? Theme { get; set; }
+
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+    [Parameter, EditorRequired] public string Name { get; set; } = string.Empty;
+    [Parameter] public CoronaIconStyle Style { get; set; } = CoronaIconStyle.Solid;
+    [Parameter] public string? CustomClass { get; set; }
+    [Parameter] public string? Width { get; set; }
+    [Parameter] public string? Height { get; set; }
+    [Parameter] public string? Size { get; set; }
+    [Parameter] public string? Color { get; set; }
+    [Parameter] public string? BackgroundColor { get; set; }
+    [Parameter] public string? Padding { get; set; }
+    [Parameter] public string? Margin { get; set; }
+    [Parameter] public string? BorderRadius { get; set; }
+    [Parameter] public bool Spin { get; set; }
+    [Parameter] public bool Pulse { get; set; }
+    [Parameter] public bool FixedWidth { get; set; }
+    [Parameter] public string? AriaLabel { get; set; }
+    [Parameter] public bool Decorative { get; set; } = true;
+    [Parameter] public CoronaIconProvider Provider { get; set; } = CoronaIconProvider.FontAwesome;
+
+    private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+    private string ResolvedRole => Decorative ? "presentation" : "img";
+    private bool AriaHidden => Decorative;
+    private string? ResolvedAriaLabel => Decorative ? null : AriaLabel ?? Name;
+
+    protected override void OnInitialized()
+    {
+        ThemeProvider.OnChange += HandleThemeChanged;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (string.IsNullOrWhiteSpace(Name))
+        {
+            throw new InvalidOperationException("CoronaIcon requires a non-empty Name parameter.");
+        }
+
+        if (Provider != CoronaIconProvider.FontAwesome)
+        {
+            throw new NotSupportedException($"The '{Provider}' icon provider is not supported yet.");
+        }
+    }
+
+    private void HandleThemeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private string BuildClass()
+    {
+        var classes = new List<string>
+        {
+            ResolveStyleClass(),
+            ResolveIconNameClass(),
+            "corona-icon"
+        };
+
+        if (!string.IsNullOrWhiteSpace(Size))
+        {
+            classes.Add($"fa-{Size.Trim()}");
+        }
+
+        if (Spin)
+        {
+            classes.Add("fa-spin");
+        }
+
+        if (Pulse)
+        {
+            classes.Add("fa-pulse");
+        }
+
+        if (FixedWidth)
+        {
+            classes.Add("fa-fw");
+        }
+
+        if (!string.IsNullOrWhiteSpace(CustomClass))
+        {
+            classes.Add(CustomClass.Trim());
+        }
+
+        return string.Join(" ", classes);
+    }
+
+    private string BuildStyle()
+    {
+        var semantic = ActiveTheme.Semantic;
+        var styleBuilder = new StringBuilder();
+
+        AppendStyle(styleBuilder, "display", "inline-flex");
+        AppendStyle(styleBuilder, "align-items", "center");
+        AppendStyle(styleBuilder, "justify-content", "center");
+        AppendStyle(styleBuilder, "width", Width);
+        AppendStyle(styleBuilder, "height", Height);
+        AppendStyle(styleBuilder, "color", Color ?? semantic.TextPrimary);
+        AppendStyle(styleBuilder, "background-color", BackgroundColor);
+        AppendStyle(styleBuilder, "padding", Padding);
+        AppendStyle(styleBuilder, "margin", Margin);
+        AppendStyle(styleBuilder, "border-radius", BorderRadius);
+        AppendStyle(styleBuilder, "line-height", "1");
+        AppendStyle(styleBuilder, "font-family", semantic.FontFamilyDefault);
+
+        return styleBuilder.ToString();
+    }
+
+    private static void AppendStyle(StringBuilder builder, string property, string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        builder.Append(property);
+        builder.Append(':');
+        builder.Append(value.Trim());
+        builder.Append(';');
+    }
+
+    private string ResolveStyleClass() => Style switch
+    {
+        CoronaIconStyle.Regular => "fa-regular",
+        CoronaIconStyle.Brand => "fa-brands",
+        _ => "fa-solid"
+    };
+
+    private string ResolveIconNameClass()
+    {
+        var normalizedName = Name.Trim();
+        return normalizedName.StartsWith("fa-", StringComparison.OrdinalIgnoreCase)
+            ? normalizedName
+            : $"fa-{normalizedName}";
+    }
+
+    public void Dispose()
+    {
+        ThemeProvider.OnChange -= HandleThemeChanged;
+    }
+}
+
+<style>
+    .corona-icon {
+        vertical-align: middle;
+        box-sizing: border-box;
+    }
+</style>

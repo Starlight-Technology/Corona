@@ -45,7 +45,8 @@ public static class DocsNavigation
             Children =
             [
                 new CoronaNavItem { Text = "Badge", Url = "/components/badge" },
-                new CoronaNavItem { Text = "Card", Url = "/components/card" }
+                new CoronaNavItem { Text = "Card", Url = "/components/card" },
+                new CoronaNavItem { Text = "Icon", Url = "/components/icon" }
             ]
         },
         new CoronaNavItem
