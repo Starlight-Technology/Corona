@@ -16,9 +16,9 @@
     }
     else
     {
-        @if (StartIconContent is not null)
+        @if (Icon is not null)
         {
-            <span class="corona-button__icon" aria-hidden="true">@StartIconContent</span>
+            <span class="corona-button__icon fa fa-@(IconStyle.ToString()) fa-@Icon" aria-hidden="true"></span>
         }
 
         @if (ChildContent is not null)
@@ -26,10 +26,6 @@
             <span class="corona-button__label">@ChildContent</span>
         }
 
-        @if (EndIconContent is not null)
-        {
-            <span class="corona-button__icon" aria-hidden="true">@EndIconContent</span>
-        }
     }
 </button>
 
@@ -43,12 +39,8 @@
     [Parameter] public bool Loading { get; set; }
     [Parameter] public bool Disabled { get; set; }
     [Parameter] public bool FullWidth { get; set; }
-    [Parameter] public string? StartIcon { get; set; }
-    [Parameter] public string? EndIcon { get; set; }
-    [Parameter] public string? StartIconName { get; set; }
-    [Parameter] public string? EndIconName { get; set; }
-    [Parameter] public CoronaIconStyle StartIconStyle { get; set; } = CoronaIconStyle.Solid;
-    [Parameter] public CoronaIconStyle EndIconStyle { get; set; } = CoronaIconStyle.Solid;
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public CoronaIconStyle IconStyle { get; set; } = CoronaIconStyle.Solid;
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public EventCallback OnClick { get; set; }
 
@@ -80,10 +72,6 @@
     private string VariantClass => Variant.ToString().ToLowerInvariant();
 
     private string SizeClass => Size.ToString().ToLowerInvariant();
-
-    private RenderFragment? StartIconContent => BuildIconContent(StartIcon, StartIconName, StartIconStyle);
-
-    private RenderFragment? EndIconContent => BuildIconContent(EndIcon, EndIconName, EndIconStyle);
 
     private RenderFragment? BuildIconContent(string? textIcon, string? iconName, CoronaIconStyle iconStyle)
     {

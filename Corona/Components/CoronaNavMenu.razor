@@ -106,6 +106,14 @@
 
     private void BuildItemBody(RenderTreeBuilder builder, ref int seq, CoronaNavItem item)
     {
+        // 🔥 PRIORIDADE: conteúdo custom
+        if (item.Content is not null)
+        {
+            builder.AddContent(seq++, item.Content);
+            return;
+        }
+
+        // fallback padrão
         if (!string.IsNullOrWhiteSpace(item.Icon))
         {
             builder.OpenElement(seq++, "span");
@@ -114,10 +122,13 @@
             builder.CloseElement();
         }
 
-        builder.OpenElement(seq++, "span");
-        builder.AddAttribute(seq++, "class", "corona-nav-menu__text");
-        builder.AddContent(seq++, item.Text);
-        builder.CloseElement();
+        if (!string.IsNullOrWhiteSpace(item.Text))
+        {
+            builder.OpenElement(seq++, "span");
+            builder.AddAttribute(seq++, "class", "corona-nav-menu__text");
+            builder.AddContent(seq++, item.Text);
+            builder.CloseElement();
+        }
     }
 
     private static void Toggle(CoronaNavItem item) => item.Expanded = !item.Expanded;

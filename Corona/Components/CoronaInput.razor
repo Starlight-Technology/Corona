@@ -1,0 +1,165 @@
+﻿@namespace Corona.Components
+@using Corona.Theming
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Globalization
+@using System.Xml.Linq
+@inject CoronaThemeProvider ThemeProvider
+
+@inherits InputBase<string>
+
+<div class="corona-input @Class" style="@BuildStyle()">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label class="corona-input__label">@Label</label>
+    }
+
+    <input @attributes="AdditionalAttributes"
+           class="corona-input__field
+    type="text"
+           value="@CurrentValue"
+           @oninput="OnInput"
+           onchange="@OnValueChange"
+           placeholder="@Placeholder"
+           disabled="@Disabled" />
+
+
+    @if (!string.IsNullOrWhiteSpace(HelperText))
+    {
+        <span class="corona-input__helper">@HelperText</span>
+    }
+</div>
+
+@code {
+    [CascadingParameter] public CoronaTheme? Theme { get; set; }
+
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+
+    // Core API (InputBase already fornece Value e ValueExpression internamente)
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string Type { get; set; } = "text";
+
+    // UX
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public string? HelperText { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+
+    // Style
+    [Parameter] public string Class { get; set; } = string.Empty;
+    [Parameter] public string? Width { get; set; }
+    [Parameter] public string? Height { get; set; }
+
+    private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+
+    // protected override void OnParametersSet()
+    // {
+    //     // Sincroniza o texto exibido quando Value for alterado externamente
+    //     CurrentValue = Type switch
+    //     {
+    //         "currency" => FormatCurrency(CurrentValue),
+    //         "phone" => FormatPhone(CurrentValue),
+    //         _ => CurrentValue ?? ""
+    //     };
+    // }
+
+    private string BuildStyle()
+    {
+        var semantic = ActiveTheme.Semantic;
+        return $"width:{Width ?? "100%"};font-family:{semantic.FontFamilyDefault};";
+    }
+
+    private async Task OnValueChange(ChangeEventArgs e)
+    {
+        await OnInput(e);
+    }
+
+    // Evento oninput do input HTML
+    private async Task OnInput(ChangeEventArgs e)
+    {
+        var raw = e.Value?.ToString() ?? "";
+        CurrentValue = String.Empty;
+        await InvokeAsync(StateHasChanged);
+        // Atualiza o valor "real" do InputBase (isso dispara ValueChanged e validação)
+        var unmasked = Type switch
+        {
+            "currency" => UnmaskCurrency(raw),
+            "phone" => UnmaskPhone(raw),
+            _ => raw
+        };
+
+        // Define o valor interno do InputBase (CurrentValue) usando a string desmascarada
+        // CurrentValueAsString chama TryParseValueFromString internamente; aqui forçamos CurrentValue diretamente
+        // Para InputBase<string> podemos atribuir CurrentValueAsString
+        CurrentValue = unmasked;
+        await InvokeAsync(StateHasChanged);
+
+        // Re-formata o texto exibido com base no valor atual
+        var formatted = Type switch
+        {
+            "currency" => FormatCurrency(CurrentValue),
+            "phone" => FormatPhone(CurrentValue),
+            _ => CurrentValue ?? ""
+        };
+
+        CurrentValue = formatted;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    // InputBase<string> exige implementação de TryParseValueFromString
+    protected override bool TryParseValueFromString(string? value, out string result, out string validationErrorMessage)
+    {
+        // Para string não precisamos converter; apenas repassa o valor
+        result = value ?? "";
+        validationErrorMessage = String.Empty;
+        return true;
+    }
+
+    // ---------- Formatação / Desmascaramento ----------
+    private string FormatCurrency(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return "";
+
+        if (!decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var number))
+            return "";
+
+        return number.ToString("C", new CultureInfo("pt-BR"));
+    }
+
+    private string UnmaskCurrency(string raw)
+    {
+        var digits = new string(raw.Where(char.IsDigit).ToArray());
+
+        if (string.IsNullOrEmpty(digits))
+            return "";
+
+        if (!decimal.TryParse(digits, out var parsed))
+            return "";
+
+        var val = parsed / 100m;
+        return val.ToString(CultureInfo.InvariantCulture);
+    }
+
+    private string FormatPhone(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return "";
+
+        var digits = new string(value.Where(char.IsDigit).ToArray());
+
+        if (digits.Length > 11)
+            digits = digits[..11];
+
+        return digits.Length switch
+        {
+            <= 2 => $"({digits}",
+            <= 6 => $"({digits[..2]}) {digits[2..]}",
+            <= 9 => $"({digits[..2]}) {digits[2..6]} {digits[6..]}",
+            _ => $"({digits[..2]}) {digits[2..7]} {digits[7..]}",
+        };
+    }
+
+    private string UnmaskPhone(string raw)
+    {
+        return new string(raw.Where(char.IsDigit).ToArray());
+    }
+}

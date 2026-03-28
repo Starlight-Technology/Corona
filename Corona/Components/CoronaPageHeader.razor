@@ -7,14 +7,14 @@
 
 <header class="corona-page-header @Class" style="@BuildStyle()">
     <div class="corona-page-header__start">
-        @if (ShowMenuButton){
-            <button type="button"
-                    class="corona-page-header__menu-button"
-                    @onclick="HandleMenuClick"
-                    @onkeydown="HandleMenuKeyDown"
-                    aria-label="Toggle navigation menu">
-                <span aria-hidden="true">@MenuIcon</span>
-            </button>
+        @if (ShowMenuButton)
+        {
+            <CoronaButton IconStyle="CoronaIconStyle.Brand"
+                          Icon="@MenuIcon"
+                          OnClick="HandleMenuClick">
+                
+            </CoronaButton>
+
         }
 
         <h1 class="corona-page-header__title">@Title</h1>

@@ -7,7 +7,8 @@
                   ShowMenuButton="@ShowMenuButton"
                   OnMenuClick="ToggleDrawer"
                   Actions="@HeaderActions" 
-                  MenuIcon="@MenuIcon"/>
+                  MenuIcon="@MenuIcon"
+                  />
 
 <div class="docs-shell">
     <CoronaDrawer Open="DrawerOpen"
@@ -17,7 +18,8 @@
                   Class="@DrawerClass">
         <CoronaStack Spacing="1rem" FullWidth="true">
             <p class="docs-drawer-title">@DrawerTitle</p>
-            <CoronaNavMenu Items="NavItems" />
+            
+            <CoronaNavMenu Items="DrawerItens" />
         </CoronaStack>
     </CoronaDrawer>
 
@@ -32,7 +34,7 @@
     public RenderFragment ChildContent { get; set; }
 
     [Parameter] 
-    public IReadOnlyList<CoronaNavItem> NavItems { get; set; }
+    public IReadOnlyList<CoronaNavItem> DrawerItens { get; set; }
 
     [Parameter]
     public string DrawerTitle { get; set; }
