@@ -12,16 +12,25 @@
     {
         <label class="corona-input__label">@Label</label>
     }
-
-    <input @attributes="AdditionalAttributes"
-           class="corona-input__field"
-           type="text"
-           value="@_displayValue"
-           @oninput="OnInput"
-           onchange="@OnValueChange"
-           placeholder="@Placeholder"
-           disabled="@Disabled" />
-
+    @if (Disabled)
+    {
+        <input @attributes="AdditionalAttributes"
+               class="corona-input__field"
+               type="@Type"
+               value="@CurrentValueAsString"
+               @oninput="OnInput"
+               disabled
+               placeholder="@Placeholder" />
+    }
+    else
+    {
+        <input @attributes="AdditionalAttributes"
+               class="corona-input__field"
+               type="@Type"
+               value="@CurrentValueAsString"
+               @oninput="OnInput"
+               placeholder="@Placeholder" />
+    }
 
     @if (!string.IsNullOrWhiteSpace(HelperText))
     {
@@ -65,12 +74,18 @@
 
     private async Task OnValueChange(ChangeEventArgs e)
     {
+        if (Disabled)
+            return;
+
         await OnInput(e);
     }
 
     // Evento oninput do input HTML
     private async Task OnInput(ChangeEventArgs e)
     {
+        if (Disabled)
+            return;
+
         var raw = e.Value?.ToString() ?? string.Empty;
         var parsedValue = Type switch
         {
