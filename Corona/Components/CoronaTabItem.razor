@@ -12,14 +12,54 @@
     [Parameter] public string? Class { get; set; }
     [Parameter] public string? PanelClass { get; set; }
 
+    // Cache previous values to avoid notifying parent on every render
+    private string _cachedHeader = string.Empty;
+    private RenderFragment? _cachedHeaderContent;
+    private RenderFragment? _cachedChildContent;
+    private bool _cachedDisabled;
+    private string? _cachedClass;
+    private string? _cachedPanelClass;
+    private bool _registered;
+
     protected override void OnInitialized()
     {
         Parent?.Register(this);
+        _registered = Parent is not null;
+        CacheValues();
     }
 
     protected override void OnParametersSet()
     {
-        Parent?.NotifyItemChanged();
+        // If not registered yet, ensure parent knows about us
+        if (!_registered)
+        {
+            Parent?.Register(this);
+            _registered = Parent is not null;
+            CacheValues();
+            return;
+        }
+
+        // Only notify parent if any relevant parameter actually changed
+        if (Header != _cachedHeader
+            || !ReferenceEquals(HeaderContent, _cachedHeaderContent)
+            || !ReferenceEquals(ChildContent, _cachedChildContent)
+            || Disabled != _cachedDisabled
+            || Class != _cachedClass
+            || PanelClass != _cachedPanelClass)
+        {
+            CacheValues();
+            Parent?.NotifyItemChanged();
+        }
+    }
+
+    private void CacheValues()
+    {
+        _cachedHeader = Header;
+        _cachedHeaderContent = HeaderContent;
+        _cachedChildContent = ChildContent;
+        _cachedDisabled = Disabled;
+        _cachedClass = Class;
+        _cachedPanelClass = PanelClass;
     }
 
     public void Dispose()

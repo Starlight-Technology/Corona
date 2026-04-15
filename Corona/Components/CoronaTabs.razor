@@ -68,15 +68,20 @@
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public string Class { get; set; } = string.Empty;
 
-    private readonly List<CoronaTabItem> _items = [];
-    private readonly List<CoronaTabDefinition> _tabs = [];
+    // Fixed: initialize Lists properly
+    private readonly List<CoronaTabItem> _items = new();
+    private readonly List<CoronaTabDefinition> _tabs = new();
 
     private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
 
 
     protected override void OnInitialized()
     {
-        ThemeProvider.OnChange += HandleThemeChanged;
+        // Guard against ThemeProvider being null to avoid NREs
+        if (ThemeProvider is not null)
+        {
+            ThemeProvider.OnChange += HandleThemeChanged;
+        }
     }
 
     private void HandleThemeChanged()
@@ -165,7 +170,10 @@
     private string GetTabPanelId(int index) => $"corona-tabpanel-{_tabs[index].Id}-{index}";
     public void Dispose()
     {
-        ThemeProvider.OnChange -= HandleThemeChanged;
+        if (ThemeProvider is not null)
+        {
+            ThemeProvider.OnChange -= HandleThemeChanged;
+        }
     }
 
 }
