@@ -1,27 +1,67 @@
-
-
 .docs-shell {
+    height: calc(100vh - 3.25rem); /* subtract header height */
     min-height: calc(100vh - 3.25rem);
+    overflow: hidden; /* prevent body scrolling, content will scroll inside */
     display: grid;
     grid-template-columns: 300px minmax(0, 1fr);
     transition: grid-template-columns .25s ease;
 }
 
-    /* drawer fechado */
-    .docs-shell:not(.drawer-open) {
-        grid-template-columns: 0 minmax(0, 1fr);
-    }
-
-    /* drawer aberto */
-    .docs-shell.drawer-open {
-        grid-template-columns: 300px minmax(0, 1fr);
-    }
-
-.docs-content {
-    transition: margin-left .25s ease;
+/* drawer fechado */
+.docs-shell:not(.drawer-open) {
+    grid-template-columns: 0 minmax(0, 1fr);
 }
 
+/* drawer aberto */
+.docs-shell.drawer-open {
+    grid-template-columns: 300px minmax(0, 1fr);
+}
 
+.docs-content {
+    transition: margin-left .25s ease;   
+    width: 100%;
+    box-sizing: border-box;
+    height: 100%;          /* fill the remaining height */
+    overflow: auto;        /* only this area scrolls */
+    /* default: no top padding on small screens (mobile / BlazorWebView) */
+    padding: 0 0 1rem;
+    -webkit-overflow-scrolling: touch; /* smoother scrolling on mobile */
+}
+
+/* Apply larger padding only on wider viewports (web / desktop) */
+@media (min-width: 500px) {
+    .docs-content {
+        transition: margin-left .25s ease;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 1.5rem 0 2rem;
+    }
+}
+
+/* Small devices safety — ensure no top gap */
+@media (max-width: 499px) {
+    .docs-content {
+        padding-top: 0;
+        padding-bottom: 1rem;
+    }
+}
+
+/* === Overrides to remove safe-area padding coming from global app.css ===
+   Use :global() so the rule actually targets the global selectors generated
+   by other CSS files (app.css). Add !important to beat global rules from
+   the shared stylesheet / runtime (BlazorWebView / MAUI). */
+@media (max-width: 799px) {
+    :global(.docs-shell) {
+        padding-top: 0 !important;
+    }
+
+    /* If global body adds env(safe-area-inset-top) (app.css), override it on small screens */
+    :global(body) {
+        padding-top: 0 !important;
+    }
+}
+
+/* Keep drawer title styling */
 .docs-drawer-title {
     margin: 0;
     font-size: .9rem;
@@ -30,8 +70,19 @@
     opacity: .7;
 }
 
-.docs-content {
-    width: 100%;
+.corona-page-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3.25rem; /* same value used in layout calc */
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    transition: background-color .2s ease, box-shadow .2s ease;
     box-sizing: border-box;
-    padding: 1.5rem 0 2rem;
+    background: var(--corona-header-bg, transparent); /* keep background so content isn't visible behind it */
+    padding: 0 1rem;
 }

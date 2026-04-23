@@ -23,8 +23,6 @@
 
 .corona-drawer {
     position: sticky;
-    top: var(--corona-header-height, 4rem);
-    height: calc(100vh - var(--corona-header-height, 4rem));
     bottom: 0;
     overflow-y: auto;
     box-sizing: border-box;
@@ -50,8 +48,6 @@
 @media (min-width: 1024px) {
     .corona-drawer.is-open {
         position: sticky;
-        top: var(--corona-header-height, 4rem);
-        height: calc(100vh - var(--corona-header-height, 4rem));
         transform: none !important; 
     }
 
