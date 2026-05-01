@@ -5,7 +5,7 @@
 @using Microsoft.AspNetCore.Components.Web
 @inject CoronaThemeProvider ThemeProvider
 
-<header class="corona-page-header @Class" style="@BuildStyle()">
+<header class="corona-page-header @Class" style="@BuildStyle(); overflow: hidden;">
     <div class="corona-page-header__start">
         @if (ShowMenuButton)
         {

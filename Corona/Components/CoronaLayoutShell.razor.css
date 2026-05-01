@@ -35,6 +35,7 @@
         width: 100%;
         box-sizing: border-box;
         padding: 1.5rem 0 2rem;
+        overflow: auto;
     }
 }
 
@@ -43,6 +44,7 @@
     .docs-content {
         padding-top: 0;
         padding-bottom: 1rem;
+        overflow: auto;
     }
 }
 
@@ -85,4 +87,5 @@
     box-sizing: border-box;
     background: var(--corona-header-bg, transparent); /* keep background so content isn't visible behind it */
     padding: 0 1rem;
+    overflow: hidden;
 }

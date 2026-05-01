@@ -17,7 +17,7 @@
         <input @attributes="AdditionalAttributes"
                class="corona-input__field"
                type="@Type"
-               value="@CurrentValueAsString"
+               value="@_displayValue"
                @oninput="OnInput"
                disabled
                placeholder="@Placeholder" />
@@ -27,7 +27,7 @@
         <input @attributes="AdditionalAttributes"
                class="corona-input__field"
                type="@Type"
-               value="@CurrentValueAsString"
+               value="@_displayValue"
                @oninput="OnInput"
                placeholder="@Placeholder" />
     }
@@ -95,13 +95,6 @@
         };
 
         var formatted = FormatValueForDisplay(parsedValue);
-
-        if (ShouldForceDisplayRefresh(raw, formatted))
-        {
-            _displayValue = string.Empty;
-            await InvokeAsync(StateHasChanged);
-            await Task.Yield();
-        }
 
         CurrentValue = Type switch
         {
@@ -181,12 +174,5 @@
             "phone" => FormatPhone(value),
             _ => value ?? string.Empty
         };
-    }
-
-    private bool ShouldForceDisplayRefresh(string raw, string formatted)
-    {
-        return Type is "currency" or "phone"
-            && !string.Equals(raw, formatted, StringComparison.Ordinal)
-            && string.Equals(_displayValue, formatted, StringComparison.Ordinal);
     }
 }
