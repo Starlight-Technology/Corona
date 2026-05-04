@@ -1,6 +1,8 @@
 using Bunit;
 using Corona.Components;
 using Corona.Components.Enums;
+using Corona.Components.Models;
+
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Web;
@@ -212,7 +214,6 @@ public sealed class ComponentRenderingTests : ComponentTestContext
         var items = new List<CoronaNavItem> { new() { Text = "Item", Url = "/" } };
 
         var cut = RenderComponent<CoronaLayoutShell>(p => p
-            .Add(x => x.NavItems, items)
             .Add(x => x.DrawerTitle, "Menu")
             .Add(x => x.ShowMenuButton, true)
             .Add(x => x.ChildContent, (RenderFragment)(b => b.AddContent(0, "Main content"))));

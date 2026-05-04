@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 
-namespace Corona.Components;
+namespace Corona.Components.Models;
 
 public sealed class CoronaNavItem
 {

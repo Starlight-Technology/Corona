@@ -2,6 +2,7 @@
 @implements IDisposable
 @using Corona.Components.Enums
 @using Corona.Theming
+@using Microsoft.AspNetCore.Components.Web
 @inject CoronaThemeProvider ThemeProvider
 
 <button type="button"
@@ -9,7 +10,8 @@
         style="@BuildStyle()"
         disabled="@IsDisabled"
         aria-busy="@Loading"
-        onclick="@HandleClickAsync">
+        @onclick="HandleClickAsync"
+        @onkeydown="HandleKeyDownAsync">
     @if (Loading)
     {
         <span class="corona-button__spinner" aria-hidden="true"></span>
@@ -103,6 +105,14 @@
         }
 
         await OnClick.InvokeAsync();
+    }
+
+    private async Task HandleKeyDownAsync(KeyboardEventArgs args)
+    {
+        if (args.Key is "Enter" or " ")
+        {
+            await HandleClickAsync();
+        }
     }
 
     private string BuildStyle()
