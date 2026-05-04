@@ -1,0 +1,52 @@
+﻿.corona-chat {
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.corona-chat__messages {
+    flex: 1;
+    padding: 12px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.corona-chat__message {
+    display: flex;
+}
+
+    .corona-chat__message.user {
+        justify-content: flex-end;
+    }
+
+    .corona-chat__message.bot {
+        justify-content: flex-start;
+    }
+
+    .corona-chat__message .bubble {
+        max-width: 70%;
+        padding: 10px 14px;
+        border-radius: 12px;
+        background: #eee;
+    }
+
+    .corona-chat__message.user .bubble {
+        background: #007bff;
+        color: white;
+    }
+
+.corona-chat__input {
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    border-top: 1px solid #ccc;
+}
+
+.corona-chat__textarea {
+    flex: 1;
+    resize: none;
+    height: 50px;
+    padding: 8px;
+}

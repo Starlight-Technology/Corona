@@ -1,4 +1,4 @@
-using Corona.Components;
+using Corona.Components.Models;
 
 namespace Corona.Components.Navigation;
 

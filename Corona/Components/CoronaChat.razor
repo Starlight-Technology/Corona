@@ -1,0 +1,94 @@
+﻿@namespace Corona.Components
+@using Corona.Components.Models
+@using Corona.Theming
+@using Microsoft.AspNetCore.Components.Web
+
+<div class="corona-chat @Class" style="@BuildStyle()">
+
+    <!-- MESSAGES -->
+    <div class="corona-chat__messages">
+        @if (Messages != null)
+        {
+            @foreach (var msg in Messages)
+            {
+                <div class="corona-chat__message @(msg.IsUser ? "user" : "bot")">
+                    <div class="bubble">
+                        @msg.Content
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <!-- INPUT AREA -->
+    <div class="corona-chat__input">
+        <textarea class="corona-chat__textarea"
+              placeholder="@Placeholder"
+              @bind="_input"
+              @bind:event="oninput"
+              disabled="@Disabled"
+                  @onkeydown="HandleKeyDown">
+        </textarea>
+
+        <CoronaButton OnClick="SendMessage"
+                      Disabled="@Disabled"
+                      Variant="Corona.Components.Enums.CoronaButtonVariant.Filled">
+            Enviar
+        </CoronaButton>
+    </div>
+
+</div>
+
+@code {
+    [CascadingParameter] public CoronaTheme? Theme { get; set; }
+    [Inject] public CoronaThemeProvider ThemeProvider { get; set; } = default!;
+
+    // DATA
+    [Parameter] public List<CoronaChatMessage> Messages { get; set; } = new();
+
+    [Parameter] public EventCallback<CoronaChatMessage> OnSend { get; set; }
+
+    // UX
+    [Parameter] public string Placeholder { get; set; } = "Digite sua mensagem...";
+    [Parameter] public bool Disabled { get; set; }
+
+    // STYLE
+    [Parameter] public string Class { get; set; } = string.Empty;
+    [Parameter] public string? Height { get; set; } = "400px";
+
+    private string _input = string.Empty;
+
+    private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme);
+
+    private string BuildStyle()
+    {
+        return $"height:{Height}; display:flex; flex-direction:column;";
+    }
+
+    private async Task SendMessage()
+    {
+        if (Disabled || string.IsNullOrWhiteSpace(_input))
+            return;
+
+        var message = new CoronaChatMessage
+        {
+            Content = _input,
+            IsUser = true
+        };
+
+        Messages.Add(message);
+
+        await OnSend.InvokeAsync(message);
+
+        _input = string.Empty;
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !e.ShiftKey)
+        {
+            
+            await SendMessage();
+        }
+    }
+}
