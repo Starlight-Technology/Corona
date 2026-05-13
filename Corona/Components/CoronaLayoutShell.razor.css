@@ -1,7 +1,10 @@
 .docs-shell {
-    height: calc(100vh - 3.25rem); /* subtract header height */
-    min-height: calc(100vh - 3.25rem);
-    overflow: hidden; /* prevent body scrolling, content will scroll inside */
+    position: fixed;
+    top: 3.25rem;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
     display: grid;
     grid-template-columns: 300px minmax(0, 1fr);
     transition: grid-template-columns .25s ease;
@@ -18,14 +21,13 @@
 }
 
 .docs-content {
-    transition: margin-left .25s ease;   
+    transition: margin-left .25s ease;
     width: 100%;
     box-sizing: border-box;
-    height: 100%;          /* fill the remaining height */
-    overflow: auto;        /* only this area scrolls */
-    /* default: no top padding on small screens (mobile / BlazorWebView) */
-    padding: 0 0 1rem;
+    height: 90%; /* fill the remaining height */
+    overflow: auto; /* only this area scrolls */
     -webkit-overflow-scrolling: touch; /* smoother scrolling on mobile */
+    padding-bottom: calc(32px + env(safe-area-inset-bottom));
 }
 
 /* Apply larger padding only on wider viewports (web / desktop) */
@@ -34,8 +36,8 @@
         transition: margin-left .25s ease;
         width: 100%;
         box-sizing: border-box;
-        padding: 1.5rem 0 2rem;
         overflow: auto;
+        padding-bottom: calc(32px + env(safe-area-inset-bottom));
     }
 }
 
@@ -43,8 +45,8 @@
 @media (max-width: 499px) {
     .docs-content {
         padding-top: 0;
-        padding-bottom: 1rem;
         overflow: auto;
+        padding-bottom: calc(32px + env(safe-area-inset-bottom));
     }
 }
 
