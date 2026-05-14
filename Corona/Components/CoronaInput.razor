@@ -88,23 +88,23 @@
             return;
 
         var raw = e.Value?.ToString() ?? string.Empty;
-        var parsedValue = Type switch
+
+        var digits = Type switch
         {
             "currency" => UnmaskCurrency(raw),
             "phone" => UnmaskPhone(raw),
             _ => raw
         };
 
-        var formatted = FormatValueForDisplay(parsedValue);
+        var formatted = FormatValueForDisplay(digits);
 
-        CurrentValue = Type switch
-        {
-            "currency" or "phone" => formatted,
-            _ => parsedValue
-        };
+        // Valor interno deve ser SEM formatação
+        CurrentValue = digits;
 
+        // Valor exibido deve ser formatado
         _displayValue = formatted;
     }
+
 
     // InputBase<string> exige implementação de TryParseValueFromString
     protected override bool TryParseValueFromString(string? value, out string result, out string validationErrorMessage)
@@ -116,32 +116,26 @@
     }
 
     // ---------- Formatação / Desmascaramento ----------
-    private string FormatCurrency(string? value)
+    private string FormatCurrency(string? digits)
     {
-        if (string.IsNullOrWhiteSpace(value))
+        if (string.IsNullOrWhiteSpace(digits))
             return "";
 
-        var normalized = UnmaskCurrency(value);
-
-        if (!decimal.TryParse(normalized, NumberStyles.Number, CultureInfo.InvariantCulture, out var number))
+        if (!long.TryParse(digits, out var number))
             return "";
 
-        return number.ToString("C", new CultureInfo("pt-BR"));
+        var val = number / 100m;
+
+        return val.ToString("C", new CultureInfo("pt-BR"));
     }
+
 
     private string UnmaskCurrency(string raw)
     {
-        var digits = new string(raw.Where(char.IsDigit).ToArray());
-
-        if (string.IsNullOrEmpty(digits))
-            return "";
-
-        if (!decimal.TryParse(digits, out var parsed))
-            return "";
-
-        var val = parsed / 100m;
-        return val.ToString(CultureInfo.InvariantCulture);
+        return new string(raw.Where(char.IsDigit).ToArray());
     }
+
+
 
     private string FormatPhone(string? value)
     {
