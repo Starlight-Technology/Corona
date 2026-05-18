@@ -38,6 +38,8 @@
 
     // ===== STYLE =====
     [Parameter] public string Class { get; set; } = string.Empty;
+    [Parameter] public string? BackgroundColor { get; set; }
+
 
     // ===== HEADER =====
     [Parameter] public CoronaTextAlign HeaderTextAlign { get; set; } = CoronaTextAlign.Left;
@@ -69,7 +71,7 @@
             height:{Height};
             margin:{Margin};
             padding:0;
-            background:{semantic.CardBackground};
+            background: {BackgroundColor ?? semantic.CardBackground};
             color:{semantic.TextPrimary};
             border-radius:{semantic.RadiusCard};
             box-shadow:{semantic.ElevationCard};
