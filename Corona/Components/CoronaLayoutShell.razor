@@ -3,6 +3,7 @@
 @using Corona.Theming
 @inherits LayoutComponentBase
 @inject CoronaThemeProvider ThemeProvider
+@inject NavigationManager Nav
 
 <CoronaPageHeader Title="@HeaderTitle"
                   ShowMenuButton="@ShowMenuButton"
@@ -24,7 +25,7 @@
         </CoronaStack>
     </CoronaDrawer>
 
-    <main class="docs-content" style="overflow:auto">
+    <main class="docs-content" style="overflow:auto" @key="Nav.Uri">
         @ChildContent
     </main>
 </div>
