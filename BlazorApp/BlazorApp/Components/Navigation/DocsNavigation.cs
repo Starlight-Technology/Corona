@@ -34,7 +34,8 @@ public static class DocsNavigation
             Expanded = true,
             Children =
             [
-                new CoronaNavItem { Text = "Button", Url = "/components/button" }
+                new CoronaNavItem { Text = "Button", Url = "/components/button" },
+                new CoronaNavItem { Text = "File Upload", Url = "/components/file-upload" }
             ]
         },
         new CoronaNavItem
@@ -46,6 +47,7 @@ public static class DocsNavigation
             [
                 new CoronaNavItem { Text = "Badge", Url = "/components/badge" },
                 new CoronaNavItem { Text = "Card", Url = "/components/card" },
+                new CoronaNavItem { Text = "Chart", Url = "/components/chart" },
                 new CoronaNavItem { Text = "Icon", Url = "/components/icon" }
             ]
         },
@@ -56,7 +58,9 @@ public static class DocsNavigation
             Expanded = true,
             Children =
             [
-                new CoronaNavItem { Text = "Dialog", Url = "/components/dialog" }
+                new CoronaNavItem { Text = "Dialog", Url = "/components/dialog" },
+                new CoronaNavItem { Text = "Loading", Url = "/components/loading" },
+                new CoronaNavItem { Text = "Progress", Url = "/components/progress" }
             ]
         },
         new CoronaNavItem

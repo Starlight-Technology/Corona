@@ -14,9 +14,9 @@
     }
 
     <input @attributes="AdditionalAttributes"
-           class="corona-input__field
-    type="text"
-           value="@CurrentValue"
+           class="corona-input__field"
+           type="text"
+           value="@_displayValue"
            @oninput="OnInput"
            onchange="@OnValueChange"
            placeholder="@Placeholder"
@@ -48,18 +48,14 @@
     [Parameter] public string? Width { get; set; }
     [Parameter] public string? Height { get; set; }
 
+    private string _displayValue = string.Empty;
+
     private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
 
-    // protected override void OnParametersSet()
-    // {
-    //     // Sincroniza o texto exibido quando Value for alterado externamente
-    //     CurrentValue = Type switch
-    //     {
-    //         "currency" => FormatCurrency(CurrentValue),
-    //         "phone" => FormatPhone(CurrentValue),
-    //         _ => CurrentValue ?? ""
-    //     };
-    // }
+    protected override void OnParametersSet()
+    {
+        _displayValue = FormatValueForDisplay(CurrentValue);
+    }
 
     private string BuildStyle()
     {
@@ -75,33 +71,30 @@
     // Evento oninput do input HTML
     private async Task OnInput(ChangeEventArgs e)
     {
-        var raw = e.Value?.ToString() ?? "";
-        CurrentValue = String.Empty;
-        await InvokeAsync(StateHasChanged);
-        // Atualiza o valor "real" do InputBase (isso dispara ValueChanged e validação)
-        var unmasked = Type switch
+        var raw = e.Value?.ToString() ?? string.Empty;
+        var parsedValue = Type switch
         {
             "currency" => UnmaskCurrency(raw),
             "phone" => UnmaskPhone(raw),
             _ => raw
         };
 
-        // Define o valor interno do InputBase (CurrentValue) usando a string desmascarada
-        // CurrentValueAsString chama TryParseValueFromString internamente; aqui forçamos CurrentValue diretamente
-        // Para InputBase<string> podemos atribuir CurrentValueAsString
-        CurrentValue = unmasked;
-        await InvokeAsync(StateHasChanged);
+        var formatted = FormatValueForDisplay(parsedValue);
 
-        // Re-formata o texto exibido com base no valor atual
-        var formatted = Type switch
+        if (ShouldForceDisplayRefresh(raw, formatted))
         {
-            "currency" => FormatCurrency(CurrentValue),
-            "phone" => FormatPhone(CurrentValue),
-            _ => CurrentValue ?? ""
+            _displayValue = string.Empty;
+            await InvokeAsync(StateHasChanged);
+            await Task.Yield();
+        }
+
+        CurrentValue = Type switch
+        {
+            "currency" or "phone" => formatted,
+            _ => parsedValue
         };
 
-        CurrentValue = formatted;
-        await InvokeAsync(StateHasChanged);
+        _displayValue = formatted;
     }
 
     // InputBase<string> exige implementação de TryParseValueFromString
@@ -119,7 +112,9 @@
         if (string.IsNullOrWhiteSpace(value))
             return "";
 
-        if (!decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var number))
+        var normalized = UnmaskCurrency(value);
+
+        if (!decimal.TryParse(normalized, NumberStyles.Number, CultureInfo.InvariantCulture, out var number))
             return "";
 
         return number.ToString("C", new CultureInfo("pt-BR"));
@@ -161,5 +156,22 @@
     private string UnmaskPhone(string raw)
     {
         return new string(raw.Where(char.IsDigit).ToArray());
+    }
+
+    private string FormatValueForDisplay(string? value)
+    {
+        return Type switch
+        {
+            "currency" => FormatCurrency(value),
+            "phone" => FormatPhone(value),
+            _ => value ?? string.Empty
+        };
+    }
+
+    private bool ShouldForceDisplayRefresh(string raw, string formatted)
+    {
+        return Type is "currency" or "phone"
+            && !string.Equals(raw, formatted, StringComparison.Ordinal)
+            && string.Equals(_displayValue, formatted, StringComparison.Ordinal);
     }
 }

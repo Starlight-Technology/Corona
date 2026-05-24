@@ -9,12 +9,13 @@
     <div class="corona-page-header__start">
         @if (ShowMenuButton)
         {
-            <CoronaButton IconStyle="CoronaIconStyle.Brand"
-                          Icon="@MenuIcon"
-                          OnClick="HandleMenuClick">
-                
-            </CoronaButton>
-
+            <button type="button"
+                    class="corona-page-header__menu-button"
+                    aria-label="Toggle navigation"
+                    onclick="@HandleMenuClick"
+                    onkeydown="@HandleMenuKeyDown">
+                @MenuIcon
+            </button>
         }
 
         <h1 class="corona-page-header__title">@Title</h1>

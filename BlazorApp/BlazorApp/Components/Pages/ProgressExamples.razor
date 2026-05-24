@@ -1,0 +1,82 @@
+@page "/components/progress"
+@using Corona.Components.Enums
+
+<PageTitle>Progress | Corona Docs</PageTitle>
+
+<CoronaContainer MaxWidth="CoronaContainerMaxWidth.Xl">
+    <CoronaStack Spacing="1.5rem" FullWidth="true">
+        <section>
+            <h1>Progress</h1>
+            <p class="docs-page-description">Progress bars communicate upload, processing, and completion states with determinate or indeterminate feedback.</p>
+        </section>
+
+        <section>
+            <h2>Live examples</h2>
+            <CoronaStack Spacing="1rem" FullWidth="true">
+                <ExampleSection Title="Determinate"
+                                Description="Use a labeled progress bar when the current completion percentage is known."
+                                Code='@("<CoronaProgressBar Label=\"Import\" Value=\"64\" />")'>
+                    <CoronaProgressBar Label="Import" Value="64" />
+                </ExampleSection>
+
+                <ExampleSection Title="Buffered and striped"
+                                Description="Buffered progress can show queued or preloaded work ahead of the current position."
+                                Code='@("<CoronaProgressBar Label=\"Upload\" Value=\"42\" BufferValue=\"76\" Striped=\"true\" Color=\"CoronaColorSemantic.Success\" />")'>
+                    <CoronaProgressBar Label="Upload" Value="42" BufferValue="76" Striped="true" Color="CoronaColorSemantic.Success" />
+                </ExampleSection>
+
+                <ExampleSection Title="Indeterminate"
+                                Description="Use indeterminate progress when the duration cannot be predicted."
+                                Code='@("<CoronaProgressBar Label=\"Analyzing files\" Indeterminate=\"true\" ShowValue=\"false\" />")'>
+                    <CoronaProgressBar Label="Analyzing files" Indeterminate="true" ShowValue="false" Color="CoronaColorSemantic.Warning" />
+                </ExampleSection>
+
+                <ExampleSection Title="Simulated task"
+                                Description="Interactive progress helps validate value updates and disabled action states."
+                                Code='@("<CoronaProgressBar Label=\"Sync\" Value=\"_progress\" Color=\"CoronaColorSemantic.Success\" />")'>
+                    <CoronaStack Spacing="1rem" FullWidth="true">
+                        <CoronaProgressBar Label="Sync" Value="_progress" Color="CoronaColorSemantic.Success" />
+                        <CoronaButton Size="CoronaComponentSize.Small" OnClick="RunProgressAsync" Disabled="_running" Loading="_running">
+                            @(_running ? "Running" : "Run task")
+                        </CoronaButton>
+                    </CoronaStack>
+                </ExampleSection>
+            </CoronaStack>
+        </section>
+
+        <section>
+            <h2>Parameters</h2>
+            <ParameterTable Parameters="_parameters" />
+        </section>
+    </CoronaStack>
+</CoronaContainer>
+
+@code {
+    private double _progress = 38;
+    private bool _running;
+
+    private readonly IReadOnlyList<ParameterTable.ParameterDefinition> _parameters =
+    [
+        new("Value", "double", "0", "Current progress value."),
+        new("Max", "double", "100", "Maximum value used to calculate percent."),
+        new("BufferValue", "double?", "null", "Optional secondary progress fill."),
+        new("Indeterminate", "bool", "false", "Animates the fill when the exact value is unknown."),
+        new("Striped", "bool", "false", "Adds a striped fill pattern."),
+        new("ShowValue", "bool", "true", "Shows the formatted percentage beside the label.")
+    ];
+
+    private async Task RunProgressAsync()
+    {
+        _running = true;
+        _progress = 0;
+
+        while (_progress < 100)
+        {
+            _progress += 12.5;
+            await Task.Delay(220);
+        }
+
+        _progress = 100;
+        _running = false;
+    }
+}

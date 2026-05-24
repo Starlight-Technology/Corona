@@ -11,6 +11,7 @@
         {
             var tab = _tabs[index];
             var active = index == ActiveIndex;
+            var tabIndex = index;
 
             <button type="button"
                     id="@GetTabButtonId(index)"
@@ -19,7 +20,7 @@
                     disabled="@tab.Disabled"
                     aria-selected="@active"
                     aria-controls="@GetTabPanelId(index)"
-                    @onclick="() => SetActiveIndexAsync(index)">
+                    onclick="@(() => SetActiveIndexAsync(tabIndex))">
                 @if (tab.HeaderContent is not null)
                 {
                     @tab.HeaderContent
