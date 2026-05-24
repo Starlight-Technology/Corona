@@ -1,4 +1,4 @@
-﻿@using Corona.Components.Models
+@using Corona.Components.Models
 @using Microsoft.AspNetCore.Components.Web
 @inject NavigationManager Nav
 
@@ -7,74 +7,129 @@
      @onpointerup="EndTouch"
      @onpointercancel="CancelTouch"
      @key="Nav.Uri">
-
     @ChildContent
 </div>
 
 @code {
-    [Parameter] public RenderFragment ChildContent { get; set; }
-    [Parameter] public IReadOnlyList<CoronaNavItem> Items { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public IReadOnlyList<CoronaNavItem> Items { get; set; } = [];
+    [Parameter] public double SwipeThresholdPx { get; set; } = 80;
 
-    private double startX;
-    private bool touching;
+    private double _startX;
+    private double _startY;
+    private bool _touching;
 
-    // Gera a lista de rotas a partir do menu
-    private List<string> PageOrder =>
-        Items?
-            .Where(i => !string.IsNullOrWhiteSpace(i.Url))
-            .Select(i => i.Url!)
-            .ToList()
-        ?? new();
+    private List<string> PageOrder => FlattenItems(Items)
+        .Select(item => NormalizeUrl(item.Url))
+        .Where(url => url is not null)
+        .Select(url => url!)
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToList();
 
-    void StartTouch(PointerEventArgs e)
+    private void StartTouch(PointerEventArgs e)
     {
-        touching = true;
-        startX = e.ClientX;
+        _touching = true;
+        _startX = e.ClientX;
+        _startY = e.ClientY;
     }
 
-    void EndTouch(PointerEventArgs e)
+    private void EndTouch(PointerEventArgs e)
     {
-        if (!touching) return;
+        if (!_touching)
+        {
+            return;
+        }
 
-        var delta = e.ClientX - startX;
+        var deltaX = e.ClientX - _startX;
+        var deltaY = e.ClientY - _startY;
 
-        if (delta < -80)
-            GoNext();
+        if (Math.Abs(deltaX) >= SwipeThresholdPx && Math.Abs(deltaX) > Math.Abs(deltaY))
+        {
+            if (deltaX < 0)
+            {
+                GoNext();
+            }
+            else
+            {
+                GoPrev();
+            }
+        }
 
-        if (delta > 80)
-            GoPrev();
-
-        touching = false;
+        _touching = false;
     }
 
-    void CancelTouch(PointerEventArgs e)
+    private void CancelTouch()
     {
-        touching = false;
+        _touching = false;
     }
 
     private void GoNext()
     {
-        var current = Normalize(Nav.ToBaseRelativePath(Nav.Uri));
-        var index = PageOrder.IndexOf(current);
+        var current = NormalizeCurrentUrl();
+        var pageOrder = PageOrder;
+        var index = pageOrder.IndexOf(current);
 
-        if (index >= 0 && index < PageOrder.Count - 1)
-            Nav.NavigateTo(PageOrder[index + 1]);
+        if (index >= 0 && index < pageOrder.Count - 1)
+        {
+            Nav.NavigateTo(pageOrder[index + 1]);
+        }
     }
 
     private void GoPrev()
     {
-        var current = Normalize(Nav.ToBaseRelativePath(Nav.Uri));
-        var index = PageOrder.IndexOf(current);
+        var current = NormalizeCurrentUrl();
+        var pageOrder = PageOrder;
+        var index = pageOrder.IndexOf(current);
 
         if (index > 0)
-            Nav.NavigateTo(PageOrder[index - 1]);
+        {
+            Nav.NavigateTo(pageOrder[index - 1]);
+        }
     }
 
-    private static string Normalize(string url)
+    private string NormalizeCurrentUrl()
     {
-        if (!url.StartsWith("/"))
-            return "/" + url;
+        var relativePath = Nav.ToBaseRelativePath(Nav.Uri);
+        return NormalizeRelativeUrl(relativePath);
+    }
 
-        return url;
+    private string NormalizeRelativeUrl(string url)
+    {
+        var absoluteUri = Nav.ToAbsoluteUri(url);
+        return NormalizePath(absoluteUri.AbsolutePath);
+    }
+
+    private string? NormalizeUrl(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            return null;
+        }
+
+        var absoluteUri = Nav.ToAbsoluteUri(url);
+        return NormalizePath(absoluteUri.AbsolutePath);
+    }
+
+    private static string NormalizePath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path) || path == "/")
+        {
+            return "/";
+        }
+
+        return "/" + path.Trim('/');
+    }
+
+    private static IEnumerable<CoronaNavItem> FlattenItems(IEnumerable<CoronaNavItem> items)
+    {
+        foreach (var item in items)
+        {
+            yield return item;
+
+            foreach (var child in FlattenItems(item.Children))
+            {
+                yield return child;
+            }
+        }
     }
 }
