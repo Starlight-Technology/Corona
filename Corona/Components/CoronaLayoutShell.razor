@@ -8,9 +8,8 @@
 <CoronaPageHeader Title="@HeaderTitle"
                   ShowMenuButton="@ShowMenuButton"
                   OnMenuClick="ToggleDrawer"
-                  Actions="@HeaderActions" 
-                  MenuIcon="@MenuIcon"
-                  />
+                  Actions="@HeaderActions"
+                  MenuIcon="@MenuIcon" />
 
 <div class="docs-shell">
     <CoronaDrawer Open="DrawerOpen"
@@ -24,18 +23,31 @@
             <CoronaNavMenu Items="DrawerItens" />
         </CoronaStack>
     </CoronaDrawer>
-
-    <main class="docs-content" style="overflow:auto" @key="Nav.Uri">
-        @ChildContent
-    </main>
+    @if (Swipe)
+    {
+        <CoronaSwipeNavigator Items="DrawerItens">
+            <main class="docs-content" style="overflow:auto" @key="Nav.Uri">
+                @ChildContent
+            </main>
+        </CoronaSwipeNavigator>
+    }
+    else
+    {
+        <main class="docs-content" style="overflow:auto" @key="Nav.Uri">
+            @ChildContent
+        </main>
+    }
 </div>
 
 @code {
 
     [Parameter]
+    public bool Swipe { get; set; } = false;
+
+    [Parameter]
     public RenderFragment ChildContent { get; set; }
 
-    [Parameter] 
+    [Parameter]
     public IReadOnlyList<CoronaNavItem> DrawerItens { get; set; }
 
     [Parameter]

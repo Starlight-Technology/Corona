@@ -1,0 +1,80 @@
+﻿@using Corona.Components.Models
+@using Microsoft.AspNetCore.Components.Web
+@inject NavigationManager Nav
+
+<div class="swipe-container"
+     @onpointerdown="StartTouch"
+     @onpointerup="EndTouch"
+     @onpointercancel="CancelTouch"
+     @key="Nav.Uri">
+
+    @ChildContent
+</div>
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public IReadOnlyList<CoronaNavItem> Items { get; set; }
+
+    private double startX;
+    private bool touching;
+
+    // Gera a lista de rotas a partir do menu
+    private List<string> PageOrder =>
+        Items?
+            .Where(i => !string.IsNullOrWhiteSpace(i.Url))
+            .Select(i => i.Url!)
+            .ToList()
+        ?? new();
+
+    void StartTouch(PointerEventArgs e)
+    {
+        touching = true;
+        startX = e.ClientX;
+    }
+
+    void EndTouch(PointerEventArgs e)
+    {
+        if (!touching) return;
+
+        var delta = e.ClientX - startX;
+
+        if (delta < -80)
+            GoNext();
+
+        if (delta > 80)
+            GoPrev();
+
+        touching = false;
+    }
+
+    void CancelTouch(PointerEventArgs e)
+    {
+        touching = false;
+    }
+
+    private void GoNext()
+    {
+        var current = Normalize(Nav.ToBaseRelativePath(Nav.Uri));
+        var index = PageOrder.IndexOf(current);
+
+        if (index >= 0 && index < PageOrder.Count - 1)
+            Nav.NavigateTo(PageOrder[index + 1]);
+    }
+
+    private void GoPrev()
+    {
+        var current = Normalize(Nav.ToBaseRelativePath(Nav.Uri));
+        var index = PageOrder.IndexOf(current);
+
+        if (index > 0)
+            Nav.NavigateTo(PageOrder[index - 1]);
+    }
+
+    private static string Normalize(string url)
+    {
+        if (!url.StartsWith("/"))
+            return "/" + url;
+
+        return url;
+    }
+}
