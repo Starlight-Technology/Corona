@@ -1,4 +1,5 @@
 using Corona.Components;
+using Corona.Components.Models;
 
 namespace BlazorApp.Components.Navigation;
 
@@ -35,6 +36,7 @@ public static class DocsNavigation
             Children =
             [
                 new CoronaNavItem { Text = "Button", Url = "/components/button" },
+                new CoronaNavItem { Text = "Input", Url = "/components/input" },
                 new CoronaNavItem { Text = "File Upload", Url = "/components/file-upload" }
             ]
         },

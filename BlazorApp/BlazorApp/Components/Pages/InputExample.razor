@@ -1,0 +1,40 @@
+﻿@page "/components/input"
+
+<PageTitle>Input | Corona Docs</PageTitle>
+
+<CoronaCard>
+    <CoronaStack Spacing="1.5rem" FullWidth="true">
+        <section>
+            <h1>Input</h1>
+            <p class="docs-page-description">Inputs allow users to enter and edit text.</p>
+        </section>
+        <section>
+            <h2>Live examples</h2>
+            <CoronaStack Spacing="1rem" FullWidth="true">
+                <ExampleSection Title="Basic usage"
+                                Description="Use the filled variant for primary actions."
+                                Code='@("<CoronaInput Placeholder=\"Enter your name\" />")'>
+                    <CoronaInput Placeholder="Enter your name" Value="text"/>
+                </ExampleSection>
+            </CoronaStack>
+        </section>
+        <section>
+            <h2>Usage</h2>
+            <CodeSnippet Code='@("<CoronaInput Placeholder=\"Enter your name\" Value=\"name\" OnChange=\"HandleNameChange\" />")' />
+        </section>
+        <section>
+            <h2>Parameters</h2>
+            @* <ParameterTable Parameters="_parameters" /> *@
+        </section>
+    </CoronaStack>
+</CoronaCard>
+
+<CoronaCard Title="TEST">
+    <CoronaInput Placeholder="Enter your name"
+                 Type="text"
+                  Value="@text" />
+</CoronaCard>
+
+@code {
+    public string text { get; set; }
+}

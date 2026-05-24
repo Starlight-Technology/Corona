@@ -1,3 +1,4 @@
+@using Corona.Components.Models
 @using Corona.Components.Navigation
 @using Corona.Theming
 @inherits LayoutComponentBase
@@ -23,7 +24,7 @@
         </CoronaStack>
     </CoronaDrawer>
 
-    <main class="docs-content">
+    <main class="docs-content" style="overflow:auto">
         @ChildContent
     </main>
 </div>
@@ -60,7 +61,7 @@
     [Parameter]
     public bool ShowMenuButton { get; set; }
 
-    [Parameter] public string? MenuIcon { get; set; } = "☰";
+    [Parameter] public string? MenuIcon { get; set; } = "\u2630";
 
     [Parameter]
     public bool DrawerOpen { get; set; } = true;

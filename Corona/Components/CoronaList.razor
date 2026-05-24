@@ -1,0 +1,68 @@
+﻿@typeparam TItem
+
+<div class="corona-list">
+
+    @if (Items is null || !Items.Any())
+    {
+        <div class="corona-list-empty">
+            Nenhum item encontrado
+        </div>
+    }
+    else
+    {
+        <div class="corona-list-items">
+            @foreach (var item in Items)
+            {
+                @ItemTemplate(item)
+            }
+        </div>
+    }
+
+    <div class="corona-list-pagination">
+        <button @onclick="PrevPage" disabled="@(CurrentPage == 1)">
+            Anterior
+        </button>
+
+        <span>Página @CurrentPage de @TotalPages</span>
+
+        <button @onclick="NextPage" disabled="@(CurrentPage == TotalPages)">
+            Próxima
+        </button>
+    </div>
+
+</div>
+
+@code {
+    [Parameter] public IEnumerable<TItem>? Items { get; set; }
+
+    [Parameter] public int TotalCount { get; set; }
+
+    [Parameter] public int PageSize { get; set; } = 10;
+
+    [Parameter] public int CurrentPage { get; set; } = 1;
+
+    [Parameter] public EventCallback<int> OnPageChanged { get; set; }
+
+    [Parameter] public RenderFragment<TItem> ItemTemplate { get; set; } = default!;
+
+    private int TotalPages =>
+        PageSize == 0 ? 1 : (int)Math.Ceiling((double)TotalCount / PageSize);
+
+    private async Task PrevPage()
+    {
+        if (CurrentPage > 1)
+            await ChangePage(CurrentPage - 1);
+    }
+
+    private async Task NextPage()
+    {
+        if (CurrentPage < TotalPages)
+            await ChangePage(CurrentPage + 1);
+    }
+
+    private async Task ChangePage(int page)
+    {
+        CurrentPage = page;
+        await OnPageChanged.InvokeAsync(page);
+    }
+}

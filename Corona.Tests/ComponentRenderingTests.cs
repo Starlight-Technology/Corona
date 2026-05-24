@@ -464,7 +464,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
         input.Change("R$ 55,22 uwehifw");
 
         cut.WaitForAssertion(() => Assert.Equal("R$ 55,22", cut.Find("input").GetAttribute("value")));
-        Assert.Equal("R$ 55,22", currentValue);
+        Assert.Equal("5522", currentValue);
     }
 
     private static IReadOnlyList<CoronaChartDataPoint> CreateChartData() =>

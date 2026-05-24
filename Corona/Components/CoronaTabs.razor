@@ -3,23 +3,24 @@
 @using Corona.Components.Enums
 @using Corona.Components.Models
 @using Corona.Theming
+@using Microsoft.AspNetCore.Components.Web
 @inject CoronaThemeProvider ThemeProvider
 
 <div class="corona-tabs corona-tabs--@VariantClass @Class" style="@BuildContainerStyle()">
     <div class="corona-tabs__header" role="tablist" aria-orientation="horizontal">
         @for (var index = 0; index < _tabs.Count; index++)
         {
+            var tabIndex = index;
             var tab = _tabs[index];
             var active = index == ActiveIndex;
-            var tabIndex = index;
 
             <button type="button"
-                    id="@GetTabButtonId(index)"
+                    id="@GetTabButtonId(tabIndex)"
                     class="corona-tabs__tab @(active ? "is-active" : string.Empty)"
                     role="tab"
                     disabled="@tab.Disabled"
                     aria-selected="@active"
-                    aria-controls="@GetTabPanelId(index)"
+                    aria-controls="@GetTabPanelId(tabIndex)"
                     onclick="@(() => SetActiveIndexAsync(tabIndex))">
                 @if (tab.HeaderContent is not null)
                 {
@@ -69,15 +70,20 @@
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public string Class { get; set; } = string.Empty;
 
-    private readonly List<CoronaTabItem> _items = [];
-    private readonly List<CoronaTabDefinition> _tabs = [];
+    // Fixed: initialize Lists properly
+    private readonly List<CoronaTabItem> _items = new();
+    private readonly List<CoronaTabDefinition> _tabs = new();
 
     private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
 
 
     protected override void OnInitialized()
     {
-        ThemeProvider.OnChange += HandleThemeChanged;
+        // Guard against ThemeProvider being null to avoid NREs
+        if (ThemeProvider is not null)
+        {
+            ThemeProvider.OnChange += HandleThemeChanged;
+        }
     }
 
     private void HandleThemeChanged()
@@ -166,7 +172,10 @@
     private string GetTabPanelId(int index) => $"corona-tabpanel-{_tabs[index].Id}-{index}";
     public void Dispose()
     {
-        ThemeProvider.OnChange -= HandleThemeChanged;
+        if (ThemeProvider is not null)
+        {
+            ThemeProvider.OnChange -= HandleThemeChanged;
+        }
     }
 
 }
