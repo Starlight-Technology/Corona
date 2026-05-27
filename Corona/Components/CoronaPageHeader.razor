@@ -9,13 +9,13 @@
     <div class="corona-page-header__start">
         @if (ShowMenuButton)
         {
-            <CoronaButton IconStyle="CoronaIconStyle.Brand"
-                          Icon="@MenuIcon"
-                          Class="corona-page-header__menu-button"
-                          OnClick="HandleMenuClick">
-                
-            </CoronaButton>
-
+            <button type="button"
+                    class="corona-page-header__menu-button"
+                    aria-label="Toggle navigation"
+                    onclick="@HandleMenuClick"
+                    onkeydown="@HandleMenuKeyDown">
+                @MenuIcon
+            </button>
         }
 
         <h1 class="corona-page-header__title">@Title</h1>
@@ -42,7 +42,7 @@
     [Parameter] public bool ShowMenuButton { get; set; }
     [Parameter] public EventCallback OnMenuClick { get; set; }
 
-    [Parameter] public string? MenuIcon { get; set; } = "☰";
+    [Parameter] public string? MenuIcon { get; set; } = "\u2630";
     [Parameter] public string? Height { get; set; }
     [Parameter] public string? BackgroundColor { get; set; }
     [Parameter] public string? Color { get; set; }

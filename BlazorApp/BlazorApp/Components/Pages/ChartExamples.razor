@@ -1,0 +1,126 @@
+@page "/components/chart"
+@using Corona.Components.Enums
+@using Corona.Components.Models
+
+<PageTitle>Chart | Corona Docs</PageTitle>
+
+<CoronaContainer MaxWidth="CoronaContainerMaxWidth.Xl">
+    <CoronaStack Spacing="1.5rem" FullWidth="true">
+        <section>
+            <h1>Chart</h1>
+            <p class="docs-page-description">Charts render simple SVG data visualizations directly in Razor without a JavaScript chart dependency.</p>
+        </section>
+
+        <section>
+            <h2>Live examples</h2>
+            <CoronaStack Spacing="1rem" FullWidth="true">
+                <ExampleSection Title="Bar chart"
+                                Description="Use bar charts for categorical comparisons."
+                                Code='@("<CoronaChart Title=\"Pipeline\" Type=\"CoronaChartType.Bar\" Data=\"_pipeline\" />")'>
+                    <CoronaChart Title="Pipeline" Type="CoronaChartType.Bar" Data="_pipeline" />
+                </ExampleSection>
+
+                <ExampleSection Title="Line chart"
+                                Description="Use a line chart for a compact trend over time."
+                                Code='@("<CoronaChart Title=\"Weekly activity\" Type=\"CoronaChartType.Line\" Data=\"_activity\" />")'>
+                    <CoronaChart Title="Weekly activity" Type="CoronaChartType.Line" Data="_activity" ShowLegend="false" />
+                </ExampleSection>
+
+                <ExampleSection Title="Area chart"
+                                Description="Use an area chart when the trend shape matters more than individual bars."
+                                Code='@("<CoronaChart Title=\"Capacity\" Type=\"CoronaChartType.Area\" Data=\"_activity\" />")'>
+                    <CoronaChart Title="Capacity" Type="CoronaChartType.Area" Data="_activity" ShowLegend="false" />
+                </ExampleSection>
+
+                <ExampleSection Title="Horizontal bar chart"
+                                Description="Use horizontal bars for ranked lists and longer category names."
+                                Code='@("<CoronaChart Title=\"Support queues\" Type=\"CoronaChartType.HorizontalBar\" Data=\"_queues\" />")'>
+                    <CoronaChart Title="Support queues" Type="CoronaChartType.HorizontalBar" Data="_queues" />
+                </ExampleSection>
+
+                <ExampleSection Title="Scatter chart"
+                                Description="Use scatter charts to compare point intensity across an ordered set."
+                                Code='@("<CoronaChart Title=\"Response spread\" Type=\"CoronaChartType.Scatter\" Data=\"_spread\" />")'>
+                    <CoronaChart Title="Response spread" Type="CoronaChartType.Scatter" Data="_spread" ShowLegend="false" />
+                </ExampleSection>
+
+                <ExampleSection Title="Pie chart"
+                                Description="Use a pie chart for compact share-of-total summaries when a center total is not needed."
+                                Code='@("<CoronaChart Title=\"Channel mix\" Type=\"CoronaChartType.Pie\" Data=\"_budget\" />")'>
+                    <CoronaChart Title="Channel mix" Type="CoronaChartType.Pie" Data="_budget" />
+                </ExampleSection>
+
+                <ExampleSection Title="Donut chart"
+                                Description="Use a donut chart for small share-of-total summaries."
+                                Code='@("<CoronaChart Title=\"Budget split\" Type=\"CoronaChartType.Donut\" Data=\"_budget\" TotalLabel=\"spent\" />")'>
+                    <CoronaChart Title="Budget split" Type="CoronaChartType.Donut" Data="_budget" TotalLabel="spent" />
+                </ExampleSection>
+
+                <ExampleSection Title="Empty state"
+                                Description="A built-in empty state keeps dashboards tidy before data loads."
+                                Code='@("<CoronaChart Title=\"Forecast\" Data=\"Array.Empty<CoronaChartDataPoint>()\" />")'>
+                    <CoronaChart Title="Forecast" Data="Array.Empty<CoronaChartDataPoint>()" EmptyText="Waiting for data" />
+                </ExampleSection>
+            </CoronaStack>
+        </section>
+
+        <section>
+            <h2>Parameters</h2>
+            <ParameterTable Parameters="_parameters" />
+        </section>
+    </CoronaStack>
+</CoronaContainer>
+
+@code {
+    private readonly IReadOnlyList<CoronaChartDataPoint> _pipeline =
+    [
+        new("Lead", 42),
+        new("Qual", 28, "#0F766E"),
+        new("Demo", 36, "#B45309"),
+        new("Won", 18, "#15803D")
+    ];
+
+    private readonly IReadOnlyList<CoronaChartDataPoint> _activity =
+    [
+        new("Mon", 12),
+        new("Tue", 18),
+        new("Wed", 15),
+        new("Thu", 26),
+        new("Fri", 31)
+    ];
+
+    private readonly IReadOnlyList<CoronaChartDataPoint> _budget =
+    [
+        new("Ops", 48),
+        new("Sales", 24),
+        new("R&D", 18),
+        new("Care", 10)
+    ];
+
+    private readonly IReadOnlyList<CoronaChartDataPoint> _queues =
+    [
+        new("Billing", 18),
+        new("Platform", 31, "#0F766E"),
+        new("Security", 24, "#7C3AED"),
+        new("Success", 12, "#15803D")
+    ];
+
+    private readonly IReadOnlyList<CoronaChartDataPoint> _spread =
+    [
+        new("P1", 9),
+        new("P2", 22, "#0F766E"),
+        new("P3", 16, "#B45309"),
+        new("P4", 33, "#7C3AED"),
+        new("P5", 27, "#B91C1C")
+    ];
+
+    private readonly IReadOnlyList<ParameterTable.ParameterDefinition> _parameters =
+    [
+        new("Data", "IReadOnlyList<CoronaChartDataPoint>", "[]", "Chart data points with label, value, and optional color."),
+        new("Type", "CoronaChartType", "Bar", "Selects Bar, HorizontalBar, Line, Area, Scatter, Pie, or Donut rendering."),
+        new("Title", "string", "null", "Optional figure title."),
+        new("ShowLegend", "bool", "true", "Shows the color legend below the chart."),
+        new("ShowValues", "bool", "true", "Shows value labels on cartesian charts."),
+        new("ValueFormatter", "Func<double, string>?", "null", "Formats numeric labels.")
+    ];
+}

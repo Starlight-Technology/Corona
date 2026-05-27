@@ -1,9 +1,8 @@
-﻿@namespace Corona.Components
+@namespace Corona.Components
 @using Corona.Theming
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Web
 @using System.Globalization
-@using System.Xml.Linq
 @inject CoronaThemeProvider ThemeProvider
 
 @inherits InputBase<string>
@@ -13,25 +12,15 @@
     {
         <label class="corona-input__label">@Label</label>
     }
-    @if (Disabled)
-    {
-        <input @attributes="AdditionalAttributes"
-               class="corona-input__field"
-               type="@Type"
-               value="@_displayValue"
-               @oninput="OnInput"
-               disabled
-               placeholder="@Placeholder" />
-    }
-    else
-    {
-        <input @attributes="AdditionalAttributes"
-               class="corona-input__field"
-               type="@Type"
-               value="@_displayValue"
-               @oninput="OnInput"
-               placeholder="@Placeholder" />
-    }
+
+    <input @attributes="AdditionalAttributes"
+           class="corona-input__field"
+           type="@Type"
+           value="@_displayValue"
+           @oninput="OnInput"
+           @onchange="OnValueChange"
+           placeholder="@Placeholder"
+           disabled="@Disabled" />
 
     @if (!string.IsNullOrWhiteSpace(HelperText))
     {
@@ -44,16 +33,11 @@
 
     [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
 
-    // Core API (InputBase already fornece Value e ValueExpression internamente)
     [Parameter] public string? Label { get; set; }
     [Parameter] public string Type { get; set; } = "text";
-
-    // UX
     [Parameter] public string? Placeholder { get; set; }
     [Parameter] public string? HelperText { get; set; }
     [Parameter] public bool Disabled { get; set; }
-
-    // Style
     [Parameter] public string Class { get; set; } = string.Empty;
     [Parameter] public string? Width { get; set; }
     [Parameter] public string? Height { get; set; }
@@ -76,76 +60,84 @@
     private async Task OnValueChange(ChangeEventArgs e)
     {
         if (Disabled)
+        {
             return;
+        }
 
         await OnInput(e);
     }
 
-    // Evento oninput do input HTML
     private async Task OnInput(ChangeEventArgs e)
     {
         if (Disabled)
+        {
             return;
+        }
 
         var raw = e.Value?.ToString() ?? string.Empty;
-
-        var digits = Type switch
+        var parsedValue = Type switch
         {
             "currency" => UnmaskCurrency(raw),
             "phone" => UnmaskPhone(raw),
             _ => raw
         };
 
-        var formatted = FormatValueForDisplay(digits);
+        var formatted = FormatValueForDisplay(parsedValue);
 
-        // Valor interno deve ser SEM formatação
-        CurrentValue = digits;
+        if (ShouldForceDisplayRefresh(raw, formatted))
+        {
+            _displayValue = string.Empty;
+            await InvokeAsync(StateHasChanged);
+            await Task.Yield();
+        }
 
-        // Valor exibido deve ser formatado
+        CurrentValue = parsedValue;
         _displayValue = formatted;
     }
 
-
-    // InputBase<string> exige implementação de TryParseValueFromString
     protected override bool TryParseValueFromString(string? value, out string result, out string validationErrorMessage)
     {
-        // Para string não precisamos converter; apenas repassa o valor
-        result = value ?? "";
-        validationErrorMessage = String.Empty;
+        result = value ?? string.Empty;
+        validationErrorMessage = string.Empty;
         return true;
     }
 
-    // ---------- Formatação / Desmascaramento ----------
-    private string FormatCurrency(string? digits)
+    private string FormatCurrency(string? value)
     {
-        if (string.IsNullOrWhiteSpace(digits))
-            return "";
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return string.Empty;
+        }
+
+        var digits = UnmaskCurrency(value);
 
         if (!long.TryParse(digits, out var number))
-            return "";
+        {
+            return string.Empty;
+        }
 
-        var val = number / 100m;
-
-        return val.ToString("C", new CultureInfo("pt-BR"));
+        var amount = number / 100m;
+        return amount.ToString("C", new CultureInfo("pt-BR"));
     }
 
-
-    private string UnmaskCurrency(string raw)
+    private static string UnmaskCurrency(string raw)
     {
         return new string(raw.Where(char.IsDigit).ToArray());
     }
 
-
-
     private string FormatPhone(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            return "";
+        {
+            return string.Empty;
+        }
 
-        var digits = new string(value.Where(char.IsDigit).ToArray());
+        var digits = UnmaskPhone(value);
 
         if (digits.Length > 11)
+        {
             digits = digits[..11];
+        }
 
         return digits.Length switch
         {
@@ -156,7 +148,7 @@
         };
     }
 
-    private string UnmaskPhone(string raw)
+    private static string UnmaskPhone(string raw)
     {
         return new string(raw.Where(char.IsDigit).ToArray());
     }
@@ -169,5 +161,12 @@
             "phone" => FormatPhone(value),
             _ => value ?? string.Empty
         };
+    }
+
+    private bool ShouldForceDisplayRefresh(string raw, string formatted)
+    {
+        return Type is "currency" or "phone"
+            && !string.Equals(raw, formatted, StringComparison.Ordinal)
+            && string.Equals(_displayValue, formatted, StringComparison.Ordinal);
     }
 }

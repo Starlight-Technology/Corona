@@ -1,0 +1,71 @@
+@page "/components/file-upload"
+@using Corona.Components.Enums
+@using Microsoft.AspNetCore.Components.Forms
+
+<PageTitle>File Upload | Corona Docs</PageTitle>
+
+<CoronaContainer MaxWidth="CoronaContainerMaxWidth.Xl">
+    <CoronaStack Spacing="1.5rem" FullWidth="true">
+        <section>
+            <h1>File Upload</h1>
+            <p class="docs-page-description">File upload gives forms a themed picker, selected file list, and events for upload pipelines.</p>
+        </section>
+
+        <section>
+            <h2>Live examples</h2>
+            <CoronaStack Spacing="1rem" FullWidth="true">
+                <ExampleSection Title="Single file"
+                                Description="Use a compact upload field for documents, images, and import files."
+                                Code='@("<CoronaFileUpload Title=\"Upload invoice\" Accept=\".pdf,.png,.jpg\" />")'>
+                    <CoronaFileUpload Title="Upload invoice" Hint="PDF, PNG, or JPG up to 5 MB." Accept=".pdf,.png,.jpg" MaxFileSizeBytes="5242880" />
+                </ExampleSection>
+
+                <ExampleSection Title="Multiple files"
+                                Description="The component stores selected file metadata and notifies the parent through FilesChanged."
+                                Code='@("<CoronaFileUpload Multiple=\"true\" MaximumFileCount=\"5\" FilesChanged=\"OnFilesChanged\" />")'>
+                    <CoronaStack Spacing="1rem" FullWidth="true">
+                        <CoronaFileUpload Title="Attach project files"
+                                          Hint="Choose up to 5 CSV, XLSX, or PDF files."
+                                          Accept=".csv,.xlsx,.pdf"
+                                          Multiple="true"
+                                          MaximumFileCount="5"
+                                          FilesChanged="OnFilesChanged" />
+                        <CoronaBadge Content="@($"{_selectedFiles.Count} selected")" Variant="CoronaBadgeVariant.Soft" Color="CoronaColorSemantic.Neutral" />
+                    </CoronaStack>
+                </ExampleSection>
+
+                <ExampleSection Title="Disabled"
+                                Description="Disabled upload fields remain visible in read-only or locked workflows."
+                                Code='@("<CoronaFileUpload Disabled=\"true\" Title=\"Uploads locked\" />")'>
+                    <CoronaFileUpload Disabled="true" Title="Uploads locked" Hint="This workflow is waiting for approval." />
+                </ExampleSection>
+            </CoronaStack>
+        </section>
+
+        <section>
+            <h2>Parameters</h2>
+            <ParameterTable Parameters="_parameters" />
+        </section>
+    </CoronaStack>
+</CoronaContainer>
+
+@code {
+    private IReadOnlyList<IBrowserFile> _selectedFiles = [];
+
+    private readonly IReadOnlyList<ParameterTable.ParameterDefinition> _parameters =
+    [
+        new("Title", "string", "Select files", "Primary text shown in the upload field."),
+        new("Hint", "string", "Browse files from your device.", "Secondary guidance text."),
+        new("Accept", "string", "null", "Browser accept filter, such as .csv,.xlsx."),
+        new("Multiple", "bool", "false", "Allows more than one file."),
+        new("MaximumFileCount", "int", "10", "Limits how many selected files are stored."),
+        new("MaxFileSizeBytes", "long?", "null", "Marks files over the limit in the file list."),
+        new("FilesChanged", "EventCallback<IReadOnlyList<IBrowserFile>>", "null", "Notifies parent components when files are selected.")
+    ];
+
+    private Task OnFilesChanged(IReadOnlyList<IBrowserFile> files)
+    {
+        _selectedFiles = files;
+        return Task.CompletedTask;
+    }
+}
