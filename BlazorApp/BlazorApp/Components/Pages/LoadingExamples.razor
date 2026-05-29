@@ -1,0 +1,83 @@
+@page "/components/loading"
+@using Corona.Components.Enums
+
+<PageTitle>Loading | Corona Docs</PageTitle>
+
+<CoronaContainer MaxWidth="CoronaContainerMaxWidth.Xl">
+    <CoronaStack Spacing="1.5rem" FullWidth="true">
+        <section>
+            <h1>Loading</h1>
+            <p class="docs-page-description">Loading indicators keep async flows understandable without stealing focus from the surrounding interface.</p>
+        </section>
+
+        <section>
+            <h2>Live examples</h2>
+            <CoronaStack Spacing="1rem" FullWidth="true">
+                <ExampleSection Title="Spinner"
+                                Description="Use a compact spinner when a single action or small surface is waiting."
+                                Code='@("<CoronaLoading Label=\"Loading records\" />")'>
+                    <CoronaLoading Label="Loading records" />
+                </ExampleSection>
+
+                <ExampleSection Title="Variants"
+                                Description="Choose a motion style that matches the amount of space available."
+                                Code='@("<CoronaStack Direction=\"CoronaStackDirection.Row\" Spacing=\"1rem\" Wrap=\"CoronaStackWrap.Wrap\">\n    <CoronaLoading Variant=\"CoronaLoadingVariant.Spinner\" Label=\"Spinner\" />\n    <CoronaLoading Variant=\"CoronaLoadingVariant.Dots\" Label=\"Dots\" />\n    <CoronaLoading Variant=\"CoronaLoadingVariant.Pulse\" Label=\"Pulse\" />\n</CoronaStack>")'>
+                    <CoronaStack Direction="CoronaStackDirection.Row" Spacing="1rem" Wrap="CoronaStackWrap.Wrap">
+                        <CoronaLoading Variant="CoronaLoadingVariant.Spinner" Label="Spinner" />
+                        <CoronaLoading Variant="CoronaLoadingVariant.Dots" Label="Dots" Color="CoronaColorSemantic.Success" />
+                        <CoronaLoading Variant="CoronaLoadingVariant.Pulse" Label="Pulse" Color="CoronaColorSemantic.Warning" />
+                    </CoronaStack>
+                </ExampleSection>
+
+                <ExampleSection Title="Overlay and skeleton"
+                                Description="Use overlay loading for a whole region and skeleton loading for pending content shapes."
+                                Code='@("<CoronaLoading Overlay=\"true\" Inline=\"false\" MinHeight=\"8rem\" Label=\"Preparing dashboard\" />\n<CoronaLoading Variant=\"CoronaLoadingVariant.Skeleton\" Inline=\"false\" />")'>
+                    <CoronaStack Spacing="1rem" FullWidth="true">
+                        <CoronaLoading Overlay="true" Inline="false" MinHeight="8rem" Label="Preparing dashboard" />
+                        <CoronaLoading Variant="CoronaLoadingVariant.Skeleton" Inline="false" />
+                    </CoronaStack>
+                </ExampleSection>
+
+                <ExampleSection Title="Async action"
+                                Description="Pair loading indicators with disabled commands while work is running."
+                                Code='@("<CoronaButton Loading=\"_saving\" Disabled=\"_saving\" OnClick=\"RunSaveAsync\">\n    @(_saving ? \"Saving\" : \"Save\")\n</CoronaButton>")'>
+                    <CoronaStack Direction="CoronaStackDirection.Row" Spacing="1rem" Align="CoronaStackAlign.Center" Wrap="CoronaStackWrap.Wrap">
+                        <CoronaButton Loading="_saving" Disabled="_saving" OnClick="RunSaveAsync">
+                            @(_saving ? "Saving" : "Save")
+                        </CoronaButton>
+                        @if (_saving)
+                        {
+                            <CoronaLoading Variant="CoronaLoadingVariant.Dots" Label="Syncing changes" Size="CoronaComponentSize.Small" />
+                        }
+                    </CoronaStack>
+                </ExampleSection>
+            </CoronaStack>
+        </section>
+
+        <section>
+            <h2>Parameters</h2>
+            <ParameterTable Parameters="_parameters" />
+        </section>
+    </CoronaStack>
+</CoronaContainer>
+
+@code {
+    private bool _saving;
+
+    private readonly IReadOnlyList<ParameterTable.ParameterDefinition> _parameters =
+    [
+        new("Variant", "CoronaLoadingVariant", "Spinner", "Selects Spinner, Dots, Pulse, or Skeleton."),
+        new("Size", "CoronaComponentSize", "Medium", "Controls indicator size and label text size."),
+        new("Color", "CoronaColorSemantic", "Primary", "Applies semantic accent color."),
+        new("Label", "string", "null", "Accessible and visible loading label."),
+        new("Inline", "bool", "true", "Uses inline-flex when true and full-width flex when false."),
+        new("Overlay", "bool", "false", "Adds a framed loading surface for pending regions.")
+    ];
+
+    private async Task RunSaveAsync()
+    {
+        _saving = true;
+        await Task.Delay(1200);
+        _saving = false;
+    }
+}
