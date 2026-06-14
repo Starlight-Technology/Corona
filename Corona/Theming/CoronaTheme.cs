@@ -28,44 +28,76 @@ public sealed record CoronaTheme(
             return this;
         }
 
-        var primitive = overrides.Primitive is null
+        var primitive = ApplyPrimitiveOverrides(overrides.Primitive);
+        var semantic = CreateSemanticTokens(primitive, overrides.Semantic);
+
+        return this with { Primitive = primitive, Semantic = semantic };
+    }
+
+    private CoronaPrimitiveTokens ApplyPrimitiveOverrides(
+        CoronaPrimitiveTokenOverrides? overrides)
+    {
+        return overrides is null
             ? Primitive
             : Primitive with
             {
-                Colors = overrides.Primitive.Colors ?? Primitive.Colors,
-                Spacing = overrides.Primitive.Spacing ?? Primitive.Spacing,
-                Radius = overrides.Primitive.Radius ?? Primitive.Radius,
-                Shadows = overrides.Primitive.Shadows ?? Primitive.Shadows,
-                Typography = overrides.Primitive.Typography ?? Primitive.Typography
+                Colors = overrides.Colors ?? Primitive.Colors,
+                Spacing = overrides.Spacing ?? Primitive.Spacing,
+                Radius = overrides.Radius ?? Primitive.Radius,
+                Shadows = overrides.Shadows ?? Primitive.Shadows,
+                Typography = overrides.Typography ?? Primitive.Typography
             };
+    }
 
-        var semanticFromPrimitive = Mode == CoronaThemeMode.Dark
+    private CoronaSemanticTokens CreateSemanticTokens(
+        CoronaPrimitiveTokens primitive,
+        CoronaSemanticTokenOverrides? overrides)
+    {
+        var semantic = Mode == CoronaThemeMode.Dark
             ? CoronaSemanticTokens.CreateDark(primitive)
             : CoronaSemanticTokens.CreateLight(primitive);
 
-        var semantic = overrides.Semantic is null
-            ? semanticFromPrimitive
-            : semanticFromPrimitive with
-            {
-                ColorPrimary = overrides.Semantic.ColorPrimary ?? semanticFromPrimitive.ColorPrimary,
-                SurfaceBackground = overrides.Semantic.SurfaceBackground ?? semanticFromPrimitive.SurfaceBackground,
-                SurfaceBackgroundAlt = overrides.Semantic.SurfaceBackgroundAlt ?? semanticFromPrimitive.SurfaceBackgroundAlt,
-                CardBackground = overrides.Semantic.CardBackground ?? semanticFromPrimitive.CardBackground,
-                TextPrimary = overrides.Semantic.TextPrimary ?? semanticFromPrimitive.TextPrimary,
-                TextSecondary = overrides.Semantic.TextSecondary ?? semanticFromPrimitive.TextSecondary,
-                BorderDefault = overrides.Semantic.BorderDefault ?? semanticFromPrimitive.BorderDefault,
-                FocusOutline = overrides.Semantic.FocusOutline ?? semanticFromPrimitive.FocusOutline,
-                ElevationCard = overrides.Semantic.ElevationCard ?? semanticFromPrimitive.ElevationCard,
-                RadiusCard = overrides.Semantic.RadiusCard ?? semanticFromPrimitive.RadiusCard,
-                SpacingCard = overrides.Semantic.SpacingCard ?? semanticFromPrimitive.SpacingCard,
-                SpacingCardHeader = overrides.Semantic.SpacingCardHeader ?? semanticFromPrimitive.SpacingCardHeader,
-                FontFamilyDefault = overrides.Semantic.FontFamilyDefault ?? semanticFromPrimitive.FontFamilyDefault,
-                FontSizeBody = overrides.Semantic.FontSizeBody ?? semanticFromPrimitive.FontSizeBody,
-                FontSizeHeading = overrides.Semantic.FontSizeHeading ?? semanticFromPrimitive.FontSizeHeading,
-                FontWeightHeading = overrides.Semantic.FontWeightHeading ?? semanticFromPrimitive.FontWeightHeading
-            };
+        if (overrides is null)
+        {
+            return semantic;
+        }
 
-        return this with { Primitive = primitive, Semantic = semantic };
+        semantic = ApplySemanticColorOverrides(semantic, overrides);
+        return ApplySemanticLayoutOverrides(semantic, overrides);
+    }
+
+    private static CoronaSemanticTokens ApplySemanticColorOverrides(
+        CoronaSemanticTokens semantic,
+        CoronaSemanticTokenOverrides overrides)
+    {
+        return semantic with
+        {
+            ColorPrimary = overrides.ColorPrimary ?? semantic.ColorPrimary,
+            SurfaceBackground = overrides.SurfaceBackground ?? semantic.SurfaceBackground,
+            SurfaceBackgroundAlt = overrides.SurfaceBackgroundAlt ?? semantic.SurfaceBackgroundAlt,
+            CardBackground = overrides.CardBackground ?? semantic.CardBackground,
+            TextPrimary = overrides.TextPrimary ?? semantic.TextPrimary,
+            TextSecondary = overrides.TextSecondary ?? semantic.TextSecondary,
+            BorderDefault = overrides.BorderDefault ?? semantic.BorderDefault,
+            FocusOutline = overrides.FocusOutline ?? semantic.FocusOutline
+        };
+    }
+
+    private static CoronaSemanticTokens ApplySemanticLayoutOverrides(
+        CoronaSemanticTokens semantic,
+        CoronaSemanticTokenOverrides overrides)
+    {
+        return semantic with
+        {
+            ElevationCard = overrides.ElevationCard ?? semantic.ElevationCard,
+            RadiusCard = overrides.RadiusCard ?? semantic.RadiusCard,
+            SpacingCard = overrides.SpacingCard ?? semantic.SpacingCard,
+            SpacingCardHeader = overrides.SpacingCardHeader ?? semantic.SpacingCardHeader,
+            FontFamilyDefault = overrides.FontFamilyDefault ?? semantic.FontFamilyDefault,
+            FontSizeBody = overrides.FontSizeBody ?? semantic.FontSizeBody,
+            FontSizeHeading = overrides.FontSizeHeading ?? semantic.FontSizeHeading,
+            FontWeightHeading = overrides.FontWeightHeading ?? semantic.FontWeightHeading
+        };
     }
 }
 

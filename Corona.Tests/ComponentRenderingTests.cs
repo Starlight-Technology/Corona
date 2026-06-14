@@ -15,7 +15,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     public void CoronaButton_Click_RunsCallback_WhenEnabled()
     {
         var clicked = false;
-        var cut = RenderComponent<CoronaButton>(p => p
+        var cut = Render<CoronaButton>(p => p
             .AddChildContent("Save")
             .Add(x => x.OnClick, EventCallback.Factory.Create(this, () => clicked = true)));
 
@@ -28,7 +28,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     public void CoronaButton_Loading_ShowsSpinnerAndDisablesButton()
     {
         var clicked = false;
-        var cut = RenderComponent<CoronaButton>(p => p
+        var cut = Render<CoronaButton>(p => p
             .Add(x => x.Loading, true)
             .Add(x => x.OnClick, EventCallback.Factory.Create(this, () => clicked = true))
             .AddChildContent("Ignored"));
@@ -42,7 +42,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaLoading_Dots_RendersStatusAndLabel()
     {
-        var cut = RenderComponent<CoronaLoading>(p => p
+        var cut = Render<CoronaLoading>(p => p
             .Add(x => x.Variant, CoronaLoadingVariant.Dots)
             .Add(x => x.Label, "Loading data")
             .Add(x => x.Color, CoronaColorSemantic.Success));
@@ -57,7 +57,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaProgressBar_ClampsValueAndRendersFill()
     {
-        var cut = RenderComponent<CoronaProgressBar>(p => p
+        var cut = Render<CoronaProgressBar>(p => p
             .Add(x => x.Label, "Upload")
             .Add(x => x.Value, 140));
 
@@ -72,7 +72,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaFileUpload_RendersConfiguredInput()
     {
-        var cut = RenderComponent<CoronaFileUpload>(p => p
+        var cut = Render<CoronaFileUpload>(p => p
             .Add(x => x.Title, "Upload report")
             .Add(x => x.Accept, ".csv,.xlsx")
             .Add(x => x.Multiple, true));
@@ -89,7 +89,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     {
         var data = CreateChartData();
 
-        var cut = RenderComponent<CoronaChart>(p => p
+        var cut = Render<CoronaChart>(p => p
             .Add(x => x.Title, "Revenue")
             .Add(x => x.Type, CoronaChartType.Bar)
             .Add(x => x.Data, data));
@@ -103,7 +103,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaChart_Line_RendersPathAndMarkers()
     {
-        var cut = RenderComponent<CoronaChart>(p => p
+        var cut = Render<CoronaChart>(p => p
             .Add(x => x.Type, CoronaChartType.Line)
             .Add(x => x.Data, CreateChartData()));
 
@@ -115,7 +115,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaChart_Area_RendersFillLineAndMarkers()
     {
-        var cut = RenderComponent<CoronaChart>(p => p
+        var cut = Render<CoronaChart>(p => p
             .Add(x => x.Type, CoronaChartType.Area)
             .Add(x => x.Data, CreateChartData()));
 
@@ -127,7 +127,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaChart_HorizontalBar_RendersHorizontalBars()
     {
-        var cut = RenderComponent<CoronaChart>(p => p
+        var cut = Render<CoronaChart>(p => p
             .Add(x => x.Type, CoronaChartType.HorizontalBar)
             .Add(x => x.Data, CreateChartData()));
 
@@ -139,7 +139,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaChart_Scatter_RendersPointsWithoutPath()
     {
-        var cut = RenderComponent<CoronaChart>(p => p
+        var cut = Render<CoronaChart>(p => p
             .Add(x => x.Type, CoronaChartType.Scatter)
             .Add(x => x.Data, CreateChartData()));
 
@@ -150,7 +150,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaChart_Pie_RendersSlices()
     {
-        var cut = RenderComponent<CoronaChart>(p => p
+        var cut = Render<CoronaChart>(p => p
             .Add(x => x.Type, CoronaChartType.Pie)
             .Add(x => x.Data, CreateChartData()));
 
@@ -163,7 +163,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     {
         var data = new List<CoronaChartDataPoint> { new("All", 100) };
 
-        var cut = RenderComponent<CoronaChart>(p => p
+        var cut = Render<CoronaChart>(p => p
             .Add(x => x.Type, CoronaChartType.Pie)
             .Add(x => x.Data, data));
 
@@ -175,7 +175,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaChart_Donut_RendersSegmentsAndTotal()
     {
-        var cut = RenderComponent<CoronaChart>(p => p
+        var cut = Render<CoronaChart>(p => p
             .Add(x => x.Type, CoronaChartType.Donut)
             .Add(x => x.Data, CreateChartData())
             .Add(x => x.TotalLabel, "orders"));
@@ -188,7 +188,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaChart_Empty_RendersEmptyState()
     {
-        var cut = RenderComponent<CoronaChart>(p => p
+        var cut = Render<CoronaChart>(p => p
             .Add(x => x.EmptyText, "Waiting")
             .Add(x => x.Data, Array.Empty<CoronaChartDataPoint>()));
 
@@ -200,7 +200,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaChart_ValueFormatter_FormatsVisibleValues()
     {
-        var cut = RenderComponent<CoronaChart>(p => p
+        var cut = Render<CoronaChart>(p => p
             .Add(x => x.Data, CreateChartData())
             .Add(x => x.ValueFormatter, value => $"{value:0} units"));
 
@@ -211,7 +211,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaProgressBar_Indeterminate_OmitsCurrentValue()
     {
-        var cut = RenderComponent<CoronaProgressBar>(p => p
+        var cut = Render<CoronaProgressBar>(p => p
             .Add(x => x.Indeterminate, true)
             .Add(x => x.Label, "Analyzing")
             .Add(x => x.ShowValue, false));
@@ -227,7 +227,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaLoading_Skeleton_RendersSkeletonLines()
     {
-        var cut = RenderComponent<CoronaLoading>(p => p
+        var cut = Render<CoronaLoading>(p => p
             .Add(x => x.Variant, CoronaLoadingVariant.Skeleton)
             .Add(x => x.Inline, false));
 
@@ -238,7 +238,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaFileUpload_Disabled_RendersDisabledInputAndState()
     {
-        var cut = RenderComponent<CoronaFileUpload>(p => p
+        var cut = Render<CoronaFileUpload>(p => p
             .Add(x => x.Disabled, true)
             .Add(x => x.Title, "Uploads locked"));
 
@@ -250,7 +250,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaBadge_RendersDotAndPositionClass()
     {
-        var cut = RenderComponent<CoronaBadge>(p => p
+        var cut = Render<CoronaBadge>(p => p
             .Add(x => x.Dot, true)
             .Add(x => x.Position, CoronaBadgePosition.BottomLeft)
             .Add(x => x.Color, CoronaColorSemantic.Warning));
@@ -263,7 +263,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaCard_RendersHeaderAndLayoutStyles()
     {
-        var cut = RenderComponent<CoronaCard>(p => p
+        var cut = Render<CoronaCard>(p => p
             .Add(x => x.Title, "Title")
             .Add(x => x.ContentTextAlign, CoronaTextAlign.Justify)
             .Add(x => x.ContentJustify, CoronaFlexAlign.SpaceAround)
@@ -279,7 +279,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaContainer_UsesRequestedMaxWidth()
     {
-        var cut = RenderComponent<CoronaContainer>(p => p
+        var cut = Render<CoronaContainer>(p => p
             .Add(x => x.MaxWidth, CoronaContainerMaxWidth.Xs)
             .Add(x => x.CenterContent, true));
 
@@ -292,7 +292,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     public void CoronaDialog_BackdropAndEscape_CloseWhenEnabled()
     {
         bool? open = true;
-        var cut = RenderComponent<CoronaDialog>(p => p
+        var cut = Render<CoronaDialog>(p => p
             .Add(x => x.Open, true)
             .Add(x => x.OpenChanged, EventCallback.Factory.Create<bool>(this, value => open = value))
             .Add(x => x.Title, "Dialog")
@@ -310,7 +310,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     public void CoronaDialog_CloseBlocked_WhenOptionsDisabled()
     {
         bool? open = true;
-        var cut = RenderComponent<CoronaDialog>(p => p
+        var cut = Render<CoronaDialog>(p => p
             .Add(x => x.Open, true)
             .Add(x => x.CloseOnBackdrop, false)
             .Add(x => x.CloseOnEscape, false)
@@ -327,7 +327,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     public void CoronaDrawer_RendersRightSideAndClosesOnKeyboard()
     {
         bool? open = true;
-        var cut = RenderComponent<CoronaDrawer>(p => p
+        var cut = Render<CoronaDrawer>(p => p
             .Add(x => x.Open, true)
             .Add(x => x.Position, CoronaDrawerPosition.Right)
             .Add(x => x.OpenChanged, EventCallback.Factory.Create<bool>(this, value => open = value))
@@ -349,7 +349,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
             new() { Text = "Docs", Url = "/docs", Children = [new CoronaNavItem { Text = "Guide", Url = "/docs/guide" }] }
         };
 
-        var cut = RenderComponent<CoronaNavMenu>(p => p.Add(x => x.Items, items));
+        var cut = Render<CoronaNavMenu>(p => p.Add(x => x.Items, items));
 
         Assert.Contains("is-active", cut.Markup);
         cut.Find(".corona-nav-menu__expander").Click();
@@ -360,7 +360,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     public void CoronaPageHeader_MenuInteractions_InvokeCallback()
     {
         var clicks = 0;
-        var cut = RenderComponent<CoronaPageHeader>(p => p
+        var cut = Render<CoronaPageHeader>(p => p
             .Add(x => x.Title, "My Page")
             .Add(x => x.ShowMenuButton, true)
             .Add(x => x.Density, CoronaHeaderDensity.Spacious)
@@ -376,7 +376,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaStack_MapsLayoutValues()
     {
-        var cut = RenderComponent<CoronaStack>(p => p
+        var cut = Render<CoronaStack>(p => p
             .Add(x => x.Direction, CoronaStackDirection.Row)
             .Add(x => x.Wrap, CoronaStackWrap.WrapReverse)
             .Add(x => x.Justify, CoronaStackJustify.SpaceEvenly)
@@ -395,7 +395,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     {
         var changed = -1;
 
-        var cut = RenderComponent<CoronaTabs>(p => p
+        var cut = Render<CoronaTabs>(p => p
             .Add(x => x.ActiveIndex, 0)
             .Add(x => x.ActiveIndexChanged, EventCallback.Factory.Create<int>(this, i => changed = i))
             .Add(x => x.LazyRender, true)
@@ -413,7 +413,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaThemeCascadingValue_RendersChildContent()
     {
-        var cut = RenderComponent<CoronaThemeCascadingValue>(p => p.AddChildContent("Themed content"));
+        var cut = Render<CoronaThemeCascadingValue>(p => p.AddChildContent("Themed content"));
         Assert.Contains("Themed content", cut.Markup);
     }
 
@@ -422,7 +422,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     {
         var items = new List<CoronaNavItem> { new() { Text = "Item", Url = "/" } };
 
-        var cut = RenderComponent<CoronaLayoutShell>(p => p
+        var cut = Render<CoronaLayoutShell>(p => p
             .Add(x => x.DrawerItens, items)
             .Add(x => x.DrawerTitle, "Menu")
             .Add(x => x.HeaderTitle, "Header")
@@ -438,7 +438,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     {
         var items = new List<CoronaNavItem> { new() { Text = "Alias item", Url = "/" } };
 
-        var cut = RenderComponent<CoronaLayoutShell>(p => p
+        var cut = Render<CoronaLayoutShell>(p => p
             .Add(x => x.NavItems, items)
             .Add(x => x.DrawerTitle, "Menu")
             .Add(x => x.HeaderTitle, "Header")
@@ -452,7 +452,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     {
         string currentValue = "R$ 55,22";
 
-        var cut = RenderComponent<CoronaInput>(p => p
+        var cut = Render<CoronaInput>(p => p
             .Add(x => x.Type, "currency")
             .Add(x => x.Value, currentValue)
             .Add(x => x.ValueChanged, EventCallback.Factory.Create<string>(this, value => currentValue = value))
