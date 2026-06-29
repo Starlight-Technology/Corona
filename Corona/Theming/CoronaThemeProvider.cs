@@ -7,7 +7,6 @@ namespace Corona.Theming;
 /// </summary>
 public sealed class CoronaThemeProvider
 {
-    private CoronaTheme _currentTheme;
 
     /// <summary>
     /// Occurs when the current theme changes.
@@ -19,20 +18,20 @@ public sealed class CoronaThemeProvider
     /// </summary>
     public CoronaThemeProvider(CoronaTheme? initialTheme = null)
     {
-        _currentTheme = initialTheme ?? CoronaThemes.Light();
+        CurrentTheme = initialTheme ?? CoronaThemes.Light();
     }
 
     /// <summary>
     /// Gets the active runtime theme.
     /// </summary>
-    public CoronaTheme CurrentTheme => _currentTheme;
+    public CoronaTheme CurrentTheme { get; private set; }
 
     /// <summary>
     /// Applies a complete theme and notifies subscribers.
     /// </summary>
     public void SetTheme(CoronaTheme theme)
     {
-        _currentTheme = theme;
+        CurrentTheme = theme;
         OnChange?.Invoke();
     }
 
@@ -41,13 +40,12 @@ public sealed class CoronaThemeProvider
     /// </summary>
     public void ToggleTheme(CoronaThemeOverrides? overrides = null)
     {
-        var nextTheme = _currentTheme.Mode == CoronaThemeMode.Light
+        var nextTheme = CurrentTheme.Mode == CoronaThemeMode.Light
             ? CoronaThemes.Dark(overrides)
             : CoronaThemes.Light(overrides);
 
         SetTheme(nextTheme);
     }
-
 }
 
 /// <summary>

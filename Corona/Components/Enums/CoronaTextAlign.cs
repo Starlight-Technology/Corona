@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Corona.Components.Enums;
+﻿namespace Corona.Components.Enums;
 
 public enum CoronaTextAlign
 {
