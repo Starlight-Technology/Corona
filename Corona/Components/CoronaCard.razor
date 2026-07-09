@@ -4,7 +4,7 @@
 @using Corona.Theming
 @inject CoronaThemeProvider ThemeProvider
 
-<div class="corona-card @Class"
+<div class="corona-card @(Hoverable ? "is-hoverable" : string.Empty) @Class"
      style="@BuildStyle()">
 
     @if (!string.IsNullOrWhiteSpace(Title))
@@ -39,6 +39,7 @@
     // ===== STYLE =====
     [Parameter] public string Class { get; set; } = string.Empty;
     [Parameter] public string? BackgroundColor { get; set; }
+    [Parameter] public bool Hoverable { get; set; } = true;
 
 
     // ===== HEADER =====
@@ -153,7 +154,7 @@
         transition: all .2s ease;
     }
 
-    .corona-card:hover {
+    .corona-card.is-hoverable:hover {
         transform: translateY(-2px);
     }
 </style>

@@ -1,0 +1,116 @@
+@namespace Corona.Components
+@using Corona.Components.Enums
+
+<CoronaCard Class="@BuildClass()"
+            BackgroundColor="@ResolvedBackground"
+            Hoverable="false"
+            ContentJustify="CoronaFlexAlign.Start"
+            ContentAlignItems="CoronaItemsAlign.Stretch"
+            Margin="0">
+    <div class="corona-metric-card__body">
+        @if (!string.IsNullOrWhiteSpace(Icon))
+        {
+            <CoronaIcon Name="@Icon" Color="@ResolvedColor" Size="lg" />
+        }
+
+        <span class="corona-metric-card__label">@Label</span>
+        <strong class="corona-metric-card__value" style="color:@ResolvedColor">@Value</strong>
+
+        @if (!string.IsNullOrWhiteSpace(Caption))
+        {
+            <small class="corona-metric-card__caption">@Caption</small>
+        }
+    </div>
+</CoronaCard>
+
+@code {
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public string? Caption { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public CoronaColorSemantic Color { get; set; } = CoronaColorSemantic.Primary;
+    [Parameter] public bool Featured { get; set; }
+    [Parameter] public bool Muted { get; set; }
+    [Parameter] public string Class { get; set; } = string.Empty;
+    [Parameter] public string? BackgroundColor { get; set; }
+    [Parameter] public string? TextColor { get; set; }
+
+    private string ResolvedColor => TextColor ?? Color switch
+    {
+        CoronaColorSemantic.Success => "#2D6A4F",
+        CoronaColorSemantic.Danger => "#BC4749",
+        CoronaColorSemantic.Warning => "#B45309",
+        CoronaColorSemantic.Neutral => "#2D3748",
+        _ => "#1B2620"
+    };
+
+    private string ResolvedBackground => BackgroundColor ?? Color switch
+    {
+        CoronaColorSemantic.Success => "linear-gradient(180deg, rgba(45, 106, 79, .18), rgba(45, 106, 79, .08))",
+        CoronaColorSemantic.Danger => "linear-gradient(180deg, rgba(188, 71, 73, .18), rgba(188, 71, 73, .08))",
+        CoronaColorSemantic.Warning => "linear-gradient(180deg, rgba(180, 83, 9, .16), rgba(180, 83, 9, .07))",
+        _ => "rgba(255, 252, 246, .86)"
+    };
+
+    private string BuildClass()
+    {
+        var classes = new List<string> { "corona-metric-card" };
+
+        if (Featured)
+        {
+            classes.Add("is-featured");
+        }
+
+        if (Muted)
+        {
+            classes.Add("is-muted");
+        }
+
+        if (!string.IsNullOrWhiteSpace(Class))
+        {
+            classes.Add(Class);
+        }
+
+        return string.Join(" ", classes);
+    }
+}
+
+<style>
+    .corona-metric-card {
+        min-height: 108px;
+    }
+
+    .corona-metric-card.is-muted {
+        opacity: .64;
+    }
+
+    .corona-metric-card__body {
+        display: grid;
+        gap: .45rem;
+        width: 100%;
+    }
+
+    .corona-metric-card__label {
+        color: rgba(45, 55, 72, .74);
+        font-weight: 800;
+    }
+
+    .corona-metric-card__value {
+        font-size: clamp(1.45rem, 5vw, 2.25rem);
+        line-height: 1.05;
+        word-break: break-word;
+    }
+
+    .corona-metric-card.is-featured .corona-metric-card__body {
+        justify-items: center;
+        text-align: center;
+    }
+
+    .corona-metric-card.is-featured .corona-metric-card__value {
+        font-size: clamp(2.35rem, 9vw, 4.35rem);
+    }
+
+    .corona-metric-card__caption {
+        color: rgba(45, 55, 72, .68);
+    }
+</style>

@@ -1,0 +1,41 @@
+@namespace Corona.Components
+@using Microsoft.AspNetCore.Components.Forms
+
+<CoronaCard Class="@BuildClass()"
+            Hoverable="false"
+            ContentJustify="Corona.Components.Enums.CoronaFlexAlign.Center"
+            ContentAlignItems="Corona.Components.Enums.CoronaItemsAlign.Center"
+            Margin="0">
+    <CoronaIcon Name="@Icon" Color="#A68A64" Size="2x" />
+    @if (!string.IsNullOrWhiteSpace(Title))
+    {
+        <strong>@Title</strong>
+    }
+    @if (!string.IsNullOrWhiteSpace(Description))
+    {
+        <span>@Description</span>
+    }
+    <InputFile OnChange="OnChange" accept="@Accept" />
+</CoronaCard>
+
+@code {
+    [Parameter] public string Icon { get; set; } = "file-arrow-up";
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Description { get; set; }
+    [Parameter] public string? Accept { get; set; }
+    [Parameter] public EventCallback<InputFileChangeEventArgs> OnChange { get; set; }
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private string BuildClass() =>
+        string.IsNullOrWhiteSpace(Class)
+            ? "corona-file-dropzone"
+            : $"corona-file-dropzone {Class}";
+}
+
+<style>
+    .corona-file-dropzone .corona-card-content {
+        min-height: 190px;
+        gap: .65rem;
+        text-align: center;
+    }
+</style>
