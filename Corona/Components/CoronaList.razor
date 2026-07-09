@@ -18,17 +18,20 @@
         </div>
     }
 
-    <div class="corona-list-pagination">
-        <button @onclick="PrevPage" disabled="@(CurrentPage == 1)">
-            Anterior
-        </button>
+    @if (ShowPagination)
+    {
+        <div class="corona-list-pagination">
+            <button @onclick="PrevPage" disabled="@(CurrentPage == 1)">
+                Anterior
+            </button>
 
-        <span>Página @CurrentPage de @TotalPages</span>
+            <span>Página @CurrentPage de @TotalPages</span>
 
-        <button @onclick="NextPage" disabled="@(CurrentPage == TotalPages)">
-            Próxima
-        </button>
-    </div>
+            <button @onclick="NextPage" disabled="@(CurrentPage == TotalPages)">
+                Próxima
+            </button>
+        </div>
+    }
 
 </div>
 
@@ -44,6 +47,8 @@
     [Parameter] public EventCallback<int> OnPageChanged { get; set; }
 
     [Parameter] public RenderFragment<TItem> ItemTemplate { get; set; } = default!;
+
+    [Parameter] public bool ShowPagination { get; set; } = true;
 
     private int TotalPages =>
         PageSize == 0 ? 1 : (int)Math.Ceiling((double)TotalCount / PageSize);

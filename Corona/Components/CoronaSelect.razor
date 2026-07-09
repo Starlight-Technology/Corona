@@ -1,0 +1,113 @@
+@namespace Corona.Components
+@implements IDisposable
+@using Corona.Components.Models
+@using Corona.Theming
+@inject CoronaThemeProvider ThemeProvider
+
+<div class="corona-select @Class" style="@BuildWrapperStyle()">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label class="corona-select__label" for="@_id">@Label</label>
+    }
+
+    <select id="@_id"
+            class="corona-select__field"
+            value="@Value"
+            disabled="@Disabled"
+            @onchange="HandleChangeAsync">
+        @if (!string.IsNullOrWhiteSpace(Placeholder))
+        {
+            <option value="" disabled="@PlaceholderDisabled">@Placeholder</option>
+        }
+
+        @foreach (var option in Options)
+        {
+            <option value="@option.Value">@option.Label</option>
+        }
+    </select>
+
+    @if (!string.IsNullOrWhiteSpace(HelperText))
+    {
+        <span class="corona-select__helper">@HelperText</span>
+    }
+</div>
+
+@code {
+    [CascadingParameter] public CoronaTheme? Theme { get; set; }
+
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public IReadOnlyList<CoronaSelectOption> Options { get; set; } = [];
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public string? HelperText { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool PlaceholderDisabled { get; set; } = true;
+    [Parameter] public string? Width { get; set; }
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private readonly string _id = $"corona-select-{Guid.NewGuid():N}";
+    private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+
+    protected override void OnInitialized()
+    {
+        ThemeProvider.OnChange += HandleThemeChanged;
+    }
+
+    private void HandleThemeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private Task HandleChangeAsync(ChangeEventArgs args)
+    {
+        Value = args.Value?.ToString();
+        return ValueChanged.InvokeAsync(Value);
+    }
+
+    private string BuildWrapperStyle()
+    {
+        var semantic = ActiveTheme.Semantic;
+        return $"width:{Width ?? "100%"};font-family:{semantic.FontFamilyDefault};--corona-select-border:{semantic.BorderDefault};--corona-select-text:{semantic.TextPrimary};--corona-select-muted:{semantic.TextSecondary};--corona-select-focus:{semantic.FocusOutline};";
+    }
+
+    public void Dispose()
+    {
+        ThemeProvider.OnChange -= HandleThemeChanged;
+    }
+}
+
+<style>
+    .corona-select {
+        display: grid;
+        gap: .35rem;
+    }
+
+    .corona-select__label {
+        color: var(--corona-select-muted);
+        font-size: .9rem;
+        font-weight: 700;
+    }
+
+    .corona-select__field {
+        width: 100%;
+        min-height: 2.5rem;
+        border: 1px solid var(--corona-select-border);
+        border-radius: 8px;
+        color: var(--corona-select-text);
+        background: rgba(255, 255, 255, .56);
+        padding: .55rem .7rem;
+        outline: none;
+    }
+
+    .corona-select__field:focus {
+        border-color: var(--corona-select-focus);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--corona-select-focus) 28%, transparent);
+    }
+
+    .corona-select__helper {
+        color: var(--corona-select-muted);
+        font-size: .8rem;
+    }
+</style>

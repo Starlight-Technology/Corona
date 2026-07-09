@@ -1,0 +1,135 @@
+@namespace Corona.Components
+@implements IDisposable
+@using Corona.Components.Enums
+@using Corona.Theming
+@inject CoronaThemeProvider ThemeProvider
+
+<label class="corona-toggle @Class" style="@BuildStyle()">
+    <span class="corona-toggle__copy">
+        @if (!string.IsNullOrWhiteSpace(Label))
+        {
+            <strong>@Label</strong>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(HelperText))
+        {
+            <small>@HelperText</small>
+        }
+    </span>
+
+    <input type="checkbox"
+           checked="@Checked"
+           disabled="@Disabled"
+           @onchange="HandleChangeAsync" />
+    <span class="corona-toggle__track" aria-hidden="true"></span>
+</label>
+
+@code {
+    [CascadingParameter] public CoronaTheme? Theme { get; set; }
+
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? HelperText { get; set; }
+    [Parameter] public bool Checked { get; set; }
+    [Parameter] public EventCallback<bool> CheckedChanged { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public CoronaColorSemantic Color { get; set; } = CoronaColorSemantic.Success;
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+
+    protected override void OnInitialized()
+    {
+        ThemeProvider.OnChange += HandleThemeChanged;
+    }
+
+    private void HandleThemeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private Task HandleChangeAsync(ChangeEventArgs args)
+    {
+        Checked = args.Value is bool value && value;
+        return CheckedChanged.InvokeAsync(Checked);
+    }
+
+    private string BuildStyle()
+    {
+        var semantic = ActiveTheme.Semantic;
+        var active = Color switch
+        {
+            CoronaColorSemantic.Danger => "#BC4749",
+            CoronaColorSemantic.Warning => "#B45309",
+            CoronaColorSemantic.Neutral => "#4B5563",
+            CoronaColorSemantic.Primary => semantic.ColorPrimary,
+            _ => "#2D6A4F"
+        };
+
+        return $"font-family:{semantic.FontFamilyDefault};color:{semantic.TextPrimary};--corona-toggle-active:{active};--corona-toggle-muted:{semantic.TextSecondary};";
+    }
+
+    public void Dispose()
+    {
+        ThemeProvider.OnChange -= HandleThemeChanged;
+    }
+}
+
+<style>
+    .corona-toggle {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 62px;
+        align-items: center;
+        gap: 1rem;
+        cursor: pointer;
+    }
+
+    .corona-toggle__copy {
+        display: grid;
+        gap: .15rem;
+    }
+
+    .corona-toggle__copy small {
+        color: var(--corona-toggle-muted);
+    }
+
+    .corona-toggle input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .corona-toggle__track {
+        position: relative;
+        width: 62px;
+        height: 36px;
+        border-radius: 999px;
+        background: rgba(45, 55, 72, .22);
+        transition: background-color .18s ease;
+    }
+
+    .corona-toggle__track::after {
+        content: "";
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .22);
+        transition: transform .18s ease;
+    }
+
+    .corona-toggle input:checked + .corona-toggle__track {
+        background: var(--corona-toggle-active);
+    }
+
+    .corona-toggle input:checked + .corona-toggle__track::after {
+        transform: translateX(26px);
+    }
+
+    .corona-toggle input:disabled + .corona-toggle__track {
+        opacity: .5;
+    }
+</style>
