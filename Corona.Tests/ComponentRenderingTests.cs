@@ -2,7 +2,6 @@ using Bunit;
 using Corona.Components;
 using Corona.Components.Enums;
 using Corona.Components.Models;
-
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Web;
@@ -16,7 +15,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     public void CoronaButton_Click_RunsCallback_WhenEnabled()
     {
         var clicked = false;
-        var cut = RenderComponent<CoronaButton>(p => p
+        var cut = Render<CoronaButton>(p => p
             .AddChildContent("Save")
             .Add(x => x.OnClick, EventCallback.Factory.Create(this, () => clicked = true)));
 
@@ -29,7 +28,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     public void CoronaButton_Loading_ShowsSpinnerAndDisablesButton()
     {
         var clicked = false;
-        var cut = RenderComponent<CoronaButton>(p => p
+        var cut = Render<CoronaButton>(p => p
             .Add(x => x.Loading, true)
             .Add(x => x.OnClick, EventCallback.Factory.Create(this, () => clicked = true))
             .AddChildContent("Ignored"));
@@ -41,9 +40,217 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     }
 
     [Fact]
+    public void CoronaLoading_Dots_RendersStatusAndLabel()
+    {
+        var cut = Render<CoronaLoading>(p => p
+            .Add(x => x.Variant, CoronaLoadingVariant.Dots)
+            .Add(x => x.Label, "Loading data")
+            .Add(x => x.Color, CoronaColorSemantic.Success));
+
+        var loading = cut.Find(".corona-loading");
+
+        Assert.Equal("status", loading.GetAttribute("role"));
+        Assert.Contains("corona-loading--dots", loading.ClassList);
+        Assert.Contains("Loading data", cut.Markup);
+    }
+
+    [Fact]
+    public void CoronaProgressBar_ClampsValueAndRendersFill()
+    {
+        var cut = Render<CoronaProgressBar>(p => p
+            .Add(x => x.Label, "Upload")
+            .Add(x => x.Value, 140));
+
+        var track = cut.Find(".corona-progress__track");
+        var fill = cut.Find(".corona-progress__fill");
+
+        Assert.Equal("100", track.GetAttribute("aria-valuenow"));
+        Assert.Contains("width:100%", fill.GetAttribute("style"));
+        Assert.Contains("100%", cut.Markup);
+    }
+
+    [Fact]
+    public void CoronaFileUpload_RendersConfiguredInput()
+    {
+        var cut = Render<CoronaFileUpload>(p => p
+            .Add(x => x.Title, "Upload report")
+            .Add(x => x.Accept, ".csv,.xlsx")
+            .Add(x => x.Multiple, true));
+
+        var input = cut.Find("input[type=file]");
+
+        Assert.Equal(".csv,.xlsx", input.GetAttribute("accept"));
+        Assert.True(input.HasAttribute("multiple"));
+        Assert.Contains("Upload report", cut.Markup);
+    }
+
+    [Fact]
+    public void CoronaChart_Bar_RendersDataAndLegend()
+    {
+        var data = CreateChartData();
+
+        var cut = Render<CoronaChart>(p => p
+            .Add(x => x.Title, "Revenue")
+            .Add(x => x.Type, CoronaChartType.Bar)
+            .Add(x => x.Data, data));
+
+        Assert.Equal(2, cut.FindAll(".corona-chart__bar").Count);
+        Assert.Equal(2, cut.FindAll(".corona-chart__legend li").Count);
+        Assert.Contains("Revenue", cut.Markup);
+        Assert.Contains("Q2", cut.Markup);
+    }
+
+    [Fact]
+    public void CoronaChart_Line_RendersPathAndMarkers()
+    {
+        var cut = Render<CoronaChart>(p => p
+            .Add(x => x.Type, CoronaChartType.Line)
+            .Add(x => x.Data, CreateChartData()));
+
+        Assert.NotNull(cut.Find(".corona-chart__line-path"));
+        Assert.Equal(2, cut.FindAll(".corona-chart__line-point").Count);
+        Assert.DoesNotContain("corona-chart__bar", cut.Markup);
+    }
+
+    [Fact]
+    public void CoronaChart_Area_RendersFillLineAndMarkers()
+    {
+        var cut = Render<CoronaChart>(p => p
+            .Add(x => x.Type, CoronaChartType.Area)
+            .Add(x => x.Data, CreateChartData()));
+
+        Assert.NotNull(cut.Find(".corona-chart__area-fill"));
+        Assert.NotNull(cut.Find(".corona-chart__line-path"));
+        Assert.Equal(2, cut.FindAll(".corona-chart__line-point").Count);
+    }
+
+    [Fact]
+    public void CoronaChart_HorizontalBar_RendersHorizontalBars()
+    {
+        var cut = Render<CoronaChart>(p => p
+            .Add(x => x.Type, CoronaChartType.HorizontalBar)
+            .Add(x => x.Data, CreateChartData()));
+
+        Assert.Equal(2, cut.FindAll(".corona-chart__horizontal-bar").Count);
+        Assert.Contains("text-anchor=\"end\"", cut.Markup);
+        Assert.Contains("Q1", cut.Markup);
+    }
+
+    [Fact]
+    public void CoronaChart_Scatter_RendersPointsWithoutPath()
+    {
+        var cut = Render<CoronaChart>(p => p
+            .Add(x => x.Type, CoronaChartType.Scatter)
+            .Add(x => x.Data, CreateChartData()));
+
+        Assert.Equal(2, cut.FindAll(".corona-chart__scatter-point").Count);
+        Assert.Empty(cut.FindAll(".corona-chart__line-path"));
+    }
+
+    [Fact]
+    public void CoronaChart_Pie_RendersSlices()
+    {
+        var cut = Render<CoronaChart>(p => p
+            .Add(x => x.Type, CoronaChartType.Pie)
+            .Add(x => x.Data, CreateChartData()));
+
+        Assert.Equal(2, cut.FindAll(".corona-chart__pie-slice").Count);
+        Assert.Empty(cut.FindAll(".corona-chart__donut-segment"));
+    }
+
+    [Fact]
+    public void CoronaChart_Pie_SingleValueRendersFullCirclePath()
+    {
+        var data = new List<CoronaChartDataPoint> { new("All", 100) };
+
+        var cut = Render<CoronaChart>(p => p
+            .Add(x => x.Type, CoronaChartType.Pie)
+            .Add(x => x.Data, data));
+
+        var path = cut.Find(".corona-chart__pie-slice").GetAttribute("d");
+
+        Assert.Contains("a 62 62 0 1 0", path);
+    }
+
+    [Fact]
+    public void CoronaChart_Donut_RendersSegmentsAndTotal()
+    {
+        var cut = Render<CoronaChart>(p => p
+            .Add(x => x.Type, CoronaChartType.Donut)
+            .Add(x => x.Data, CreateChartData())
+            .Add(x => x.TotalLabel, "orders"));
+
+        Assert.Equal(2, cut.FindAll(".corona-chart__donut-segment").Count);
+        Assert.Contains("corona-chart__donut-total", cut.Markup);
+        Assert.Contains("orders", cut.Markup);
+    }
+
+    [Fact]
+    public void CoronaChart_Empty_RendersEmptyState()
+    {
+        var cut = Render<CoronaChart>(p => p
+            .Add(x => x.EmptyText, "Waiting")
+            .Add(x => x.Data, Array.Empty<CoronaChartDataPoint>()));
+
+        Assert.NotNull(cut.Find(".corona-chart__empty"));
+        Assert.Contains("Waiting", cut.Markup);
+        Assert.Empty(cut.FindAll("svg"));
+    }
+
+    [Fact]
+    public void CoronaChart_ValueFormatter_FormatsVisibleValues()
+    {
+        var cut = Render<CoronaChart>(p => p
+            .Add(x => x.Data, CreateChartData())
+            .Add(x => x.ValueFormatter, value => $"{value:0} units"));
+
+        Assert.Contains("12 units", cut.Markup);
+        Assert.Contains("28 units", cut.Markup);
+    }
+
+    [Fact]
+    public void CoronaProgressBar_Indeterminate_OmitsCurrentValue()
+    {
+        var cut = Render<CoronaProgressBar>(p => p
+            .Add(x => x.Indeterminate, true)
+            .Add(x => x.Label, "Analyzing")
+            .Add(x => x.ShowValue, false));
+
+        var progress = cut.Find(".corona-progress");
+        var track = cut.Find(".corona-progress__track");
+
+        Assert.Contains("is-indeterminate", progress.ClassList);
+        Assert.Null(track.GetAttribute("aria-valuenow"));
+        Assert.DoesNotContain("%", cut.Markup);
+    }
+
+    [Fact]
+    public void CoronaLoading_Skeleton_RendersSkeletonLines()
+    {
+        var cut = Render<CoronaLoading>(p => p
+            .Add(x => x.Variant, CoronaLoadingVariant.Skeleton)
+            .Add(x => x.Inline, false));
+
+        Assert.Contains("corona-loading--skeleton", cut.Find(".corona-loading").ClassList);
+        Assert.Equal(3, cut.FindAll(".corona-loading__skeleton-line").Count);
+    }
+
+    [Fact]
+    public void CoronaFileUpload_Disabled_RendersDisabledInputAndState()
+    {
+        var cut = Render<CoronaFileUpload>(p => p
+            .Add(x => x.Disabled, true)
+            .Add(x => x.Title, "Uploads locked"));
+
+        Assert.True(cut.Find("input[type=file]").HasAttribute("disabled"));
+        Assert.Contains("is-disabled", cut.Find(".corona-file-upload__dropzone").ClassList);
+        Assert.Contains("Uploads locked", cut.Markup);
+    }
+
+    [Fact]
     public void CoronaBadge_RendersDotAndPositionClass()
     {
-        var cut = RenderComponent<CoronaBadge>(p => p
+        var cut = Render<CoronaBadge>(p => p
             .Add(x => x.Dot, true)
             .Add(x => x.Position, CoronaBadgePosition.BottomLeft)
             .Add(x => x.Color, CoronaColorSemantic.Warning));
@@ -56,7 +263,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaCard_RendersHeaderAndLayoutStyles()
     {
-        var cut = RenderComponent<CoronaCard>(p => p
+        var cut = Render<CoronaCard>(p => p
             .Add(x => x.Title, "Title")
             .Add(x => x.ContentTextAlign, CoronaTextAlign.Justify)
             .Add(x => x.ContentJustify, CoronaFlexAlign.SpaceAround)
@@ -72,7 +279,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaContainer_UsesRequestedMaxWidth()
     {
-        var cut = RenderComponent<CoronaContainer>(p => p
+        var cut = Render<CoronaContainer>(p => p
             .Add(x => x.MaxWidth, CoronaContainerMaxWidth.Xs)
             .Add(x => x.CenterContent, true));
 
@@ -85,7 +292,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     public void CoronaDialog_BackdropAndEscape_CloseWhenEnabled()
     {
         bool? open = true;
-        var cut = RenderComponent<CoronaDialog>(p => p
+        var cut = Render<CoronaDialog>(p => p
             .Add(x => x.Open, true)
             .Add(x => x.OpenChanged, EventCallback.Factory.Create<bool>(this, value => open = value))
             .Add(x => x.Title, "Dialog")
@@ -103,7 +310,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     public void CoronaDialog_CloseBlocked_WhenOptionsDisabled()
     {
         bool? open = true;
-        var cut = RenderComponent<CoronaDialog>(p => p
+        var cut = Render<CoronaDialog>(p => p
             .Add(x => x.Open, true)
             .Add(x => x.CloseOnBackdrop, false)
             .Add(x => x.CloseOnEscape, false)
@@ -120,7 +327,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     public void CoronaDrawer_RendersRightSideAndClosesOnKeyboard()
     {
         bool? open = true;
-        var cut = RenderComponent<CoronaDrawer>(p => p
+        var cut = Render<CoronaDrawer>(p => p
             .Add(x => x.Open, true)
             .Add(x => x.Position, CoronaDrawerPosition.Right)
             .Add(x => x.OpenChanged, EventCallback.Factory.Create<bool>(this, value => open = value))
@@ -142,7 +349,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
             new() { Text = "Docs", Url = "/docs", Children = [new CoronaNavItem { Text = "Guide", Url = "/docs/guide" }] }
         };
 
-        var cut = RenderComponent<CoronaNavMenu>(p => p.Add(x => x.Items, items));
+        var cut = Render<CoronaNavMenu>(p => p.Add(x => x.Items, items));
 
         Assert.Contains("is-active", cut.Markup);
         cut.Find(".corona-nav-menu__expander").Click();
@@ -153,7 +360,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     public void CoronaPageHeader_MenuInteractions_InvokeCallback()
     {
         var clicks = 0;
-        var cut = RenderComponent<CoronaPageHeader>(p => p
+        var cut = Render<CoronaPageHeader>(p => p
             .Add(x => x.Title, "My Page")
             .Add(x => x.ShowMenuButton, true)
             .Add(x => x.Density, CoronaHeaderDensity.Spacious)
@@ -169,7 +376,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaStack_MapsLayoutValues()
     {
-        var cut = RenderComponent<CoronaStack>(p => p
+        var cut = Render<CoronaStack>(p => p
             .Add(x => x.Direction, CoronaStackDirection.Row)
             .Add(x => x.Wrap, CoronaStackWrap.WrapReverse)
             .Add(x => x.Justify, CoronaStackJustify.SpaceEvenly)
@@ -188,11 +395,13 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     {
         var changed = -1;
 
-        var cut = RenderComponent<CoronaTabs>(p => p
+        var cut = Render<CoronaTabs>(p => p
             .Add(x => x.ActiveIndex, 0)
             .Add(x => x.ActiveIndexChanged, EventCallback.Factory.Create<int>(this, i => changed = i))
             .Add(x => x.LazyRender, true)
             .AddChildContent<TabsFixture>());
+
+        cut.WaitForAssertion(() => Assert.Equal(2, cut.FindAll(".corona-tabs__tab").Count));
 
         var tabs = cut.FindAll(".corona-tabs__tab");
         Assert.Equal(2, tabs.Count);
@@ -204,7 +413,7 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     [Fact]
     public void CoronaThemeCascadingValue_RendersChildContent()
     {
-        var cut = RenderComponent<CoronaThemeCascadingValue>(p => p.AddChildContent("Themed content"));
+        var cut = Render<CoronaThemeCascadingValue>(p => p.AddChildContent("Themed content"));
         Assert.Contains("Themed content", cut.Markup);
     }
 
@@ -213,14 +422,56 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     {
         var items = new List<CoronaNavItem> { new() { Text = "Item", Url = "/" } };
 
-        var cut = RenderComponent<CoronaLayoutShell>(p => p
+        var cut = Render<CoronaLayoutShell>(p => p
+            .Add(x => x.DrawerItens, items)
             .Add(x => x.DrawerTitle, "Menu")
+            .Add(x => x.HeaderTitle, "Header")
             .Add(x => x.ShowMenuButton, true)
             .Add(x => x.ChildContent, (RenderFragment)(b => b.AddContent(0, "Main content"))));
 
         Assert.Contains("Menu", cut.Markup);
         Assert.Contains("Main content", cut.Markup);
     }
+
+    [Fact]
+    public void CoronaLayoutShell_AcceptsNavItemsAlias()
+    {
+        var items = new List<CoronaNavItem> { new() { Text = "Alias item", Url = "/" } };
+
+        var cut = Render<CoronaLayoutShell>(p => p
+            .Add(x => x.NavItems, items)
+            .Add(x => x.DrawerTitle, "Menu")
+            .Add(x => x.HeaderTitle, "Header")
+            .Add(x => x.ChildContent, (RenderFragment)(b => b.AddContent(0, "Main content"))));
+
+        Assert.Contains("Alias item", cut.Markup);
+    }
+
+    [Fact]
+    public void CoronaInput_Currency_RemovesTrailingTextFromExistingFormattedValue()
+    {
+        string currentValue = "R$ 55,22";
+
+        var cut = Render<CoronaInput>(p => p
+            .Add(x => x.Type, "currency")
+            .Add(x => x.Value, currentValue)
+            .Add(x => x.ValueChanged, EventCallback.Factory.Create<string>(this, value => currentValue = value))
+            .Add(x => x.ValueExpression, () => currentValue));
+
+        var input = cut.Find("input");
+        Assert.Equal("R$ 55,22", input.GetAttribute("value"));
+
+        input.Change("R$ 55,22 uwehifw");
+
+        cut.WaitForAssertion(() => Assert.Equal("R$ 55,22", cut.Find("input").GetAttribute("value")));
+        Assert.Equal("5522", currentValue);
+    }
+
+    private static IReadOnlyList<CoronaChartDataPoint> CreateChartData() =>
+    [
+        new("Q1", 12),
+        new("Q2", 28, "#0F766E")
+    ];
 
     private sealed class TabsFixture : ComponentBase
     {

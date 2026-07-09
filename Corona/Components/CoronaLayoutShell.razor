@@ -11,7 +11,7 @@
                   Actions="@HeaderActions"
                   MenuIcon="@MenuIcon" />
 
-<div class="docs-shell">
+<div class="docs-shell @(DrawerOpen ? "drawer-open" : string.Empty)">
     <CoronaDrawer Open="DrawerOpen"
                   OpenChanged="OnDrawerChanged"
                   Overlay="@DrawerOverlay"
@@ -20,7 +20,7 @@
         <CoronaStack Spacing="1rem" FullWidth="true">
             <p class="docs-drawer-title">@DrawerTitle</p>
             
-            <CoronaNavMenu Items="DrawerItens" />
+            <CoronaNavMenu Items="ResolvedDrawerItems" />
         </CoronaStack>
     </CoronaDrawer>
     @if (Swipe)
@@ -51,10 +51,13 @@
     public IReadOnlyList<CoronaNavItem> DrawerItens { get; set; }
 
     [Parameter]
-    public string DrawerTitle { get; set; }
+    public IReadOnlyList<CoronaNavItem>? NavItems { get; set; }
 
     [Parameter]
-    public string HeaderTitle { get; set; }
+    public string DrawerTitle { get; set; } = string.Empty;
+
+    [Parameter]
+    public string HeaderTitle { get; set; } = string.Empty;
 
     [Parameter]
     public int DrawerWidthPx { get; set; } = 300;
@@ -66,12 +69,12 @@
     /// I recommend to use CoronaStack with buttons or text, but can be any rander fragment.
     /// </summary>
     [Parameter]
-    public RenderFragment HeaderActions { get; set; }
+    public RenderFragment? HeaderActions { get; set; }
 
     [Parameter]
     public bool ShowMenuButton { get; set; }
 
-    [Parameter] public string? MenuIcon { get; set; } = "☰";
+    [Parameter] public string? MenuIcon { get; set; } = "\u2630";
 
     [Parameter]
     public bool DrawerOpen { get; set; } = true;
@@ -79,6 +82,8 @@
     [Parameter] public EventCallback<bool> DrawerOpenChanged { get; set; }
 
     private string DrawerClass => "docs-drawer";
+
+    private IReadOnlyList<CoronaNavItem> ResolvedDrawerItems => DrawerItens ?? NavItems ?? [];
 
     private Task OnDrawerChanged(bool open)
     {

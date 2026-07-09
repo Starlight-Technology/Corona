@@ -15,5 +15,4 @@ public sealed class CoronaNavItem
     public bool Expanded { get; set; }
 
     public RenderFragment? Content { get; init; }
-
 }

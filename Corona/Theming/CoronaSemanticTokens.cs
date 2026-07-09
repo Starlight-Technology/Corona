@@ -25,7 +25,9 @@ public sealed record CoronaSemanticTokens(
     /// <summary>
     /// Creates semantic tokens from primitive tokens for a light palette.
     /// </summary>
-    public static CoronaSemanticTokens CreateLight(CoronaPrimitiveTokens primitives) => new(
+    public static CoronaSemanticTokens CreateLight(CoronaPrimitiveTokens primitives)
+    {
+        return new(
         ColorPrimary: primitives.Colors.Brand600,
         SurfaceBackground: primitives.Colors.Gray50,
         SurfaceBackgroundAlt: primitives.Colors.White,
@@ -42,11 +44,14 @@ public sealed record CoronaSemanticTokens(
         FontSizeBody: primitives.Typography.SizeMd,
         FontSizeHeading: primitives.Typography.SizeLg,
         FontWeightHeading: primitives.Typography.WeightSemibold);
+    }
 
     /// <summary>
     /// Creates semantic tokens from primitive tokens for a dark palette.
     /// </summary>
-    public static CoronaSemanticTokens CreateDark(CoronaPrimitiveTokens primitives) => new(
+    public static CoronaSemanticTokens CreateDark(CoronaPrimitiveTokens primitives)
+    {
+        return new(
         ColorPrimary: primitives.Colors.Brand500,
         SurfaceBackground: primitives.Colors.Gray900,
         SurfaceBackgroundAlt: primitives.Colors.Gray700,
@@ -63,4 +68,5 @@ public sealed record CoronaSemanticTokens(
         FontSizeBody: primitives.Typography.SizeMd,
         FontSizeHeading: primitives.Typography.SizeLg,
         FontWeightHeading: primitives.Typography.WeightSemibold);
+    }
 }

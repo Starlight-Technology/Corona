@@ -3,7 +3,7 @@ using Corona.Theming;
 
 namespace Corona.Tests;
 
-public abstract class ComponentTestContext : TestContext
+public abstract class ComponentTestContext : BunitContext
 {
     protected ComponentTestContext()
     {

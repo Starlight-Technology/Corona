@@ -1,0 +1,136 @@
+@namespace Corona.Components
+@implements IDisposable
+@using Microsoft.AspNetCore.Components.Forms
+@using Corona.Components.Enums
+@using Corona.Theming
+@inject CoronaThemeProvider ThemeProvider
+
+<div class="corona-file-upload @Class" style="@BuildStyle()">
+    <label class="corona-file-upload__dropzone @(Disabled ? "is-disabled" : string.Empty)">
+        <InputFile class="corona-file-upload__input"
+                   OnChange="HandleFilesSelectedAsync"
+                   multiple="@Multiple"
+                   accept="@Accept"
+                   disabled="@Disabled" />
+        <span class="corona-file-upload__icon fa fa-solid fa-upload" aria-hidden="true"></span>
+        <span class="corona-file-upload__copy">
+            <span class="corona-file-upload__title">@Title</span>
+            @if (!string.IsNullOrWhiteSpace(Hint))
+            {
+                <span class="corona-file-upload__hint">@Hint</span>
+            }
+        </span>
+    </label>
+
+    @if (ShowFileList && _files.Count > 0)
+    {
+        <ul class="corona-file-upload__list" aria-label="Selected files">
+            @foreach (var file in _files)
+            {
+                var oversized = IsOversized(file);
+                <li class="corona-file-upload__file @(oversized ? "is-invalid" : string.Empty)">
+                    <span class="corona-file-upload__file-name">@file.Name</span>
+                    <span class="corona-file-upload__file-meta">
+                        @FormatFileSize(file.Size)
+                        @if (oversized)
+                        {
+                            <span> · exceeds limit</span>
+                        }
+                    </span>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+    [CascadingParameter] public CoronaTheme? Theme { get; set; }
+
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+    [Parameter] public string Title { get; set; } = "Select files";
+    [Parameter] public string? Hint { get; set; } = "Browse files from your device.";
+    [Parameter] public string? Accept { get; set; }
+    [Parameter] public bool Multiple { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool ShowFileList { get; set; } = true;
+    [Parameter] public int MaximumFileCount { get; set; } = 10;
+    [Parameter] public long? MaxFileSizeBytes { get; set; }
+    [Parameter] public CoronaColorSemantic Color { get; set; } = CoronaColorSemantic.Primary;
+    [Parameter] public EventCallback<InputFileChangeEventArgs> OnChange { get; set; }
+    [Parameter] public EventCallback<IReadOnlyList<IBrowserFile>> FilesChanged { get; set; }
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private readonly List<IBrowserFile> _files = [];
+
+    private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+
+    protected override void OnInitialized()
+    {
+        ThemeProvider.OnChange += HandleThemeChanged;
+    }
+
+    private void HandleThemeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task HandleFilesSelectedAsync(InputFileChangeEventArgs args)
+    {
+        var requestedLimit = Multiple ? Math.Max(1, MaximumFileCount) : 1;
+        var readLimit = Math.Max(args.FileCount, requestedLimit);
+        var selected = args.GetMultipleFiles(readLimit).Take(requestedLimit).ToList();
+
+        _files.Clear();
+        _files.AddRange(selected);
+
+        await OnChange.InvokeAsync(args);
+        await FilesChanged.InvokeAsync(_files);
+    }
+
+    private string BuildStyle()
+    {
+        var semantic = ActiveTheme.Semantic;
+        var primitive = ActiveTheme.Primitive;
+
+        return $"--corona-upload-accent:{ResolveAccent()};--corona-upload-surface:{semantic.SurfaceBackgroundAlt};--corona-upload-surface-hover:{semantic.FocusOutline};--corona-upload-border:{semantic.BorderDefault};--corona-upload-text:{semantic.TextPrimary};--corona-upload-muted:{semantic.TextSecondary};--corona-upload-danger:#B91C1C;--corona-upload-radius:{primitive.Radius.Md};font-family:{semantic.FontFamilyDefault};";
+    }
+
+    private bool IsOversized(IBrowserFile file)
+    {
+        return MaxFileSizeBytes.HasValue && file.Size > MaxFileSizeBytes.Value;
+    }
+
+    private string ResolveAccent()
+    {
+        var colors = ActiveTheme.Primitive.Colors;
+
+        return Color switch
+        {
+            CoronaColorSemantic.Neutral => colors.Gray700,
+            CoronaColorSemantic.Success => "#15803D",
+            CoronaColorSemantic.Warning => "#B45309",
+            CoronaColorSemantic.Danger => "#B91C1C",
+            _ => ActiveTheme.Semantic.ColorPrimary
+        };
+    }
+
+    private static string FormatFileSize(long bytes)
+    {
+        string[] units = ["B", "KB", "MB", "GB"];
+        var size = (double)bytes;
+        var unit = 0;
+
+        while (size >= 1024 && unit < units.Length - 1)
+        {
+            size /= 1024;
+            unit++;
+        }
+
+        return $"{size:0.#} {units[unit]}";
+    }
+
+    public void Dispose()
+    {
+        ThemeProvider.OnChange -= HandleThemeChanged;
+    }
+}

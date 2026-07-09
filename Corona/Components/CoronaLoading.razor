@@ -1,0 +1,117 @@
+@namespace Corona.Components
+@implements IDisposable
+@using Corona.Components.Enums
+@using Corona.Theming
+@inject CoronaThemeProvider ThemeProvider
+
+<div class="corona-loading corona-loading--@VariantClass corona-loading--@SizeClass @(Inline ? "is-inline" : string.Empty) @(Overlay ? "is-overlay" : string.Empty) @Class"
+     style="@BuildStyle()"
+     role="status"
+     aria-live="polite"
+     aria-label="@ResolvedAriaLabel">
+    @if (Variant == CoronaLoadingVariant.Skeleton)
+    {
+        <div class="corona-loading__skeleton" aria-hidden="true">
+            <span class="corona-loading__skeleton-line is-wide"></span>
+            <span class="corona-loading__skeleton-line"></span>
+            <span class="corona-loading__skeleton-line is-short"></span>
+        </div>
+    }
+    else if (Variant == CoronaLoadingVariant.Dots)
+    {
+        <span class="corona-loading__dots" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+        </span>
+    }
+    else if (Variant == CoronaLoadingVariant.Pulse)
+    {
+        <span class="corona-loading__pulse" aria-hidden="true"></span>
+    }
+    else
+    {
+        <span class="corona-loading__spinner" aria-hidden="true"></span>
+    }
+
+    @if (ChildContent is not null)
+    {
+        <span class="corona-loading__label">@ChildContent</span>
+    }
+    else if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <span class="corona-loading__label">@Label</span>
+    }
+</div>
+
+@code {
+    [CascadingParameter] public CoronaTheme? Theme { get; set; }
+
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+    [Parameter] public CoronaLoadingVariant Variant { get; set; } = CoronaLoadingVariant.Spinner;
+    [Parameter] public CoronaComponentSize Size { get; set; } = CoronaComponentSize.Medium;
+    [Parameter] public CoronaColorSemantic Color { get; set; } = CoronaColorSemantic.Primary;
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public bool Inline { get; set; } = true;
+    [Parameter] public bool Overlay { get; set; }
+    [Parameter] public string? Width { get; set; }
+    [Parameter] public string? MinHeight { get; set; }
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+    private string VariantClass => Variant.ToString().ToLowerInvariant();
+    private string SizeClass => Size.ToString().ToLowerInvariant();
+    private string ResolvedAriaLabel => Label ?? "Loading";
+
+    protected override void OnInitialized()
+    {
+        ThemeProvider.OnChange += HandleThemeChanged;
+    }
+
+    private void HandleThemeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private string BuildStyle()
+    {
+        var semantic = ActiveTheme.Semantic;
+        var primitive = ActiveTheme.Primitive;
+        var size = ResolveSize();
+        var accent = ResolveAccent();
+
+        return $"--corona-loading-accent:{accent};--corona-loading-muted:{semantic.BorderDefault};--corona-loading-surface:{semantic.SurfaceBackgroundAlt};--corona-loading-text:{semantic.TextSecondary};--corona-loading-size:{size.Indicator};--corona-loading-gap:{size.Gap};--corona-loading-font-size:{size.FontSize};width:{Width ?? (Inline ? "auto" : "100%")};min-height:{MinHeight ?? (Overlay ? "10rem" : "auto")};font-family:{semantic.FontFamilyDefault};border-radius:{primitive.Radius.Md};";
+    }
+
+    private (string Indicator, string Gap, string FontSize) ResolveSize()
+    {
+        var typography = ActiveTheme.Primitive.Typography;
+
+        return Size switch
+        {
+            CoronaComponentSize.Small => ("1rem", "0.375rem", typography.SizeSm),
+            CoronaComponentSize.Large => ("2rem", "0.75rem", typography.SizeLg),
+            _ => ("1.5rem", "0.5rem", typography.SizeMd)
+        };
+    }
+
+    private string ResolveAccent()
+    {
+        var colors = ActiveTheme.Primitive.Colors;
+
+        return Color switch
+        {
+            CoronaColorSemantic.Neutral => colors.Gray700,
+            CoronaColorSemantic.Success => "#15803D",
+            CoronaColorSemantic.Warning => "#B45309",
+            CoronaColorSemantic.Danger => "#B91C1C",
+            _ => ActiveTheme.Semantic.ColorPrimary
+        };
+    }
+
+    public void Dispose()
+    {
+        ThemeProvider.OnChange -= HandleThemeChanged;
+    }
+}

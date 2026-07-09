@@ -21,7 +21,7 @@
                     disabled="@tab.Disabled"
                     aria-selected="@active"
                     aria-controls="@GetTabPanelId(tabIndex)"
-                    @onclick="() => SetActiveIndexAsync(tabIndex)">
+                    onclick="@(() => SetActiveIndexAsync(tabIndex))">
                 @if (tab.HeaderContent is not null)
                 {
                     @tab.HeaderContent

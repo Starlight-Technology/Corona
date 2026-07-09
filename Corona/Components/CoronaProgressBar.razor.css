@@ -1,0 +1,71 @@
+.corona-progress {
+    width: 100%;
+    color: var(--corona-progress-text);
+    box-sizing: border-box;
+}
+
+.corona-progress__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.375rem;
+    font-size: 0.875rem;
+}
+
+.corona-progress__label {
+    font-weight: 600;
+}
+
+.corona-progress__value {
+    color: var(--corona-progress-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.corona-progress__track {
+    position: relative;
+    width: 100%;
+    height: var(--corona-progress-height);
+    overflow: hidden;
+    border-radius: var(--corona-progress-radius);
+    background: var(--corona-progress-track);
+}
+
+.corona-progress__buffer,
+.corona-progress__fill {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    border-radius: inherit;
+}
+
+.corona-progress__buffer {
+    background: var(--corona-progress-buffer);
+    opacity: 0.72;
+}
+
+.corona-progress__fill {
+    width: 0;
+    background: var(--corona-progress-accent);
+    transition: width 200ms ease;
+}
+
+.corona-progress.is-striped .corona-progress__fill {
+    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.22) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.22) 50%, rgba(255, 255, 255, 0.22) 75%, transparent 75%, transparent);
+    background-size: 1rem 1rem;
+}
+
+.corona-progress.is-indeterminate .corona-progress__fill {
+    width: 38%;
+    animation: corona-progress-indeterminate 1100ms ease-in-out infinite;
+}
+
+@keyframes corona-progress-indeterminate {
+    0% {
+        transform: translateX(-105%);
+    }
+
+    100% {
+        transform: translateX(270%);
+    }
+}

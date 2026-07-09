@@ -1,0 +1,120 @@
+@namespace Corona.Components
+@implements IDisposable
+@using System.Globalization
+@using Corona.Components.Enums
+@using Corona.Theming
+@inject CoronaThemeProvider ThemeProvider
+
+<div class="corona-progress corona-progress--@SizeClass @(Indeterminate ? "is-indeterminate" : string.Empty) @(Striped ? "is-striped" : string.Empty) @Class"
+     style="@BuildStyle()">
+    @if (!string.IsNullOrWhiteSpace(Label) || ShowValue)
+    {
+        <div class="corona-progress__header">
+            @if (!string.IsNullOrWhiteSpace(Label))
+            {
+                <span class="corona-progress__label">@Label</span>
+            }
+
+            @if (ShowValue && !Indeterminate)
+            {
+                <span class="corona-progress__value">@FormattedValue</span>
+            }
+        </div>
+    }
+
+    <div class="corona-progress__track"
+         role="progressbar"
+         aria-label="@ResolvedAriaLabel"
+         aria-valuemin="0"
+         aria-valuemax="@Max"
+         aria-valuenow="@AriaValueNow">
+        @if (BufferValue.HasValue && !Indeterminate)
+        {
+            <span class="corona-progress__buffer" style="@BuildBufferStyle()"></span>
+        }
+        <span class="corona-progress__fill" style="@BuildFillStyle()"></span>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter] public CoronaTheme? Theme { get; set; }
+
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+    [Parameter] public double Value { get; set; }
+    [Parameter] public double Max { get; set; } = 100;
+    [Parameter] public double? BufferValue { get; set; }
+    [Parameter] public bool Indeterminate { get; set; }
+    [Parameter] public bool Striped { get; set; }
+    [Parameter] public bool ShowValue { get; set; } = true;
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public CoronaComponentSize Size { get; set; } = CoronaComponentSize.Medium;
+    [Parameter] public CoronaColorSemantic Color { get; set; } = CoronaColorSemantic.Primary;
+    [Parameter] public string? Height { get; set; }
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+    private string SizeClass => Size.ToString().ToLowerInvariant();
+    private double SafeMax => Max <= 0 ? 100 : Max;
+    private double ClampedValue => Math.Clamp(Value, 0, SafeMax);
+    private double Percent => ClampedValue / SafeMax * 100;
+    private string ResolvedAriaLabel => Label ?? "Progress";
+    private string? AriaValueNow => Indeterminate ? null : ClampedValue.ToString("0.##", CultureInfo.InvariantCulture);
+    private string FormattedValue => $"{Percent:0}%";
+
+    protected override void OnInitialized()
+    {
+        ThemeProvider.OnChange += HandleThemeChanged;
+    }
+
+    private void HandleThemeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private string BuildStyle()
+    {
+        var semantic = ActiveTheme.Semantic;
+        var primitive = ActiveTheme.Primitive;
+
+        return $"--corona-progress-accent:{ResolveAccent()};--corona-progress-track:{semantic.BorderDefault};--corona-progress-buffer:{semantic.FocusOutline};--corona-progress-text:{semantic.TextPrimary};--corona-progress-muted:{semantic.TextSecondary};--corona-progress-height:{Height ?? ResolveHeight()};--corona-progress-radius:{primitive.Radius.Sm};font-family:{semantic.FontFamilyDefault};";
+    }
+
+    private string BuildFillStyle()
+    {
+        return Indeterminate
+            ? string.Empty
+            : $"width:{Percent.ToString("0.##", CultureInfo.InvariantCulture)}%;";
+    }
+
+    private string BuildBufferStyle()
+    {
+        var buffer = Math.Clamp(BufferValue ?? 0, 0, SafeMax) / SafeMax * 100;
+        return $"width:{buffer.ToString("0.##", CultureInfo.InvariantCulture)}%;";
+    }
+
+    private string ResolveHeight() => Size switch
+    {
+        CoronaComponentSize.Small => "0.375rem",
+        CoronaComponentSize.Large => "0.75rem",
+        _ => "0.5rem"
+    };
+
+    private string ResolveAccent()
+    {
+        var colors = ActiveTheme.Primitive.Colors;
+
+        return Color switch
+        {
+            CoronaColorSemantic.Neutral => colors.Gray700,
+            CoronaColorSemantic.Success => "#15803D",
+            CoronaColorSemantic.Warning => "#B45309",
+            CoronaColorSemantic.Danger => "#B91C1C",
+            _ => ActiveTheme.Semantic.ColorPrimary
+        };
+    }
+
+    public void Dispose()
+    {
+        ThemeProvider.OnChange -= HandleThemeChanged;
+    }
+}

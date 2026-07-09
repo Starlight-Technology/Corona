@@ -1,0 +1,377 @@
+@namespace Corona.Components
+@implements IDisposable
+@using System.Globalization
+@using System.Net
+@using Corona.Components.Enums
+@using Corona.Components.Models
+@using Corona.Theming
+@using Microsoft.AspNetCore.Components
+@inject CoronaThemeProvider ThemeProvider
+
+<figure class="corona-chart corona-chart--@TypeClass @Class" style="@BuildStyle()">
+    @if (!string.IsNullOrWhiteSpace(Title))
+    {
+        <figcaption class="corona-chart__title">@Title</figcaption>
+    }
+
+    @if (Data.Count == 0)
+    {
+        <div class="corona-chart__empty">@EmptyText</div>
+    }
+    else
+    {
+        <svg class="corona-chart__svg"
+             viewBox="0 0 320 180"
+             role="img"
+             aria-label="@ResolvedAriaLabel">
+            @if (IsRadialChart)
+            {
+                @if (Type == CoronaChartType.Donut)
+                {
+                    <circle class="corona-chart__donut-track" cx="@RadialCenterX" cy="@RadialCenterY" r="@DonutRadius"></circle>
+                    @for (var index = 0; index < Data.Count; index++)
+                    {
+                        var point = Data[index];
+                        var percent = GetRadialPercent(point);
+                        <circle class="corona-chart__donut-segment"
+                                cx="@RadialCenterX"
+                                cy="@RadialCenterY"
+                                r="@DonutRadius"
+                                pathLength="100"
+                                stroke="@ResolvePointColor(point, index)"
+                                stroke-dasharray="@percent.ToString("0.##", CultureInfo.InvariantCulture) 100"
+                                stroke-dashoffset="@((-GetRadialOffset(index)).ToString("0.##", CultureInfo.InvariantCulture))"
+                                transform="rotate(-90 @RadialCenterX @RadialCenterY)"></circle>
+                    }
+                    @RenderSvgText("corona-chart__donut-total", RadialCenterX, 84, "middle", FormatValue(TotalValue))
+                    @RenderSvgText("corona-chart__donut-label", RadialCenterX, 104, "middle", TotalLabel)
+                }
+                else
+                {
+                    @for (var index = 0; index < Data.Count; index++)
+                    {
+                        var point = Data[index];
+                        <path class="corona-chart__pie-slice"
+                              d="@BuildPieSlicePath(index)"
+                              fill="@ResolvePointColor(point, index)"></path>
+                    }
+                }
+            }
+            else
+            {
+                <g class="corona-chart__grid">
+                    <line x1="@ChartLeft" y1="@ChartTop" x2="@ChartLeft" y2="@ChartBottom"></line>
+                    <line x1="@ChartLeft" y1="@ChartBottom" x2="@ChartRight" y2="@ChartBottom"></line>
+                    <line x1="@ChartLeft" y1="@MidGridY" x2="@ChartRight" y2="@MidGridY"></line>
+                </g>
+
+                @if (Type == CoronaChartType.Area)
+                {
+                    <path class="corona-chart__area-fill"
+                          d="@BuildAreaPath()"
+                          fill="@ResolvePointColor(Data[0], 0)"></path>
+                    <polyline class="corona-chart__line-path"
+                              points="@BuildLinePoints()"
+                              fill="none"
+                              stroke="@ResolvePointColor(Data[0], 0)"></polyline>
+                    @RenderPointMarkers("corona-chart__line-point")
+                }
+                else if (Type == CoronaChartType.Line)
+                {
+                    <polyline class="corona-chart__line-path"
+                              points="@BuildLinePoints()"
+                              fill="none"
+                              stroke="@ResolvePointColor(Data[0], 0)"></polyline>
+                    @RenderPointMarkers("corona-chart__line-point")
+                }
+                else if (Type == CoronaChartType.Scatter)
+                {
+                    @RenderPointMarkers("corona-chart__scatter-point")
+                }
+                else if (Type == CoronaChartType.HorizontalBar)
+                {
+                    @for (var index = 0; index < Data.Count; index++)
+                    {
+                        var point = Data[index];
+                        <rect class="corona-chart__horizontal-bar"
+                              x="@ChartLeft"
+                              y="@GetHorizontalBarY(index).ToString("0.##", CultureInfo.InvariantCulture)"
+                              width="@GetHorizontalBarWidth(point.Value).ToString("0.##", CultureInfo.InvariantCulture)"
+                              height="@HorizontalBarHeight.ToString("0.##", CultureInfo.InvariantCulture)"
+                              rx="4"
+                              fill="@ResolvePointColor(point, index)"></rect>
+                    }
+                }
+                else
+                {
+                    @for (var index = 0; index < Data.Count; index++)
+                    {
+                        var point = Data[index];
+                        <rect class="corona-chart__bar"
+                              x="@GetBarX(index).ToString("0.##", CultureInfo.InvariantCulture)"
+                              y="@GetY(point.Value).ToString("0.##", CultureInfo.InvariantCulture)"
+                              width="@BarWidth.ToString("0.##", CultureInfo.InvariantCulture)"
+                              height="@GetBarHeight(point.Value).ToString("0.##", CultureInfo.InvariantCulture)"
+                              rx="4"
+                              fill="@ResolvePointColor(point, index)"></rect>
+                    }
+                }
+
+                @if (ShowValues)
+                {
+                    @for (var index = 0; index < Data.Count; index++)
+                    {
+                        var point = Data[index];
+                        @if (Type == CoronaChartType.HorizontalBar)
+                        {
+                            @RenderSvgText("corona-chart__value", Math.Min(304, ChartLeft + GetHorizontalBarWidth(point.Value) + 12), GetHorizontalLabelY(index), "start", FormatValue(point.Value))
+                        }
+                        else
+                        {
+                            @RenderSvgText("corona-chart__value", GetLabelX(index), Math.Max(18, GetY(point.Value) - 7), "middle", FormatValue(point.Value))
+                        }
+                    }
+                }
+
+                @for (var index = 0; index < Data.Count; index++)
+                {
+                    var point = Data[index];
+                    @if (Type == CoronaChartType.HorizontalBar)
+                    {
+                        @RenderSvgText("corona-chart__axis-label", 28, GetHorizontalLabelY(index), "end", point.Label)
+                    }
+                    else
+                    {
+                        @RenderSvgText("corona-chart__axis-label", GetLabelX(index), 166, "middle", point.Label)
+                    }
+                }
+            }
+        </svg>
+
+        @if (ShowLegend)
+        {
+            <ul class="corona-chart__legend">
+                @for (var index = 0; index < Data.Count; index++)
+                {
+                    var point = Data[index];
+                    <li>
+                        <span class="corona-chart__legend-swatch" style="background:@ResolvePointColor(point, index);"></span>
+                        <span>@point.Label</span>
+                    </li>
+                }
+            </ul>
+        }
+    }
+</figure>
+
+@code {
+    private const double ChartLeft = 34;
+    private const double ChartRight = 294;
+    private const double ChartTop = 36;
+    private const double ChartBottom = 146;
+    private const double RadialCenterX = 160;
+    private const double RadialCenterY = 90;
+    private const double PieRadius = 62;
+    private const double DonutRadius = 54;
+    private static readonly string[] Palette = ["#2563EB", "#0F766E", "#B45309", "#7C3AED", "#B91C1C", "#15803D"];
+
+    [CascadingParameter] public CoronaTheme? Theme { get; set; }
+
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+    [Parameter] public IReadOnlyList<CoronaChartDataPoint> Data { get; set; } = [];
+    [Parameter] public CoronaChartType Type { get; set; } = CoronaChartType.Bar;
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? AriaLabel { get; set; }
+    [Parameter] public string EmptyText { get; set; } = "No data available";
+    [Parameter] public string TotalLabel { get; set; } = "total";
+    [Parameter] public bool ShowLegend { get; set; } = true;
+    [Parameter] public bool ShowValues { get; set; } = true;
+    [Parameter] public string Height { get; set; } = "16rem";
+    [Parameter] public Func<double, string>? ValueFormatter { get; set; }
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+    private string TypeClass => Type.ToString().ToLowerInvariant();
+    private string ResolvedAriaLabel => AriaLabel ?? Title ?? "Chart";
+    private bool IsRadialChart => Type is CoronaChartType.Pie or CoronaChartType.Donut;
+    private double TotalValue => Data.Sum(x => Math.Max(0, x.Value));
+    private double MaxValue => Math.Max(1, Data.Select(x => Math.Max(0, x.Value)).DefaultIfEmpty(1).Max());
+    private double PlotWidth => ChartRight - ChartLeft;
+    private double PlotHeight => ChartBottom - ChartTop;
+    private double MidGridY => ChartTop + (PlotHeight / 2);
+    private double SlotWidth => Data.Count == 0 ? PlotWidth : PlotWidth / Data.Count;
+    private double BarWidth => Math.Max(12, SlotWidth * 0.58);
+    private double HorizontalSlotHeight => Data.Count == 0 ? PlotHeight : PlotHeight / Data.Count;
+    private double HorizontalBarHeight => Math.Max(10, HorizontalSlotHeight * 0.54);
+
+    protected override void OnInitialized()
+    {
+        ThemeProvider.OnChange += HandleThemeChanged;
+    }
+
+    private void HandleThemeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private string BuildStyle()
+    {
+        var semantic = ActiveTheme.Semantic;
+        var primitive = ActiveTheme.Primitive;
+
+        return $"--corona-chart-surface:{semantic.SurfaceBackgroundAlt};--corona-chart-border:{semantic.BorderDefault};--corona-chart-text:{semantic.TextPrimary};--corona-chart-muted:{semantic.TextSecondary};--corona-chart-grid:{primitive.Colors.Gray200};--corona-chart-height:{Height};font-family:{semantic.FontFamilyDefault};";
+    }
+
+    private string ResolvePointColor(CoronaChartDataPoint point, int index)
+    {
+        return string.IsNullOrWhiteSpace(point.Color)
+            ? Palette[index % Palette.Length]
+            : point.Color;
+    }
+
+    private RenderFragment RenderPointMarkers(string className) => builder =>
+    {
+        var sequence = 0;
+        for (var index = 0; index < Data.Count; index++)
+        {
+            var point = Data[index];
+            builder.OpenElement(sequence++, "circle");
+            builder.AddAttribute(sequence++, "class", className);
+            builder.AddAttribute(sequence++, "cx", GetLineX(index).ToString("0.##", CultureInfo.InvariantCulture));
+            builder.AddAttribute(sequence++, "cy", GetY(point.Value).ToString("0.##", CultureInfo.InvariantCulture));
+            builder.AddAttribute(sequence++, "r", Type == CoronaChartType.Scatter ? "5" : "4");
+            builder.AddAttribute(sequence++, "fill", ResolvePointColor(point, index));
+            builder.CloseElement();
+        }
+    };
+
+    private double GetBarX(int index)
+    {
+        return ChartLeft + (SlotWidth * index) + ((SlotWidth - BarWidth) / 2);
+    }
+
+    private double GetHorizontalBarY(int index)
+    {
+        return ChartTop + (HorizontalSlotHeight * index) + ((HorizontalSlotHeight - HorizontalBarHeight) / 2);
+    }
+
+    private double GetHorizontalBarWidth(double value)
+    {
+        var normalized = Math.Clamp(Math.Max(0, value) / MaxValue, 0, 1);
+        return PlotWidth * normalized;
+    }
+
+    private double GetHorizontalLabelY(int index)
+    {
+        return GetHorizontalBarY(index) + (HorizontalBarHeight / 2) + 3;
+    }
+
+    private double GetLabelX(int index)
+    {
+        return Type is CoronaChartType.Line or CoronaChartType.Area or CoronaChartType.Scatter
+            ? GetLineX(index)
+            : GetBarX(index) + (BarWidth / 2);
+    }
+
+    private double GetLineX(int index)
+    {
+        return Data.Count <= 1
+            ? ChartLeft + PlotWidth / 2
+            : ChartLeft + (PlotWidth / (Data.Count - 1) * index);
+    }
+
+    private double GetY(double value)
+    {
+        var normalized = Math.Clamp(Math.Max(0, value) / MaxValue, 0, 1);
+        return ChartBottom - (PlotHeight * normalized);
+    }
+
+    private double GetBarHeight(double value)
+    {
+        return ChartBottom - GetY(value);
+    }
+
+    private string BuildLinePoints()
+    {
+        return string.Join(" ", Data.Select((point, index) =>
+            $"{GetLineX(index).ToString("0.##", CultureInfo.InvariantCulture)},{GetY(point.Value).ToString("0.##", CultureInfo.InvariantCulture)}"));
+    }
+
+    private string BuildAreaPath()
+    {
+        if (Data.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        var points = string.Join(" L ", Data.Select((point, index) =>
+            $"{GetLineX(index).ToString("0.##", CultureInfo.InvariantCulture)} {GetY(point.Value).ToString("0.##", CultureInfo.InvariantCulture)}"));
+
+        return $"M {GetLineX(0).ToString("0.##", CultureInfo.InvariantCulture)} {ChartBottom.ToString("0.##", CultureInfo.InvariantCulture)} L {points} L {GetLineX(Data.Count - 1).ToString("0.##", CultureInfo.InvariantCulture)} {ChartBottom.ToString("0.##", CultureInfo.InvariantCulture)} Z";
+    }
+
+    private string BuildPieSlicePath(int index)
+    {
+        if (TotalValue <= 0)
+        {
+            return string.Empty;
+        }
+
+        var startPercent = GetRadialOffset(index);
+        var slicePercent = GetRadialPercent(Data[index]);
+
+        if (slicePercent >= 99.999)
+        {
+            return $"M {(RadialCenterX - PieRadius).ToString("0.##", CultureInfo.InvariantCulture)} {RadialCenterY.ToString("0.##", CultureInfo.InvariantCulture)} a {PieRadius.ToString("0.##", CultureInfo.InvariantCulture)} {PieRadius.ToString("0.##", CultureInfo.InvariantCulture)} 0 1 0 {(PieRadius * 2).ToString("0.##", CultureInfo.InvariantCulture)} 0 a {PieRadius.ToString("0.##", CultureInfo.InvariantCulture)} {PieRadius.ToString("0.##", CultureInfo.InvariantCulture)} 0 1 0 {(-(PieRadius * 2)).ToString("0.##", CultureInfo.InvariantCulture)} 0";
+        }
+
+        var endPercent = startPercent + slicePercent;
+        var start = PercentToPoint(startPercent, PieRadius);
+        var end = PercentToPoint(endPercent, PieRadius);
+        var largeArc = endPercent - startPercent > 50 ? 1 : 0;
+
+        return $"M {RadialCenterX.ToString("0.##", CultureInfo.InvariantCulture)} {RadialCenterY.ToString("0.##", CultureInfo.InvariantCulture)} L {start.X.ToString("0.##", CultureInfo.InvariantCulture)} {start.Y.ToString("0.##", CultureInfo.InvariantCulture)} A {PieRadius.ToString("0.##", CultureInfo.InvariantCulture)} {PieRadius.ToString("0.##", CultureInfo.InvariantCulture)} 0 {largeArc} 1 {end.X.ToString("0.##", CultureInfo.InvariantCulture)} {end.Y.ToString("0.##", CultureInfo.InvariantCulture)} Z";
+    }
+
+    private (double X, double Y) PercentToPoint(double percent, double radius)
+    {
+        var angle = ((percent / 100d) * 360d - 90d) * Math.PI / 180d;
+        return (
+            RadialCenterX + radius * Math.Cos(angle),
+            RadialCenterY + radius * Math.Sin(angle));
+    }
+
+    private double GetRadialPercent(CoronaChartDataPoint point)
+    {
+        return TotalValue <= 0 ? 0 : Math.Max(0, point.Value) / TotalValue * 100;
+    }
+
+    private double GetRadialOffset(int index)
+    {
+        var offset = 0d;
+        for (var i = 0; i < index; i++)
+        {
+            offset += GetRadialPercent(Data[i]);
+        }
+
+        return offset;
+    }
+
+    private string FormatValue(double value)
+    {
+        return ValueFormatter?.Invoke(value) ?? value.ToString("0.##", CultureInfo.InvariantCulture);
+    }
+
+    private static MarkupString RenderSvgText(string className, double x, double y, string textAnchor, string content)
+    {
+        var markup =
+            $"<text class=\"{WebUtility.HtmlEncode(className)}\" x=\"{x.ToString("0.##", CultureInfo.InvariantCulture)}\" y=\"{y.ToString("0.##", CultureInfo.InvariantCulture)}\" text-anchor=\"{WebUtility.HtmlEncode(textAnchor)}\">{WebUtility.HtmlEncode(content)}</text>";
+
+        return new MarkupString(markup);
+    }
+
+    public void Dispose()
+    {
+        ThemeProvider.OnChange -= HandleThemeChanged;
+    }
+}
