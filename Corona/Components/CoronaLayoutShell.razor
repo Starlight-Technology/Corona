@@ -85,6 +85,8 @@
 
     private IReadOnlyList<CoronaNavItem> ResolvedDrawerItems => DrawerItens ?? NavItems ?? [];
 
+    private IReadOnlyList<CoronaNavItem> ResolvedHeaderItems => HeaderActions ?? ResolvedDrawerItems;
+
     private Task OnDrawerChanged(bool open)
     {
         DrawerOpen = open;
