@@ -64,3 +64,21 @@
         pointer-events: auto;
     }
 }
+
+/* Small-screen actions: visible on small screens, hidden on larger viewports */
+.corona-page-header__actions-small {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+@media (min-width: 500px) {
+    .corona-page-header__actions-small {
+        display: none;
+    }
+}
+
+.corona-page-header__action-item {
+    display: inline-flex;
+    align-items: center;
+}
