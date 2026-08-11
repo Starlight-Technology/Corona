@@ -15,7 +15,7 @@ public sealed class CoronaSwipeNavigatorTests : ComponentTestContext
     {
         var navigation = RegisterNavigation("http://localhost/income?month=05");
 
-        var cut = RenderComponent<CoronaSwipeNavigator>(p => p
+        var cut = Render<CoronaSwipeNavigator>(p => p
             .Add(x => x.Items, MenuItems())
             .Add(x => x.SwipeThresholdPx, 50)
             .AddChildContent("Page content"));
@@ -30,7 +30,7 @@ public sealed class CoronaSwipeNavigatorTests : ComponentTestContext
     {
         var navigation = RegisterNavigation("http://localhost/outcome");
 
-        var cut = RenderComponent<CoronaSwipeNavigator>(p => p
+        var cut = Render<CoronaSwipeNavigator>(p => p
             .Add(x => x.Items, MenuItems())
             .Add(x => x.SwipeThresholdPx, 50)
             .AddChildContent("Page content"));
@@ -45,7 +45,7 @@ public sealed class CoronaSwipeNavigatorTests : ComponentTestContext
     {
         var navigation = RegisterNavigation("http://localhost/income");
 
-        var cut = RenderComponent<CoronaSwipeNavigator>(p => p
+        var cut = Render<CoronaSwipeNavigator>(p => p
             .Add(x => x.Items, MenuItems())
             .Add(x => x.SwipeThresholdPx, 50)
             .AddChildContent("Page content"));
@@ -62,7 +62,7 @@ public sealed class CoronaSwipeNavigatorTests : ComponentTestContext
     {
         var navigation = RegisterNavigation("http://localhost/income");
 
-        var cut = RenderComponent<CoronaSwipeNavigator>(p => p
+        var cut = Render<CoronaSwipeNavigator>(p => p
             .Add(x => x.Items, MenuItems())
             .Add(x => x.SwipeThresholdPx, 50)
             .AddChildContent("Page content"));
