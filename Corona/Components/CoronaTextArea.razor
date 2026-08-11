@@ -1,0 +1,105 @@
+@namespace Corona.Components
+@implements IDisposable
+@using Corona.Theming
+@inject CoronaThemeProvider ThemeProvider
+
+<div class="corona-textarea @Class" style="@BuildStyle()">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label class="corona-textarea__label" for="@_id">@Label</label>
+    }
+
+    <textarea id="@_id"
+              class="corona-textarea__field"
+              rows="@Rows"
+              maxlength="@MaxLength"
+              placeholder="@Placeholder"
+              disabled="@Disabled"
+              value="@Value"
+              @oninput="HandleInputAsync"></textarea>
+
+    @if (!string.IsNullOrWhiteSpace(HelperText))
+    {
+        <span class="corona-textarea__helper">@HelperText</span>
+    }
+</div>
+
+@code {
+    [CascadingParameter] public CoronaTheme? Theme { get; set; }
+
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public string? HelperText { get; set; }
+    [Parameter] public int Rows { get; set; } = 3;
+    [Parameter] public int? MaxLength { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public string? Width { get; set; }
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private readonly string _id = $"corona-textarea-{Guid.NewGuid():N}";
+    private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
+
+    protected override void OnInitialized()
+    {
+        ThemeProvider.OnChange += HandleThemeChanged;
+    }
+
+    private void HandleThemeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private Task HandleInputAsync(ChangeEventArgs args)
+    {
+        Value = args.Value?.ToString();
+        return ValueChanged.InvokeAsync(Value);
+    }
+
+    private string BuildStyle()
+    {
+        var semantic = ActiveTheme.Semantic;
+        return $"width:{Width ?? "100%"};font-family:{semantic.FontFamilyDefault};--corona-textarea-border:{semantic.BorderDefault};--corona-textarea-text:{semantic.TextPrimary};--corona-textarea-muted:{semantic.TextSecondary};--corona-textarea-focus:{semantic.FocusOutline};";
+    }
+
+    public void Dispose()
+    {
+        ThemeProvider.OnChange -= HandleThemeChanged;
+    }
+}
+
+<style>
+    .corona-textarea {
+        display: grid;
+        gap: .35rem;
+    }
+
+    .corona-textarea__label {
+        color: var(--corona-textarea-muted);
+        font-size: .9rem;
+        font-weight: 700;
+    }
+
+    .corona-textarea__field {
+        width: 100%;
+        border: 1px solid var(--corona-textarea-border);
+        border-radius: 8px;
+        color: var(--corona-textarea-text);
+        background: rgba(255, 255, 255, .56);
+        padding: .7rem .85rem;
+        resize: vertical;
+        outline: none;
+    }
+
+    .corona-textarea__field:focus {
+        border-color: var(--corona-textarea-focus);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--corona-textarea-focus) 28%, transparent);
+    }
+
+    .corona-textarea__helper {
+        color: var(--corona-textarea-muted);
+        font-size: .8rem;
+    }
+</style>

@@ -1,0 +1,82 @@
+@namespace Corona.Components
+@using Corona.Components.Enums
+
+@if (!string.IsNullOrWhiteSpace(Href))
+{
+    <a class="@BuildClass()"
+       style="@BuildStyle()"
+       href="@Href"
+       title="@Label"
+       aria-label="@Label">
+        <CoronaIcon Name="@Icon" Color="#fff" Size="lg" />
+    </a>
+}
+else
+{
+    <button type="button"
+            class="@BuildClass()"
+            style="@BuildStyle()"
+            title="@Label"
+            aria-label="@Label"
+            @onclick="OnClick">
+        <CoronaIcon Name="@Icon" Color="#fff" Size="lg" />
+    </button>
+}
+
+@code {
+    [Parameter, EditorRequired] public string Icon { get; set; } = "plus";
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? Href { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public CoronaColorSemantic Color { get; set; } = CoronaColorSemantic.Primary;
+    [Parameter] public CoronaFloatingActionPlacement Placement { get; set; } = CoronaFloatingActionPlacement.Inline;
+    [Parameter] public string? BackgroundColor { get; set; }
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private string BuildClass() =>
+        $"corona-floating-action corona-floating-action--{Placement.ToString().ToLowerInvariant()} {Class}";
+
+    private string BuildStyle()
+    {
+        var background = BackgroundColor ?? Color switch
+        {
+            CoronaColorSemantic.Success => "#2D6A4F",
+            CoronaColorSemantic.Danger => "#BC4749",
+            CoronaColorSemantic.Warning => "#B45309",
+            CoronaColorSemantic.Neutral => "#4B5563",
+            _ => "#1B2620"
+        };
+
+        return $"background:{background};";
+    }
+}
+
+<style>
+    .corona-floating-action {
+        display: inline-grid;
+        place-items: center;
+        width: 58px;
+        height: 58px;
+        border: 0;
+        border-radius: 50%;
+        color: #fff;
+        text-decoration: none;
+        box-shadow: 0 14px 24px rgba(27, 38, 32, .22);
+        cursor: pointer;
+        z-index: 30;
+    }
+
+    .corona-floating-action--bottomleft,
+    .corona-floating-action--bottomright {
+        position: fixed;
+        bottom: max(1.1rem, env(safe-area-inset-bottom));
+    }
+
+    .corona-floating-action--bottomleft {
+        left: max(1rem, env(safe-area-inset-left));
+    }
+
+    .corona-floating-action--bottomright {
+        right: max(1rem, env(safe-area-inset-right));
+    }
+</style>

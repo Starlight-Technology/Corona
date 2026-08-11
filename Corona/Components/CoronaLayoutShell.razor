@@ -3,13 +3,13 @@
 @using Corona.Theming
 @inherits LayoutComponentBase
 @inject CoronaThemeProvider ThemeProvider
+@inject NavigationManager Nav
 
 <CoronaPageHeader Title="@HeaderTitle"
                   ShowMenuButton="@ShowMenuButton"
                   OnMenuClick="ToggleDrawer"
-                  Actions="@HeaderActions" 
-                  MenuIcon="@MenuIcon"
-                  />
+                  Actions="@HeaderActions"
+                  MenuIcon="@MenuIcon" />
 
 <div class="docs-shell @(DrawerOpen ? "drawer-open" : string.Empty)">
     <CoronaDrawer Open="DrawerOpen"
@@ -23,19 +23,32 @@
             <CoronaNavMenu Items="ResolvedDrawerItems" />
         </CoronaStack>
     </CoronaDrawer>
-
-    <main class="docs-content" style="overflow:auto">
-        @ChildContent
-    </main>
+    @if (Swipe)
+    {
+        <CoronaSwipeNavigator Items="DrawerItens">
+            <main class="docs-content" style="overflow:auto" @key="Nav.Uri">
+                @ChildContent
+            </main>
+        </CoronaSwipeNavigator>
+    }
+    else
+    {
+        <main class="docs-content" style="overflow:auto" @key="Nav.Uri">
+            @ChildContent
+        </main>
+    }
 </div>
 
 @code {
 
     [Parameter]
-    public RenderFragment? ChildContent { get; set; }
+    public bool Swipe { get; set; } = false;
 
-    [Parameter] 
-    public IReadOnlyList<CoronaNavItem>? DrawerItens { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<CoronaNavItem> DrawerItens { get; set; }
 
     [Parameter]
     public IReadOnlyList<CoronaNavItem>? NavItems { get; set; }

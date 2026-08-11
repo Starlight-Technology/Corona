@@ -1,0 +1,207 @@
+@namespace Corona.Components
+@using Corona.Components.Models
+@using System.Globalization
+
+<CoronaCard Class="@BuildClass()"
+            Hoverable="false"
+            ContentJustify="Corona.Components.Enums.CoronaFlexAlign.Start"
+            ContentAlignItems="Corona.Components.Enums.CoronaItemsAlign.Stretch"
+            Margin="0">
+    <div class="corona-donut-card__layout">
+        <button type="button"
+                class="corona-donut-card__chart"
+                style="@BuildDonutStyle()"
+                aria-label="@AriaLabel"
+                @onclick="ClearSelectionAsync">
+            <span>@FocusPercent.ToString("N0", CultureInfo.CurrentCulture)%</span>
+            <strong>@FormatValue(FocusValue)</strong>
+        </button>
+
+        @if (ShowLegend)
+        {
+            <div class="corona-donut-card__legend">
+                @if (!string.IsNullOrWhiteSpace(LegendTitle))
+                {
+                    <span class="corona-donut-card__legend-title">@LegendTitle</span>
+                }
+
+                @foreach (var slice in Slices)
+                {
+                    var share = Total <= 0 ? 0 : (slice.Value / Total) * 100;
+
+                    <button type="button"
+                            class="corona-donut-card__legend-row @(SelectedLabel == slice.Label ? "is-active" : string.Empty)"
+                            @onclick="@(() => SelectSliceAsync(slice.Label))">
+                        <span class="corona-donut-card__swatch" style="background:@slice.Color"></span>
+                        <span>@slice.Label</span>
+                        <strong>@share.ToString("N0", CultureInfo.CurrentCulture)%</strong>
+                        <small>@FormatValue(slice.Value)</small>
+                    </button>
+                }
+            </div>
+        }
+    </div>
+</CoronaCard>
+
+@code {
+    [Parameter] public IReadOnlyList<CoronaDonutSlice> Slices { get; set; } = [];
+    [Parameter] public string? SelectedLabel { get; set; }
+    [Parameter] public EventCallback<string?> SelectedLabelChanged { get; set; }
+    [Parameter] public string LegendTitle { get; set; } = "Categoria";
+    [Parameter] public string AriaLabel { get; set; } = "Gráfico de rosca";
+    [Parameter] public Func<decimal, string>? ValueFormatter { get; set; }
+    [Parameter] public bool ShowLegend { get; set; } = true;
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private decimal Total => Slices.Sum(x => x.Value);
+
+    private CoronaDonutSlice? FocusSlice =>
+        string.IsNullOrWhiteSpace(SelectedLabel)
+            ? Slices.OrderByDescending(x => x.Value).FirstOrDefault()
+            : Slices.FirstOrDefault(x => x.Label == SelectedLabel);
+
+    private decimal FocusValue => FocusSlice?.Value ?? Total;
+
+    private decimal FocusPercent => Total <= 0 ? 0 : (FocusValue / Total) * 100;
+
+    private string FormatValue(decimal value) =>
+        ValueFormatter?.Invoke(value) ?? value.ToString("N2", CultureInfo.CurrentCulture);
+
+    private string BuildClass() =>
+        string.IsNullOrWhiteSpace(Class)
+            ? "corona-donut-card"
+            : $"corona-donut-card {Class}";
+
+    private string BuildDonutStyle()
+    {
+        if (Total <= 0)
+        {
+            return "background: conic-gradient(#D8D0C2 0% 100%);";
+        }
+
+        var cursor = 0m;
+        var stops = new List<string>();
+
+        foreach (var slice in Slices.Where(x => x.Value > 0))
+        {
+            var start = cursor;
+            cursor += (slice.Value / Total) * 100;
+            stops.Add($"{slice.Color} {start.ToString("0.##", CultureInfo.InvariantCulture)}% {cursor.ToString("0.##", CultureInfo.InvariantCulture)}%");
+        }
+
+        return $"background: conic-gradient({string.Join(", ", stops)});";
+    }
+
+    private Task SelectSliceAsync(string label)
+    {
+        SelectedLabel = label;
+        return SelectedLabelChanged.InvokeAsync(label);
+    }
+
+    private Task ClearSelectionAsync()
+    {
+        SelectedLabel = null;
+        return SelectedLabelChanged.InvokeAsync(null);
+    }
+}
+
+<style>
+    .corona-donut-card__layout {
+        display: grid;
+        grid-template-columns: minmax(220px, .85fr) minmax(0, 1fr);
+        gap: 1rem;
+        align-items: center;
+        width: 100%;
+    }
+
+    .corona-donut-card__chart {
+        position: relative;
+        width: min(100%, 280px);
+        aspect-ratio: 1;
+        justify-self: center;
+        border: 0;
+        border-radius: 50%;
+        box-shadow: inset 0 -10px 0 rgba(0, 0, 0, .12), 0 10px 22px rgba(27, 38, 32, .14);
+    }
+
+    .corona-donut-card__chart::after {
+        content: "";
+        position: absolute;
+        inset: 27%;
+        border-radius: 50%;
+        background: #F4F1EA;
+        box-shadow: inset 0 0 0 1px rgba(27, 38, 32, .08);
+    }
+
+    .corona-donut-card__chart span,
+    .corona-donut-card__chart strong {
+        position: relative;
+        z-index: 1;
+        display: block;
+        color: #1B2620;
+    }
+
+    .corona-donut-card__chart span {
+        font-size: clamp(2.2rem, 8vw, 3.7rem);
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .corona-donut-card__chart strong {
+        margin-top: .3rem;
+        font-size: 1.12rem;
+    }
+
+    .corona-donut-card__legend {
+        display: grid;
+        gap: .3rem;
+    }
+
+    .corona-donut-card__legend-title {
+        color: rgba(45, 55, 72, .72);
+        font-weight: 700;
+    }
+
+    .corona-donut-card__legend-row {
+        display: grid;
+        grid-template-columns: 16px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: .6rem;
+        min-height: 58px;
+        border: 0;
+        border-bottom: 1px solid rgba(166, 138, 100, .22);
+        color: #2D3748;
+        background: transparent;
+        text-align: left;
+    }
+
+    .corona-donut-card__legend-row.is-active {
+        color: #1B2620;
+        background: rgba(166, 138, 100, .12);
+    }
+
+    .corona-donut-card__swatch {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+    }
+
+    .corona-donut-card__legend-row strong {
+        font-size: 1.25rem;
+    }
+
+    .corona-donut-card__legend-row small {
+        grid-column: 2 / 4;
+        color: rgba(45, 55, 72, .72);
+    }
+
+    @@media (max-width: 760px) {
+        .corona-donut-card__layout {
+            grid-template-columns: 1fr;
+        }
+
+        .corona-donut-card__chart {
+            width: min(100%, 250px);
+        }
+    }
+</style>
