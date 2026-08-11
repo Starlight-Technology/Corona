@@ -1,6 +1,14 @@
 <Solution>
+  <Folder Name="/.github/" />
+  <Folder Name="/.github/Workflows/">
+    <File Path=".github/workflows/ci.yml" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="AGENTS.md" />
+    <File Path="README.md" />
+  </Folder>
   <Project Path="BlazorApp/BlazorApp.Client/BlazorApp.Client.csproj" Id="ffdd18b8-e482-4215-be21-6d0e763cd177" />
   <Project Path="BlazorApp/BlazorApp/BlazorApp.csproj" Id="09718a24-d8fd-4ebf-8dcf-3087d532420a" />
-  <Project Path="Corona/Corona.csproj" />
   <Project Path="Corona.Tests/Corona.Tests.csproj" />
+  <Project Path="Corona/Corona.csproj" />
 </Solution>
