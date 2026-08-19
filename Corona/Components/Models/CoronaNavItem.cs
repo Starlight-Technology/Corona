@@ -15,4 +15,8 @@ public sealed class CoronaNavItem
     public bool Expanded { get; set; }
 
     public RenderFragment? Content { get; init; }
+
+    // When true the item should only be displayed on small screens (e.g. in-header small area)
+    // and hidden on large screens. Defaults to false.
+    public bool ShowOnlyOnSmall { get; init; } = false;
 }

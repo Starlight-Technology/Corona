@@ -3,7 +3,11 @@
 @using Corona.Components.Enums
 @using Corona.Theming
 @using Microsoft.AspNetCore.Components.Web
+@using Corona.Components.Models
+@using System.Linq
 @inject CoronaThemeProvider ThemeProvider
+@inject NavigationManager NavigationManager
+
 
 <header class="corona-page-header @Class" style="@BuildStyle(); overflow: hidden;">
     <div class="corona-page-header__start">
@@ -21,10 +25,16 @@
         <h1 class="corona-page-header__title">@Title</h1>
     </div>
 
-    @if (Actions is not null)
+    @if (NavItems is not null)
     {
         <div class="corona-page-header__actions">
-            @Actions
+            @foreach (var item in NavItems)
+            {     
+
+                <CoronaButton OnClick="()=>NavigationManager.NavigateTo(item.Url ?? string.Empty)">
+                    @item.Text
+                </CoronaButton>
+            }
         </div>
     }
 </header>
@@ -38,7 +48,7 @@
     [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
 
     [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
-    [Parameter] public RenderFragment? Actions { get; set; }
+    [Parameter] public IReadOnlyList<CoronaNavItem>? NavItems { get; set; }
     [Parameter] public bool ShowMenuButton { get; set; }
     [Parameter] public EventCallback OnMenuClick { get; set; }
 
@@ -50,7 +60,8 @@
     [Parameter] public string? Shadow { get; set; }
     [Parameter] public CoronaHeaderDensity Density { get; set; } = CoronaHeaderDensity.Comfortable;
     [Parameter] public string Class { get; set; } = string.Empty;
-
+    [Parameter]
+    public bool DrawerOpen { get; set; } = true;
     private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
 
 
@@ -100,6 +111,18 @@
     public void Dispose()
     {
         ThemeProvider.OnChange -= HandleThemeChanged;
+    }
+
+    private Task OnDrawerChanged(bool open)
+    {
+        DrawerOpen = open;
+        return Task.CompletedTask;
+    }
+
+    private Task ToggleDrawer()
+    {
+        DrawerOpen = !DrawerOpen;
+        return Task.CompletedTask;
     }
 
 }

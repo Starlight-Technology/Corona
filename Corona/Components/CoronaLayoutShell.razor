@@ -5,11 +5,7 @@
 @inject CoronaThemeProvider ThemeProvider
 @inject NavigationManager Nav
 
-<CoronaPageHeader Title="@HeaderTitle"
-                  ShowMenuButton="@ShowMenuButton"
-                  OnMenuClick="ToggleDrawer"
-                  Actions="@HeaderActions"
-                  MenuIcon="@MenuIcon" />
+
 
 <div class="docs-shell @(DrawerOpen ? "drawer-open" : string.Empty)">
     <CoronaDrawer Open="DrawerOpen"
@@ -19,7 +15,7 @@
                   Class="@DrawerClass">
         <CoronaStack Spacing="1rem" FullWidth="true">
             <p class="docs-drawer-title">@DrawerTitle</p>
-            
+
             <CoronaNavMenu Items="ResolvedDrawerItems" />
         </CoronaStack>
     </CoronaDrawer>
@@ -65,11 +61,8 @@
     [Parameter]
     public bool DrawerOverlay { get; set; }
 
-    /// <summary>
-    /// I recommend to use CoronaStack with buttons or text, but can be any rander fragment.
-    /// </summary>
     [Parameter]
-    public RenderFragment? HeaderActions { get; set; }
+    public IReadOnlyList<CoronaNavItem>? HeaderNavItems { get; set; }
 
     [Parameter]
     public bool ShowMenuButton { get; set; }
@@ -85,10 +78,12 @@
 
     private IReadOnlyList<CoronaNavItem> ResolvedDrawerItems => DrawerItens ?? NavItems ?? [];
 
+    private IReadOnlyList<CoronaNavItem> ResolvedHeaderItems => HeaderNavItems ?? ResolvedDrawerItems;
+
     private Task OnDrawerChanged(bool open)
     {
         DrawerOpen = open;
-        return Task.CompletedTask;
+        return DrawerOpenChanged.InvokeAsync(open);
     }
 
     private Task ToggleDrawer()
