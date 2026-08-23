@@ -1,0 +1,10 @@
+.corona-interactive-drawer__title {
+    margin: 0;
+    font-size: .9rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    opacity: .7;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

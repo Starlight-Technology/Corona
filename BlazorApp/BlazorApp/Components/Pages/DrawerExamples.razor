@@ -1,0 +1,70 @@
+﻿@page "/components/drawer"
+@using Corona.Components.Enums
+@using Corona.Components.Models
+@using Corona.Components.Navigation
+@inject CoronaDrawerStateService DrawerState
+
+<PageTitle>Drawer + Header Island | Corona Docs</PageTitle>
+
+<CoronaContainer MaxWidth="CoronaContainerMaxWidth.Xl">
+    <CoronaStack Spacing="1.5rem" FullWidth="true">
+        <section>
+            <h1>Drawer + Header Island</h1>
+            <p class="docs-page-description">
+                CoronaHeaderIsland e CoronaInteractiveDrawer formam um layout interativo: o botao de menu abre
+                a gaveta, o overlay ou uma navegacao fecham, tudo sincronizado pelo CoronaDrawerStateService.
+            </p>
+        </section>
+        <section>
+            <h2>Live example</h2>
+            <div class="demo-layout">
+                <CoronaHeaderIsland Title="Corona Docs" NavItems="@DemoItems" />
+                <div class="demo-layout__body">
+                    <CoronaInteractiveDrawer Title="Navegacao" NavItems="@DemoItems" />
+                    <main class="demo-layout__content">
+                        <CoronaStack Spacing="1rem" FullWidth="true">
+                            <h3>Conteudo</h3>
+                            <p>Use o botao de menu no header para abrir a gaveta ou o botao abaixo.</p>
+                            <CoronaButton OnClick="OpenDrawer">Abrir drawer</CoronaButton>
+                        </CoronaStack>
+                    </main>
+                </div>
+            </div>
+        </section>
+        <section>
+            <h2>Uso em um MainLayout</h2>
+            <CodeSnippet Code='@("<CoronaHeaderIsland Title=\"App\" NavItems=\"@MenuItens\" /><div class=\"app-shell\"><CoronaInteractiveDrawer NavItems=\"@MenuItens\" /><main>@Body</main></div>")' />
+            <p>Registre os servicos compartilhados com <code>AddCoronaLayout()</code> e renderize os componentes interativamente (Server, WebAssembly ou Auto).</p>
+        </section>
+        <section><h2>Parâmetros</h2><ParameterTable Parameters="_parameters" /></section>
+    </CoronaStack>
+</CoronaContainer>
+
+@code {
+    private IReadOnlyList<CoronaNavItem> DemoItems { get; } =
+    [
+        new() { Text = "Overview", Url = "/" },
+        new() { Text = "Button", Url = "/components/button" },
+        new() { Text = "Stack", Url = "/components/stack" },
+        new() { Text = "Tabs", Url = "/components/tabs" }
+    ];
+
+    private Task OpenDrawer()
+    {
+        DrawerState.SetOpen(true);
+        return Task.CompletedTask;
+    }
+
+    private readonly IReadOnlyList<ParameterTable.ParameterDefinition> _parameters =
+    [
+        new("CoronaHeaderIsland Title", "string", "required", "Titulo exibido no header."),
+        new("CoronaHeaderIsland NavItems", "IReadOnlyList<CoronaNavItem>", "null", "Itens de navegacao do header."),
+        new("CoronaHeaderIsland ShowMenuButton", "bool", "true", "Mostra o botao de menu."),
+        new("CoronaHeaderIsland OnMenuClick", "EventCallback", "-", "Callback custom; quando definido, substitui o toggle do drawer."),
+        new("CoronaInteractiveDrawer Title", "string", "null", "Titulo da gaveta (usado sem ChildContent)."),
+        new("CoronaInteractiveDrawer NavItems", "IReadOnlyList<CoronaNavItem>", "null", "Menu da gaveta (usado sem ChildContent)."),
+        new("CoronaInteractiveDrawer ChildContent", "RenderFragment", "null", "Conteudo custom; sobrescreve Title + NavItems."),
+        new("CoronaInteractiveDrawer Width", "string", "300px", "Largura da gaveta."),
+        new("CoronaInteractiveDrawer CloseOnNavigation", "bool", "true", "Fecha a gaveta ao navegar.")
+    ];
+}

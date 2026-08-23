@@ -1,0 +1,25 @@
+.demo-layout {
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+    border-radius: .75rem;
+    overflow: hidden;
+}
+
+.demo-layout__body {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 0 minmax(0, 1fr);
+    transition: grid-template-columns .25s ease;
+    overflow: hidden;
+}
+
+.demo-layout__body:has(:global(.corona-drawer.is-open)) {
+    grid-template-columns: 300px minmax(0, 1fr);
+}
+
+.demo-layout__content {
+    overflow: auto;
+    padding: 1rem;
+}

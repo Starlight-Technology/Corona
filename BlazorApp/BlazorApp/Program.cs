@@ -1,5 +1,6 @@
 using BlazorApp.Client.Pages;
 using BlazorApp.Components;
+using Corona.Components.Navigation;
 using Corona.Theming;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddCoronaTheming(CoronaThemes.Light());
+builder.Services.AddCoronaLayout();
 
 var app = builder.Build();
 

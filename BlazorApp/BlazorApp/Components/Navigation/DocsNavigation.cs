@@ -25,7 +25,8 @@ public static class DocsNavigation
             Children =
             [
                 new CoronaNavItem { Text = "Container", Url = "/components/container" },
-                new CoronaNavItem { Text = "Stack", Url = "/components/stack" }
+                new CoronaNavItem { Text = "Stack", Url = "/components/stack" },
+                new CoronaNavItem { Text = "Drawer + Header Island", Url = "/components/drawer" }
             ]
         },
         new CoronaNavItem

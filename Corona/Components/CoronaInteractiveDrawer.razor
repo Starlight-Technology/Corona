@@ -1,0 +1,102 @@
+@namespace Corona.Components
+@implements IDisposable
+@using Corona.Components.Enums
+@using Corona.Components.Models
+@using Corona.Components.Navigation
+@using Corona.Theming
+@using Microsoft.AspNetCore.Components.Routing
+@inject CoronaDrawerStateService DrawerState
+@inject NavigationManager NavigationManager
+
+<CoronaDrawer Open="@_isOpen"
+              OpenChanged="HandleOpenChanged"
+              Overlay="@Overlay"
+              Width="@Width"
+              Position="@Position"
+              BackgroundColor="@BackgroundColor"
+              Color="@Color"
+              Shadow="@Shadow"
+              Padding="@Padding"
+              OverlayColor="@OverlayColor"
+              Class="@Class"
+              TopOffset="@TopOffset"
+              ThemeOverrides="@ThemeOverrides">
+
+    @if (ChildContent is not null)
+    {
+        @ChildContent
+    }
+    else if (NavItems is { Count: > 0 })
+    {
+        <CoronaStack Spacing="1rem" FullWidth="true">
+            @if (!string.IsNullOrWhiteSpace(Title))
+            {
+                <p class="corona-interactive-drawer__title">@Title</p>
+            }
+
+            <CoronaNavMenu Items="@NavItems" />
+        </CoronaStack>
+    }
+    else if (!string.IsNullOrWhiteSpace(Title))
+    {
+        <p class="corona-interactive-drawer__title">@Title</p>
+    }
+</CoronaDrawer>
+
+@code {
+    /// <summary>
+    /// Optional component-level theme overrides.
+    /// </summary>
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public IReadOnlyList<CoronaNavItem>? NavItems { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Width { get; set; } = "300px";
+    [Parameter] public bool Overlay { get; set; } = true;
+    [Parameter] public CoronaDrawerPosition Position { get; set; } = CoronaDrawerPosition.Left;
+    [Parameter] public string? BackgroundColor { get; set; }
+    [Parameter] public string? Color { get; set; }
+    [Parameter] public string? Shadow { get; set; }
+    [Parameter] public string Padding { get; set; } = "1rem";
+    [Parameter] public string OverlayColor { get; set; } = "rgba(15, 23, 42, .42)";
+    [Parameter] public string Class { get; set; } = string.Empty;
+    [Parameter] public string TopOffset { get; set; } = "0px";
+    [Parameter] public bool CloseOnNavigation { get; set; } = true;
+
+    private bool _isOpen;
+
+    protected override void OnInitialized()
+    {
+        _isOpen = DrawerState.IsOpen;
+        DrawerState.OnChange += HandleStateChanged;
+        NavigationManager.LocationChanged += HandleLocationChanged;
+    }
+
+    private void HandleStateChanged()
+    {
+        _isOpen = DrawerState.IsOpen;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private Task HandleOpenChanged(bool open)
+    {
+        DrawerState.SetOpen(open);
+        return Task.CompletedTask;
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (CloseOnNavigation)
+        {
+            DrawerState.SetOpen(false);
+        }
+    }
+
+    public void Dispose()
+    {
+        DrawerState.OnChange -= HandleStateChanged;
+        NavigationManager.LocationChanged -= HandleLocationChanged;
+    }
+
+}

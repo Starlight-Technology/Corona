@@ -1,0 +1,52 @@
+@namespace Corona.Components
+@using Corona.Components.Enums
+@using Corona.Components.Models
+@using Corona.Components.Navigation
+@using Corona.Theming
+@inject CoronaDrawerStateService DrawerState
+
+<CoronaPageHeader Title="@Title"
+                  ShowMenuButton="@ShowMenuButton"
+                  NavItems="@NavItems"
+                  MenuIcon="@MenuIcon"
+                  Height="@Height"
+                  BackgroundColor="@BackgroundColor"
+                  Color="@Color"
+                  Padding="@Padding"
+                  Shadow="@Shadow"
+                  Density="@Density"
+                  Class="@Class"
+                  ThemeOverrides="@ThemeOverrides"
+                  OnMenuClick="HandleMenuClick" />
+
+@code {
+    /// <summary>
+    /// Optional component-level theme overrides.
+    /// </summary>
+    [Parameter] public CoronaThemeOverrides? ThemeOverrides { get; set; }
+
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter] public IReadOnlyList<CoronaNavItem>? NavItems { get; set; }
+    [Parameter] public bool ShowMenuButton { get; set; } = true;
+    [Parameter] public EventCallback OnMenuClick { get; set; }
+    [Parameter] public string? MenuIcon { get; set; } = "\u2630";
+    [Parameter] public string? Height { get; set; }
+    [Parameter] public string? BackgroundColor { get; set; }
+    [Parameter] public string? Color { get; set; }
+    [Parameter] public string? Padding { get; set; }
+    [Parameter] public string? Shadow { get; set; }
+    [Parameter] public CoronaHeaderDensity Density { get; set; } = CoronaHeaderDensity.Comfortable;
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private Task HandleMenuClick()
+    {
+        if (OnMenuClick.HasDelegate)
+        {
+            return OnMenuClick.InvokeAsync();
+        }
+
+        DrawerState.Toggle();
+        return Task.CompletedTask;
+    }
+
+}

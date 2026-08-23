@@ -33,6 +33,7 @@ Não há lint/analyzer configurado além dos padrões do SDK; rode `dotnet build
   - `CoronaThemes.Light()` / `CoronaThemes.Dark()` para temas built-in.
   - `CoronaThemeProvider` — serviço singleton de runtime com evento `OnChange`; registrado via `AddCoronaTheming()`.
 - `Corona/Components/` — componentes; cada um com `*.razor` e, quando necessário, estilos scoped `*.razor.css`.
+- `AddCoronaLayout()` (em `Corona/Components/Navigation/`) registra o `CoronaDrawerStateService` (Scoped), usado pelos componentes interativos de layout (`CoronaHeaderIsland` e `CoronaInteractiveDrawer`) para sincronizar drawer e header; registrar também no client WASM.
 
 ## Convenções
 
