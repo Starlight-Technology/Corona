@@ -94,9 +94,8 @@ No Program.cs do seu projeto Blazor (WASM ou Server) registre os serviços de th
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>('#app');
 
-// Registra o sistema de theming e serviços Corona
+// Registra o sistema de theming
 builder.Services.AddCoronaTheming(CoronaThemes.Light());
-builder.Services.AddCoronaComponents();
 
 await builder.Build().RunAsync();
 ```
@@ -109,7 +108,6 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 builder.Services.AddCoronaTheming(CoronaThemes.Light());
-builder.Services.AddCoronaComponents();
 
 var app = builder.Build();
 // ...
