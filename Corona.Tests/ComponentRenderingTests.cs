@@ -40,6 +40,24 @@ public sealed class ComponentRenderingTests : ComponentTestContext
     }
 
     [Fact]
+    public void CoronaButton_RendersTitleAndKeepsClickWhenStoppingPropagation()
+    {
+        var clicked = false;
+        var cut = Render<CoronaButton>(p => p
+            .Add(x => x.Title, "Save changes")
+            .Add(x => x.StopPropagation, true)
+            .Add(x => x.OnClick, EventCallback.Factory.Create(this, () => clicked = true))
+            .AddChildContent("Save"));
+
+        var button = cut.Find("button");
+        Assert.Equal("Save changes", button.GetAttribute("title"));
+
+        button.Click();
+
+        Assert.True(clicked);
+    }
+
+    [Fact]
     public void CoronaLoading_Dots_RendersStatusAndLabel()
     {
         var cut = Render<CoronaLoading>(p => p
@@ -258,6 +276,18 @@ public sealed class ComponentRenderingTests : ComponentTestContext
         var badge = cut.Find(".corona-badge");
         Assert.Contains("is-dot", badge.ClassList);
         Assert.Contains("corona-badge--bottomleft", badge.ClassList);
+    }
+
+    [Fact]
+    public void CoronaBadge_RendersTitle()
+    {
+        var cut = Render<CoronaBadge>(p => p
+            .Add(x => x.Title, "Git ativo")
+            .Add(x => x.Content, "Git"));
+
+        Assert.Equal(
+            "Git ativo",
+            cut.Find(".corona-badge-anchor").GetAttribute("title"));
     }
 
     [Fact]

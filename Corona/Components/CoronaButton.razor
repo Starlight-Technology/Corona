@@ -8,9 +8,11 @@
 <button type="button"
         class="corona-button corona-button--@VariantClass corona-button--@SizeClass @(FullWidth ? "is-full-width" : string.Empty) @Class"
         style="@BuildStyle()"
+        title="@Title"
         disabled="@IsDisabled"
         aria-busy="@Loading"
         @onclick="HandleClickAsync"
+        @onclick:stopPropagation="StopPropagation"
         @onkeydown="HandleKeyDownAsync">
     @if (Loading)
     {
@@ -45,6 +47,8 @@
     [Parameter] public CoronaIconStyle IconStyle { get; set; } = CoronaIconStyle.Solid;
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public bool StopPropagation { get; set; }
 
     [Parameter] public string? Width { get; set; }
     [Parameter] public string? Height { get; set; }

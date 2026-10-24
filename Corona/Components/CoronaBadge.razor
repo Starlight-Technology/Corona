@@ -4,7 +4,8 @@
 @using Corona.Theming
 @inject CoronaThemeProvider ThemeProvider
 
-<span class="corona-badge-anchor @(Overlap ? "is-overlap" : string.Empty) @Class">
+<span class="corona-badge-anchor @(Overlap ? "is-overlap" : string.Empty) @Class"
+      title="@Title">
     @if (ChildContent is not null)
     {
         @ChildContent
@@ -33,6 +34,7 @@
     [Parameter] public bool Overlap { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public string Class { get; set; } = string.Empty;
+    [Parameter] public string? Title { get; set; }
 
     private CoronaTheme ActiveTheme => (Theme ?? ThemeProvider.CurrentTheme).WithOverrides(ThemeOverrides);
 
