@@ -57,4 +57,14 @@ public static class CoronaIcons
     public const string Slack = "slack";
     public const string Cog = "cog";
     public const string Cogs = "cogs";
+    public const string Copy = "copy";
+    public const string Expand = "expand";
+    public const string Collapse = "compress";
+    public const string Play = "play";
+    public const string ArrowClockwise = "arrow-rotate-right";
+    public const string Sparkles = "sparkles";
+    public const string Branch = "code-branch";
+    public const string ExternalLink = "arrow-up-right-from-square";
+    public const string Eye = "eye";
+    public const string GitBranch = "code-branch";
 }
